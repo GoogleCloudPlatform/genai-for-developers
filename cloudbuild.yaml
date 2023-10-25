@@ -31,6 +31,10 @@ steps:
   # Docker push to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push',  'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/dai-cli:${SHORT_SHA}']
+
+  # Docker push to Google Artifact Registry (latest)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push',  'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/dai-cli']
   
 # Store images in Google Artifact Registry 
 images:
