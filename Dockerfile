@@ -25,7 +25,7 @@ RUN pip install google-cloud-discoveryengine
 
 RUN pip freeze > requirements.txt
 
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
 
 RUN python hello.py
 
