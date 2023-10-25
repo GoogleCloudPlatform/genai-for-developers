@@ -19,16 +19,32 @@ FROM python:3.11-slim
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
 
+RUN python3 -m venv venv
+RUN . venv/bin/activate
+RUN deactivate
+
+RUN pip install streamlit
+RUN pip install google-cloud-aiplatform
+RUN pip install google-cloud-discoveryengine
+
+RUN pip freeze > requirements.txt
+
+RUN pip install requirements.txt
+
+RUN python hello.py
+
+RUN pip install --editable .
+
 # Copy local code to the container image.
-ENV APP_HOME /app
-WORKDIR $APP_HOME
-COPY . ./
+# ENV APP_HOME /app
+# WORKDIR $APP_HOME
+# COPY . ./
 
-# Install production dependencies.
-RUN pip install Flask gunicorn
+# # Install production dependencies.
+# RUN pip install Flask gunicorn
 
-# Run the web service on container startup. Here we use the gunicorn
-# webserver, with one worker process and 8 threads.
-# For environments with multiple CPU cores, increase the number of workers
-# to be equal to the cores available.
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
+# # Run the web service on container startup. Here we use the gunicorn
+# # webserver, with one worker process and 8 threads.
+# # For environments with multiple CPU cores, increase the number of workers
+# # to be equal to the cores available.
+# CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
