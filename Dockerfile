@@ -19,7 +19,10 @@ FROM python:3.11-slim
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
 
-RUN ls
+# Copy local code to the container image.
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY . ./
 
 RUN pip install streamlit
 RUN pip install google-cloud-aiplatform
@@ -31,10 +34,6 @@ RUN pip install -r requirements.txt
 
 RUN pip install --editable .
 
-# Copy local code to the container image.
-# ENV APP_HOME /app
-# WORKDIR $APP_HOME
-# COPY . ./
 
 # # Install production dependencies.
 # RUN pip install Flask gunicorn
