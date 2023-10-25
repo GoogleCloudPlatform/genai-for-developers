@@ -19,6 +19,8 @@ FROM python:3.11-slim
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
 
+RUN ls
+
 RUN pip install streamlit
 RUN pip install google-cloud-aiplatform
 RUN pip install google-cloud-discoveryengine
