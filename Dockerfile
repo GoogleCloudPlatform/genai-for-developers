@@ -19,10 +19,6 @@ FROM python:3.11-slim
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
 
-RUN python3 -m venv venv
-RUN . venv/bin/activate
-RUN deactivate
-
 RUN pip install streamlit
 RUN pip install google-cloud-aiplatform
 RUN pip install google-cloud-discoveryengine
