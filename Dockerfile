@@ -27,7 +27,7 @@ RUN pip freeze > requirements.txt
 
 RUN pip install -r requirements.txt
 
-RUN python hello.py
+RUN python gcloudai/hello.py
 
 RUN pip install --editable .
 
