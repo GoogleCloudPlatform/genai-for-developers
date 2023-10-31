@@ -13,15 +13,6 @@
 # limitations under the License.
 
 steps:
-  # Install dependencies
-  # - name: python
-  #   entrypoint: pip
-  #   args: ["install", "-r", "requirements.txt", "--user"]
-
-  # Run unit tests
-  # - name: python
-  #   entrypoint: python
-  #   args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml"] 
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
