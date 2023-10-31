@@ -11,14 +11,13 @@ deactivate
 
 Dependencies
 ```sh
-
-pip install streamlit
+pip install click
 pip install google-cloud-aiplatform
 pip install google-cloud-discoveryengine
 
 pip freeze > requirements.txt
 
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Run the app from source
@@ -43,5 +42,6 @@ python setup.py develop -u
 
 Use the app
 ```sh
+cd gcloudai
 python gcloudai/hello.py query
 ```

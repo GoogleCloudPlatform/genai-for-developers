@@ -1,7 +1,7 @@
 import click
 import os
 from vertexai.language_models import CodeChatModel, ChatModel
-from commands import cmd
+from gcloudai.commands import cmd
 
 def send_message(prompt):
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
