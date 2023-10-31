@@ -52,6 +52,10 @@ Docker
 docker build -t dai-img .
 docker run -it dai-img
 dai ai
+
+# mount local gcloud config for adc
+docker run -it -v ~/.config:/root/.config dai-img
+dai query
 ```
 
 Cloud Build

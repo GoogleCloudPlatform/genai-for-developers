@@ -1,9 +1,11 @@
 import click
 import os
 from vertexai.language_models import CodeChatModel, ChatModel
+from google.cloud import aiplatform
 from gcloudai.commands import cmd
 
 def send_message(prompt):
+    aiplatform.init(project='crg-scratch-022423',)
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
     code_chat_model = ChatModel.from_pretrained("chat-bison")
