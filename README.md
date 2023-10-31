@@ -53,3 +53,14 @@ docker build -t dai-img .
 docker run -it dai-img
 dai ai
 ```
+
+Cloud Build
+```sh
+gcloud artifacts repositories create app-image-repo \
+    --repository-format=docker \
+    --location=us-central1
+
+gcloud builds submit . \
+    --substitutions=_ARTIFACT_REGISTRY_REPO=app-image-repo
+
+```
