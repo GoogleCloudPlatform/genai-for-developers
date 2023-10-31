@@ -45,3 +45,11 @@ Use the app
 cd gcloudai
 python gcloudai/hello.py query
 ```
+
+Docker
+
+```sh
+docker build -t dai-img .
+docker run -it dai-img
+dai ai
+```

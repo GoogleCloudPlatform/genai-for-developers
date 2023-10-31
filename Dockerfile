@@ -24,12 +24,6 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-RUN pip install streamlit
-RUN pip install google-cloud-aiplatform
-RUN pip install google-cloud-discoveryengine
-
-RUN pip freeze > requirements.txt
-
 RUN pip install -r requirements.txt
 
 RUN pip install --editable .
