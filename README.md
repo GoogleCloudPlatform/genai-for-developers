@@ -59,13 +59,25 @@ docker run -it -v ~/.config:/root/.config dai-img
 dai query
 ```
 
+# Swtich account/project account
+
+```sh
+gcloud auth login
+gcloud auth list
+gcloud config set account {account}
+
+gcloud config set project genai-cicd
+```
+
 Cloud Build
 ```sh
 gcloud artifacts repositories create app-image-repo \
     --repository-format=docker \
     --location=us-central1
 
-gcloud builds submit . \
+gcloud builds submit . --config=cloudbuild-local.yaml \
     --substitutions=_ARTIFACT_REGISTRY_REPO=app-image-repo
+
+gcloud builds submit . --config=cloudbuild-pipeline-test.yaml 
 
 ```
