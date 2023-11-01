@@ -1,4 +1,4 @@
-# dai
+# Developer AI Command Line Interface
 
 ## Getting started
 To start, setup your virtualenv, install requirements and run the sample command
