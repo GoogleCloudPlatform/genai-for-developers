@@ -44,6 +44,7 @@ Use the app
 ```sh
 cd gcloudai
 python gcloudai/hello.py query
+python gcloudai/hello.py readfiles
 ```
 
 Docker

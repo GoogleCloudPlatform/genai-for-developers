@@ -1,5 +1,6 @@
 import click
 import os
+from util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 from google.cloud import aiplatform
 from gcloudai.commands import cmd
@@ -46,9 +47,20 @@ def query():
     response = send_message("Provide a summary of this source code")
     click.echo(response)
 
+@click.command()
+def readfiles():
+    click.echo('reading files')
+    text_files_contents = get_text_files_contents(".")
+    for full_path, contents in text_files_contents.items():
+        click.echo(f"File: {full_path}")
+        click.echo("--------------------")
+        click.echo(contents)
+        click.echo("\n====================\n")
+
 cli.add_command(ai)
 cli.add_command(query)
 cli.add_command(cmd.hello)
+cli.add_command(readfiles)
 
 
 if __name__ == '__main__':
