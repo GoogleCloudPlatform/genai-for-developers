@@ -41,7 +41,7 @@ def ai():
 @click.option('-c', '--context', required=False, type=str, default="")
 def query(query, context):
     click.echo('Calling Chat with Context')
-    response = send_message_with_context(query, context)
+    response = send_message(query, context)
     click.echo(response)
 
 cli.add_command(ai)
