@@ -36,7 +36,16 @@ dai ai
 
 ## Testing integrations with Cloud Build Jobs
 
+<<<<<<< HEAD
+Use the app
+```sh
+cd gcloudai
+python gcloudai/hello.py query
+python gcloudai/hello.py readfiles
+```
+=======
 There are multiple cloudbuild files included in order to facilitate local builds and tests as well as automated CICD for this repo.
+>>>>>>> main
 
 First ensure you have an AR repo created to hold your image
 
