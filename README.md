@@ -1,83 +1,100 @@
 # dai
 
-
-Venv Commands
+## Getting started
+To start, setup your virtualenv, install requirements and run the sample command
 
 ```sh
 python3 -m venv venv
 . venv/bin/activate
-deactivate
+pip install -r requirements.txt
+python cli.py  ai 
+python cli.py  query 
 ```
 
-Dependencies
+## Adding dependencies
+
+When adding new dependencies, first install the package with pip as seen in the following example. Then be sure to freeze the dependencies in the requirements.txt file
+
 ```sh
 pip install click
-pip install google-cloud-aiplatform
-pip install google-cloud-discoveryengine
-
 pip freeze > requirements.txt
-
-pip install -r requirements.txt
 ```
 
-Run the app from source
-```sh
-python hello.py
-```
+## Working with an installable app
 
-Install the app
+To create an installable CLI from the source, use setuptools to create the dai cli with the following command
+
 ```sh
 pip install --editable .
 ```
 
-Run the installed app
+Once installed you can use the CLI with its short name `dai` as follows
+
 ```sh
 dai ai
 ```
 
-Uninstall the app
-```sh
-python setup.py develop -u
-```
+## Testing integrations with Cloud Build Jobs
 
+<<<<<<< HEAD
 Use the app
 ```sh
 cd gcloudai
 python gcloudai/hello.py query
 python gcloudai/hello.py readfiles
 ```
+=======
+There are multiple cloudbuild files included in order to facilitate local builds and tests as well as automated CICD for this repo.
+>>>>>>> main
 
-Docker
+First ensure you have an AR repo created to hold your image
 
-```sh
-docker build -t dai-img .
-docker run -it dai-img
-dai ai
-
-# mount local gcloud config for adc
-docker run -it -v ~/.config:/root/.config dai-img
-dai query
-```
-
-# Swtich account/project account
-
-```sh
-gcloud auth login
-gcloud auth list
-gcloud config set account {account}
-
-gcloud config set project genai-cicd
-```
-
-Cloud Build
 ```sh
 gcloud artifacts repositories create app-image-repo \
     --repository-format=docker \
     --location=us-central1
+```
 
+To trigger a build in Cloud Build manually run the following command. This build file does not use the ${SHORT_SHA} tag as seen in the standard webhook model
+
+```sh
 gcloud builds submit . --config=cloudbuild-local.yaml \
     --substitutions=_ARTIFACT_REGISTRY_REPO=app-image-repo
+```
 
+To test the CLI as it would be used in a typcal pipeline, run the following command.
+
+```sh
 gcloud builds submit . --config=cloudbuild-pipeline-test.yaml 
 
+```
+
+## Containerized CLI
+
+To work with the CLI inside the container, build it locally and run it with your .config folder mounted to provide access to gcloud credentials
+
+```sh
+docker build -t dai-img .
+docker run -it -v ~/.config:/root/.config dai-img
+```
+
+Once in the container run commands against the cli
+
+```sh
+dai ai
+dai query
+```
+
+## Cleanup
+
+To uninstall the package run the following command
+
+```sh
+python setup.py develop -u
+```
+
+To deactivate virtual env run the following command
+
+```sh
+deactivate
 ```

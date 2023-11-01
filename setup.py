@@ -9,7 +9,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'dai = gcloudai.hello:cli',
+            'dai = cli:cli',
         ],
     },
 )
