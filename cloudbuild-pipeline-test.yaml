@@ -1,0 +1,6 @@
+steps:
+- id: duet-ai-run
+  name: us-central1-docker.pkg.dev/genai-cicd/app-image-repo/dai-cli
+  script: |
+    #!/usr/bin/env bash
+    dai query
