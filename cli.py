@@ -39,9 +39,9 @@ def ai():
 @click.command()
 @click.option('-q', '--query', required=False, type=str, default="Provide a summary of this source code")
 @click.option('-c', '--context', required=False, type=str, default="")
-def query(q, c):
+def query(query, context):
     click.echo('Calling Chat with Context')
-    response = send_message_with_context(q, c)
+    response = send_message_with_context(query, context)
     click.echo(response)
 
 cli.add_command(ai)
