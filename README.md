@@ -73,7 +73,7 @@ Once in the container run commands against the cli
 
 ```sh
 dai ai
-dai query
+dai echo
 ```
 
 ## Cleanup
