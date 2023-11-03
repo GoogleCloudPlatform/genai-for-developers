@@ -1,5 +1,5 @@
 import click
 
 @click.command()
-def hello():
-    click.echo('Hello World')
+def sub():
+    click.echo('Executed sub command')

@@ -1,4 +1,4 @@
-# dai
+# Developer AI Command Line Interface
 
 ## Getting started
 To start, setup your virtualenv, install requirements and run the sample command
@@ -7,10 +7,19 @@ To start, setup your virtualenv, install requirements and run the sample command
 python3 -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
-python cli.py  ai 
-python cli.py  query 
+
 ```
 
+Sample commands
+```sh
+python cli.py  echo
+python cli.py  sub 
+
+python cli.py prompt with_context  
+python cli.py prompt with_msg
+python cli.py prompt with_msg_streaming
+
+```
 ## Adding dependencies
 
 When adding new dependencies, first install the package with pip as seen in the following example. Then be sure to freeze the dependencies in the requirements.txt file
@@ -36,16 +45,7 @@ dai ai
 
 ## Testing integrations with Cloud Build Jobs
 
-<<<<<<< HEAD
-Use the app
-```sh
-cd gcloudai
-python gcloudai/hello.py query
-python gcloudai/hello.py readfiles
-```
-=======
 There are multiple cloudbuild files included in order to facilitate local builds and tests as well as automated CICD for this repo.
->>>>>>> main
 
 First ensure you have an AR repo created to hold your image
 
@@ -82,7 +82,7 @@ Once in the container run commands against the cli
 
 ```sh
 dai ai
-dai query
+dai echo
 ```
 
 ## Cleanup
