@@ -11,7 +11,7 @@ from vertexai.language_models import CodeChatModel, ChatModel
 def with_context(qry, context):
     click.echo("Prompt with context")
     code_chat_model = ChatModel.from_pretrained("chat-bison")
-    context=""
+    #context=""
 
 
     chat = code_chat_model.start_chat(context=context)
