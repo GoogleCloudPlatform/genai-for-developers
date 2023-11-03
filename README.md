@@ -7,10 +7,19 @@ To start, setup your virtualenv, install requirements and run the sample command
 python3 -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
-python cli.py  ai 
-python cli.py  query 
+
 ```
 
+Sample commands
+```sh
+python cli.py  echo
+python cli.py  sub 
+
+python cli.py prompt with_context  
+python cli.py prompt with_msg
+python cli.py prompt with_msg_streaming
+
+```
 ## Adding dependencies
 
 When adding new dependencies, first install the package with pip as seen in the following example. Then be sure to freeze the dependencies in the requirements.txt file
