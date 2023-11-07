@@ -36,3 +36,31 @@ def get_text_files_contents(path, ignore=None):
                     with open(full_path, 'r', encoding='ascii') as f:
                         result[full_path] = f.read()
     return result
+
+
+def format_files_as_string(input):
+    def process_file(file_path):
+        if not is_ascii_text(file_path):
+            return f"file: {file_path}\nsource: [Binary File - Not ASCII Text]\n"
+
+        with open(file_path, 'r') as file:
+            content = file.read()
+            return f"file: {file_path}\nsource:\n{content}\n"
+
+    formatted_string = ""
+    
+    if isinstance(input, str):
+        if os.path.isdir(input):
+            for root, dirs, files in os.walk(input):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    formatted_string += process_file(file_path)
+        else:
+            formatted_string += process_file(input)
+    elif isinstance(input, list):
+        for file_path in input:
+            formatted_string += process_file(file_path)
+    else:
+        raise ValueError("Input must be a directory path, a single file path, or a list of file paths")
+
+    return formatted_string

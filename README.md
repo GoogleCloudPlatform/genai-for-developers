@@ -19,6 +19,10 @@ python cli.py prompt with_context
 python cli.py prompt with_msg
 python cli.py prompt with_msg_streaming
 
+python cli.py review efficiency -c testfiles/ef
+python cli.py review performance -c testfiles/perf
+python cli.py review secrets -c testfiles/sec
+
 ```
 ## Adding dependencies
 
