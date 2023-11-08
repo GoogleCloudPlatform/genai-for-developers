@@ -41,11 +41,13 @@ def get_text_files_contents(path, ignore=None):
 def format_files_as_string(input):
     def process_file(file_path):
         if not is_ascii_text(file_path):
-            return f"file: {file_path}\nsource: [Binary File - Not ASCII Text]\n"
+            # return f"file: {file_path}\nsource: [Binary File - Not ASCII Text]\n"
+            pass
 
         with open(file_path, 'r') as file:
             content = file.read()
-            return f"file: {file_path}\nsource:\n{content}\n"
+            # return f"file: {file_path}\nsource:\n{content}\n"
+            return f"{content}\n\n"
 
     formatted_string = ""
     

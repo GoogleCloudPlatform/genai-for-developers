@@ -8,8 +8,8 @@ from vertexai.preview.language_models import CodeGenerationModel
 
 
 parameters = {
-    "max_output_tokens": 1024,
-    "temperature": 0.
+    "max_output_tokens": 2048,
+    "temperature": 0.2
 }
 
 @click.command(name='efficiency')
@@ -18,20 +18,26 @@ def efficiency(context):
     click.echo('efficiency')
     
     prompt='''
+CODE:
+{}
+
+INSTRUCTIONS:
 You are an experienced programmer and a software architect doing a code review.
 Find inefficiencies in the code. For each issue provide detailed explanation.
 Output the findings with class and method names followed by the found issues.
 
-Code: {}
+
 '''
     context=format_files_as_string(context)
 
    
-    model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    # model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    model = CodeGenerationModel.from_pretrained("code-bison")
     response = model.predict(
         prefix = prompt.format(context),
         **parameters
     )
+    click.echo(f"Request to Model: {prompt.format(context)}")
     click.echo(f"Response from Model: {response.text}")
     
 
@@ -45,15 +51,20 @@ def performance(context):
     click.echo('performance')
 
     prompt='''
+CODE: 
+{}
+
+INSTRUCTIONS:
 You are an experienced programmer and an application performance tuning expert doing a code review.
 Find performance issues in the code. For each issue provide detailed explanation.
 Output the findings with class and method names followed by the found issues.
 
-Code: {}
+
 '''
     context=format_files_as_string(context)
 
-    model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    #model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    model = CodeGenerationModel.from_pretrained("code-bison")
     response = model.predict(
         prefix = prompt.format(context),
         **parameters
@@ -71,20 +82,22 @@ def secrets(context):
     click.echo('secrets')
 
     prompt='''
-You are an experienced SIEM programmer doing a code review. Looking for policy violations in the code.
-You MUST find policy violations using examples below. For each issue provide a detailed explanation.
-Policy violation examples:
-- hardcoded passwords and secret key
-- using IPs addresses vs DNS
-- using http or ftp vs https or ftps protocols. example http:// or ftp://
+CODE: 
+{}
+
+INSTRUCTIONS:
+You are an experienced security programmer doing a code review. Looking for security violations in the code.
+You MUST find security violations using examples below. For each issue provide a detailed explanation.
+
 
 Output the findings with class and method names followed by the found issues.
+If no issues are found, output "No issues found".
 
-Code: {}
 '''
     context=format_files_as_string(context)
 
-    model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    # model = CodeGenerationModel.from_pretrained("code-bison-32k")
+    model = CodeGenerationModel.from_pretrained("code-bison")
     response = model.predict(
         prefix = prompt.format(context),
         **parameters
