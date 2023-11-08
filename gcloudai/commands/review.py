@@ -52,9 +52,11 @@ CODE:
 '''
     qry='''
 INSTRUCTIONS:
-You are an experienced programmer and an application performance tuning expert doing a code review.
-Find performance issues in the code. For each issue provide detailed explanation.
+You are an experienced staff level programmer and an application performance tuning expert doing a code review.
+Find language specific performance issues in the code, such string concatenation, as memory leaks, race conditions, and deadlocks. 
+For each issue provide detailed explanation.
 Output the findings with class and method names followed by the found issues.
+
 '''
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
