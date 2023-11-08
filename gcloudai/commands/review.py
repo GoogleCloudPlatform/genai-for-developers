@@ -78,10 +78,18 @@ CODE:
 {}
 '''
     qry='''
+    INSTRUCTIONS:
 You are an experienced security programmer doing a code review. Looking for security violations in the code.
-You MUST find security violations using examples below. For each issue provide a detailed explanation.
-
+Examine the attached code for potential security issues. Issues to look for, look for instances of insecure cookies, insecure session management, any instances of SQL injection, cross-site scripting (XSS), 
+or other vulnerabilities that could compromise user data or allow unauthorized access to the application. 
+Provide a comprehensive report of any identified vulnerabilities and recommend appropriate remediation measures.
 Output the findings with class and method names followed by the found issues.
+
+Example of the output format to use:
+Class name.Method name: 
+Issue: 
+Recommendation: 
+
 If no issues are found, output "No issues found".
 '''
     # Load files as text into source variable
