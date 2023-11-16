@@ -1,5 +1,5 @@
 import click
-from gcloudai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages
+from gcloudai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches
 from vertexai.language_models import CodeChatModel
 
 
@@ -9,12 +9,12 @@ parameters = {
 }
 
 @click.command(name="notes_user")
-@click.option('-s', '--start_sha', required=True, type=str)
-@click.option('-e', '--end_sha', required=True, type=str)
-def notes_user(start_sha, end_sha):
+@click.option('-s', '--branch_a', required=True, type=str)
+@click.option('-e', '--branch_b', required=True, type=str)
+def notes_user(branch_a, branch_b):
     click.echo('notes_user')
-    click.echo(f'start_sha={start_sha}')
-    click.echo(f'end_sha={end_sha}')
+    click.echo(f'branch_a={branch_a}')
+    click.echo(f'branch_b={branch_b}')
     
     source='''
     GIT DIFFS:
@@ -46,6 +46,14 @@ def notes_user(start_sha, end_sha):
     Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section and write user friendly explanation about what has changed in several sentences with bullet points.
     Only write explanation for new code changes and not for othe code in the FINAL CODE section.
     '''
+
+    list = list_commits_for_branches(branch_a, branch_b)
+
+    start_sha = list[len(list)-1]
+    end_sha = list[0]
+    
+    click.echo(f'start_sha={start_sha}')
+    click.echo(f'end_sha={end_sha}')
 
     files = list_files(start_sha, end_sha)
     changes = list_changes(start_sha, end_sha)

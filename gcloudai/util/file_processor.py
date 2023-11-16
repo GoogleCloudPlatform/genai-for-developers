@@ -90,3 +90,15 @@ def list_commit_messages(start_sha, end_sha):
     command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}..{end_sha}"]
     output = subprocess.check_output(command, text=True)
     return output
+
+def list_commits_for_branches(branch_a, branch_b):
+    command = ["git", "log", "--pretty=format:%h", f"{branch_a}..{branch_b}"]
+    output = subprocess.check_output(command).decode("utf-8").strip()
+
+    commits = output.splitlines()
+
+    list = []
+    for commit in commits:
+        list.append(commit)
+    
+    return list
