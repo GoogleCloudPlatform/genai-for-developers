@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 def is_ascii_text(file_path):
     """
@@ -66,3 +67,26 @@ def format_files_as_string(input):
         raise ValueError("Input must be a directory path, a single file path, or a list of file paths")
 
     return formatted_string
+
+def list_files(start_sha, end_sha):
+    command = ["git", "diff", "--name-only", start_sha, end_sha]
+
+    output = subprocess.check_output(command).decode("utf-8").strip()
+
+    filenames = output.splitlines()
+
+    files = []
+    for filename in filenames:
+        files.append(filename)
+    
+    return files
+
+def list_changes(start_sha, end_sha):
+    command = ["git", "diff", start_sha, end_sha]
+    output = subprocess.check_output(command, text=True)
+    return output
+
+def list_commit_messages(start_sha, end_sha):
+    command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}..{end_sha}"]
+    output = subprocess.check_output(command, text=True)
+    return output

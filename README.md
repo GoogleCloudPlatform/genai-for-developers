@@ -23,6 +23,8 @@ python cli.py review efficiency -c testfiles/ef
 python cli.py review performance -c testfiles/perf
 python cli.py review secrets -c testfiles/sec
 
+python3 cli.py release notes_user -s "start_sha" -e "end_sha" 
+
 dai review secrets -c /Users/crgrant/dev/ai-dev-productivity/dai-cymbal-demo/src/ledger/balancereader/src/main/java/anthos/samples/bankofanthos/balancereader
 
 ```
