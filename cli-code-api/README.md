@@ -32,9 +32,9 @@ python devai.py prompt with_context
 python devai.py prompt with_msg
 python devai.py prompt with_msg_streaming
 
-python devai.py review code -c ../testfiles/ef
-python devai.py review performance -c ../testfiles/perf
-python devai.py review security -c ../testfiles/sec
+python devai.py review code -c ../sample-app/src/main/java
+python devai.py review performance -c ../sample-app/src/main/java
+python devai.py review security -c ../sample-app/src/main/java
 
 python devai.py release notes_user_tag -t "v5.0.0"
 python devai.py release notes_user -s "main" -e "feature-branch-name" 
