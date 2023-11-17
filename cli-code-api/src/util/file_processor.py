@@ -61,8 +61,8 @@ def format_files_as_string(input):
 
         with open(file_path, 'r') as file:
             content = file.read()
-            # return f"file: {file_path}\nsource:\n{content}\n"
-            return f"{content}\n\n"
+            return f"\nfile: {file_path}\ncontent:\n{content}\n"
+            # return f"{content}\n\n"
 
     formatted_string = ""
     
@@ -71,19 +71,22 @@ def format_files_as_string(input):
             for root, dirs, files in os.walk(input):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    formatted_string += process_file(file_path)
+                    if os.path.exists(file_path):
+                        formatted_string += process_file(file_path)
         else:
-            formatted_string += process_file(input)
+            if os.path.exists(file_path):
+                formatted_string += process_file(input)
     elif isinstance(input, list):
         for file_path in input:
-            formatted_string += process_file(file_path)
+            if os.path.exists(file_path):
+                formatted_string += process_file(file_path)
     else:
         raise ValueError("Input must be a directory path, a single file path, or a list of file paths")
 
     return formatted_string
 
 def list_files(start_sha, end_sha):
-    command = ["git", "diff", "--name-only", start_sha, end_sha]
+    command = ["git", "diff", "--name-only", f"{start_sha}^", end_sha]
 
     output = subprocess.check_output(command).decode("utf-8").strip()
 
@@ -96,17 +99,17 @@ def list_files(start_sha, end_sha):
     return files
 
 def list_changes(start_sha, end_sha):
-    command = ["git", "diff", start_sha, end_sha]
+    command = ["git", "diff", f"{start_sha}^", end_sha]
     output = subprocess.check_output(command, text=True)
     return output
 
 def list_commit_messages(start_sha, end_sha):
-    command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}..{end_sha}"]
+    command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}^..{end_sha}"]
     output = subprocess.check_output(command, text=True)
     return output
 
 def list_commits_for_branches(branch_a, branch_b):
-    command = ["git", "log", "--pretty=format:%h", f"{branch_a}..{branch_b}"]
+    command = ["git", "log", "--pretty=format:%h", f"{branch_a}^..{branch_b}"]
     output = subprocess.check_output(command).decode("utf-8").strip()
 
     commits = output.splitlines()
@@ -115,4 +118,27 @@ def list_commits_for_branches(branch_a, branch_b):
     for commit in commits:
         list.append(commit)
     
+    return list
+
+def list_commits_for_tags(branch_a, branch_b):
+    command = ["git", "log", "--pretty=format:%h", f"{branch_a}^..{branch_b}"]
+    output = subprocess.check_output(command).decode("utf-8").strip()
+
+    commits = output.splitlines()
+
+    list = []
+    for commit in commits:
+        list.append(commit)
+    
+    return list
+
+def list_tags():
+    command = ["git", "tag"]
+    output = subprocess.check_output(command).decode("utf-8").strip()
+    tags = output.splitlines()
+
+    list = []
+    for tag in tags:
+        list.append(tag)
+
     return list
