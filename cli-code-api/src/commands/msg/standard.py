@@ -1,12 +1,26 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import click
 
-from gcloudai.util.file_processor import get_text_files_contents
+from util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 
-@click.command(name='with_msg_streaming')
+@click.command(name='with_msg')
 @click.option('-q', '--query', required=False, type=str, default="Provide a summary of this source code")
 @click.option('-p', '--path', required=False, type=str, default=".")
-def with_msg_streaming(query, path):
+def with_msg(query, path):
    
     # code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
@@ -26,11 +40,8 @@ Here are the files
     chat = code_chat_model.start_chat()
 
 
-    responses = chat.send_message_streaming(initial_prompt)
-    rtrn=""
-    for response in responses:
-        rtrn+=response.text
-    click.echo(rtrn)
+    response = chat.send_message(initial_prompt)
+    click.echo(response)
 
 
     ignored = ["__pycache__", "venv", ".vscode", ".git"]
@@ -45,28 +56,22 @@ Here are the files
 # {contents}
 # =================
 # ''')
-        rr=chat.send_message_streaming(f'''
+        rr=chat.send_message(f'''
 File: {full_path}
 -----------------
 {contents}
 =================
 ''')
-        #click.echo(responses.response)
-        # rtrn=""
-        # for response in rr:
-        #     rtrn+=response.text
-        # click.echo(rtrn)
+        click.echo(response)
+        
         
 
-    chat.send_message_streaming("===LOAD COMPLETE===")
-    #click.echo(response.response)
+    response = chat.send_message("===LOAD COMPLETE===")
+    click.echo(response)
 
-    # response = chat.send_message(query)
-    # click.echo(response)
+    response = chat.send_message(query)
+    click.echo(response)
 
     click.echo(query)
-    responses = chat.send_message_streaming(query)
-    rtrn=""
-    for response in responses:
-        rtrn+=response.text
-    click.echo(rtrn)
+    response = chat.send_message(query)
+    click.echo(response)
