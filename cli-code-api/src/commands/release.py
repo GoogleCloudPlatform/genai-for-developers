@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import click
-from util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches
+from util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches, list_tags
 from vertexai.language_models import CodeChatModel
 
 
@@ -62,8 +62,91 @@ def notes_user(branch_a, branch_b):
     '''
 
     list = list_commits_for_branches(branch_a, branch_b)
-
     start_sha = list[len(list)-1]
+    print(len(list))
+    if len(list) == 1:
+        start_sha = branch_a
+        print("set start_sha to branch")
+
+    
+    end_sha = list[0]
+    
+    click.echo(f'start_sha={start_sha}')
+    click.echo(f'end_sha={end_sha}')
+
+    files = list_files(start_sha, end_sha)
+    
+    changes = list_changes(start_sha, end_sha)
+    commit_messages = list_commit_messages(start_sha, end_sha)
+
+    prompt_context = source.format(changes, commit_messages, format_files_as_string(files))
+
+    code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
+    chat = code_chat_model.start_chat(context=prompt_context, **parameters)
+    response = chat.send_message(qry)
+
+    click.echo(f"Response from Model: {response.text}")
+
+@click.command(name="notes_user_tag")
+@click.option('-t', '--tag', required=True, type=str)
+def notes_user_tag(tag):
+    click.echo('notes_user_tag')
+    click.echo(f'tag={tag}')
+
+    source='''
+    GIT DIFFS:
+    {}
+   
+    GIT COMMITS:
+    {}
+    
+    FINAL CODE:
+    {}
+
+    '''
+    qry='''
+    INSTRUCTIONS:
+    You are senior software engineer doing a code review. You are given following information:
+    GIT DIFFS - new code changes
+    GIT COMMITS - developer written comments for new code changes
+    FINAL CODE - final version of the source code
+
+    GIT DIFFS show lines added and removed with + and - indicators.
+    Here's an example:
+    This line shows that code was changed/removed from the FINAL CODE section:
+    -            return f"file: source: [Binary File - Not ASCII Text]"
+    This line shows that code was changed/added in the FINAL CODE section:
+    +            # return f"file: source: [Binary File - Not ASCII Text]
+
+    GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+
+    Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section and write user friendly explanation about what has changed in several sentences with bullet points.
+    Only write explanation for new code changes and not for othe code in the FINAL CODE section.
+    '''
+    
+    tags = list_tags()
+
+    if len(tags) == 0:
+        click.echo("No tags found")
+        return
+    
+    if len(tags) == 1:
+        click.echo("Only one tag found")
+        # TODO handle first tag
+        return
+
+    previous_tag = ""
+    for i in range(len(tags)):
+        if tags[i] == tag:
+            previous_tag = tags[i-1]
+            
+    list = list_commits_for_branches(previous_tag, tag)
+    
+    start_sha = list[len(list)-1]
+    
+    if len(list) == 1:
+        start_sha = previous_tag
+    
     end_sha = list[0]
     
     click.echo(f'start_sha={start_sha}')
@@ -86,3 +169,4 @@ def release():
     pass
 
 release.add_command(notes_user)
+release.add_command(notes_user_tag)
