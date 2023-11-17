@@ -1,7 +1,6 @@
 import click
-from gcloudai.util.file_processor import format_files_as_string
+from util.file_processor import format_files_as_string
 from vertexai.language_models import CodeChatModel, ChatModel
-import vertexai
 from vertexai.preview.language_models import CodeGenerationModel
 
 

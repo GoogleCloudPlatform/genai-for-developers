@@ -1,15 +1,15 @@
 from setuptools import setup
 
 setup(
-    name='dai',
+    name='devai',
     version='0.1.0',
-    py_modules=['dai'],
+    py_modules=['devai'],
     install_requires=[
         'Click',
     ],
     entry_points={
         'console_scripts': [
-            'dai = cli:cli',
+            'devai = devai:devai',
         ],
     },
 )

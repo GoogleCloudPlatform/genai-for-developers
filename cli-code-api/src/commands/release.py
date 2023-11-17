@@ -1,5 +1,5 @@
 import click
-from gcloudai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches
+from util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches
 from vertexai.language_models import CodeChatModel
 
 

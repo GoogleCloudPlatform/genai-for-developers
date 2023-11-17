@@ -1,6 +1,6 @@
 import click
 
-from gcloudai.util.file_processor import get_text_files_contents
+from util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 
 @click.command(name='with_msg_streaming')

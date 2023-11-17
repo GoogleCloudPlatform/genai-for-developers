@@ -1,7 +1,7 @@
 import click
-from gcloudai.commands.msg import standard, streaming
+from commands.msg import standard, streaming
 
-from gcloudai.util.file_processor import get_text_files_contents
+from util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 
 
