@@ -85,60 +85,50 @@ def format_files_as_string(input):
 
     return formatted_string
 
-def list_files(start_sha, end_sha):
-    command = ["git", "diff", "--name-only", f"{start_sha}^", end_sha]
+def list_files(start_sha, end_sha, refer_commit_parent=False):
 
-    output = subprocess.check_output(command).decode("utf-8").strip()
+    if refer_commit_parent:
+        start_sha = f"{start_sha}^"
+        
+    command = ["git", "diff", "--name-only", start_sha, end_sha]
 
-    filenames = output.splitlines()
+    return run_git_command(command)
 
-    files = []
-    for filename in filenames:
-        files.append(filename)
-    
-    return files
+def list_changes(start_sha, end_sha, refer_commit_parent=False):
+    if refer_commit_parent:
+        start_sha = f"{start_sha}^"
 
-def list_changes(start_sha, end_sha):
-    command = ["git", "diff", f"{start_sha}^", end_sha]
+    command = ["git", "diff", start_sha, end_sha]
     output = subprocess.check_output(command, text=True)
     return output
 
-def list_commit_messages(start_sha, end_sha):
-    command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}^..{end_sha}"]
+def list_commit_messages(start_sha, end_sha, refer_commit_parent=False):
+    
+    command = ["git", "log", "--pretty=format:%s", "--name-only", start_sha, end_sha]
+    if refer_commit_parent:
+        command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}^..{end_sha}"]
+
     output = subprocess.check_output(command, text=True)
     return output
 
 def list_commits_for_branches(branch_a, branch_b):
-    command = ["git", "log", "--pretty=format:%h", f"{branch_a}^..{branch_b}"]
-    output = subprocess.check_output(command).decode("utf-8").strip()
+    command = ["git", "log", "--pretty=format:%h", f"{branch_a}..{branch_b}"]
+    return run_git_command(command)
 
-    commits = output.splitlines()
-
-    list = []
-    for commit in commits:
-        list.append(commit)
-    
-    return list
-
-def list_commits_for_tags(branch_a, branch_b):
-    command = ["git", "log", "--pretty=format:%h", f"{branch_a}^..{branch_b}"]
-    output = subprocess.check_output(command).decode("utf-8").strip()
-
-    commits = output.splitlines()
-
-    list = []
-    for commit in commits:
-        list.append(commit)
-    
-    return list
+def list_commits_for_tags(tag_a, tag_b):
+    command = ["git", "log", "--pretty=format:%h", tag_a, tag_b]
+    return run_git_command(command)
 
 def list_tags():
     command = ["git", "tag"]
+    return run_git_command(command)
+
+def run_git_command(command):
     output = subprocess.check_output(command).decode("utf-8").strip()
-    tags = output.splitlines()
+    records = output.splitlines()
 
     list = []
-    for tag in tags:
-        list.append(tag)
+    for record in records:
+        list.append(record)
 
     return list
