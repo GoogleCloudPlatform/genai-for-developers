@@ -9,7 +9,6 @@ This directory contains a sample cli implementation called devai, as well as a t
 To start, setup your virtualenv, install requirements and run the sample command
 
 ```sh
-cd cli-code-api
 python3 -m venv venv
 . venv/bin/activate
 pip install -r src/requirements.txt
@@ -32,9 +31,9 @@ python devai.py prompt with_context
 python devai.py prompt with_msg
 python devai.py prompt with_msg_streaming
 
-python devai.py review code -c ../sample-app/src/main/java
-python devai.py review performance -c ../sample-app/src/main/java
-python devai.py review security -c ../sample-app/src/main/java
+python devai.py review code -c ../../sample-app/src/main/java
+python devai.py review performance -c ../../sample-app/src/main/java
+python devai.py review security -c ../../sample-app/src/main/java
 
 python devai.py release notes_user_tag -t "v5.0.0"
 python devai.py release notes_user -s "main" -e "feature-branch-name" 

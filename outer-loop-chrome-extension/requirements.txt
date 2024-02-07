@@ -1,0 +1,4 @@
+functions-framework==3.*
+google-cloud-aiplatform >= 1.31.0
+google-cloud-logging
+flask_cors
