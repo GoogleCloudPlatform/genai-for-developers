@@ -1,4 +1,4 @@
-# GenAI for Developer Productivity
+# GenAI for Developers
 
 Generative AI is opening up doors for individuals and businesses alike. Developers can take advantage of this new technology in a myriad of ways, from simplifying mundane tasks, to building applications that take advantage of the latest technology.
 
