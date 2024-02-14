@@ -1,0 +1,43 @@
+{
+    "display_information": {
+        "name": "DevAI Bot"
+    },
+    "features": {
+        "app_home": {
+            "home_tab_enabled": true,
+            "messages_tab_enabled": true,
+            "messages_tab_read_only_enabled": false
+        },
+        "bot_user": {
+            "display_name": "DevAI Bot",
+            "always_online": false
+        }
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": [
+                "calls:write",
+                "im:history",
+                "im:write",
+                "mpim:write",
+                "chat:write",
+                "channels:history",
+                "groups:history"
+            ]
+        }
+    },
+    "settings": {
+        "event_subscriptions": {
+            "request_url": "https://c246-68-133-82-223.ngrok-free.app/slack/events",
+            "bot_events": [
+                "app_home_opened",
+                "message.channels",
+                "message.groups",
+                "message.im"
+            ]
+        },
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": false,
+        "token_rotation_enabled": false
+    }
+}
