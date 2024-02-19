@@ -14,7 +14,7 @@
 
 
 import click
-from util.file_processor import format_files_as_string
+from devai.util.file_processor import format_files_as_string
 from vertexai.language_models import CodeChatModel, ChatModel
 from vertexai.preview.language_models import CodeGenerationModel
 
@@ -27,7 +27,7 @@ parameters = {
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
 def code(context):
-    click.echo('code')
+    #click.echo('code')
     
     source='''
 CODE:
@@ -48,6 +48,7 @@ If no significant issues are found output "No Issues"
     source=source.format(format_files_as_string(context))
 
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
+    
     chat = code_chat_model.start_chat(context=source, **parameters)
     response = chat.send_message(qry)
 
@@ -57,7 +58,7 @@ If no significant issues are found output "No Issues"
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def performance(context):
-    click.echo('performance')
+    #click.echo('performance')
     
     source='''
 CODE:
@@ -85,7 +86,7 @@ Output the findings with class and method names followed by the found issues.
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def security(context):
-    click.echo('simple security')
+    #click.echo('simple security')
 
     source='''
 CODE: 

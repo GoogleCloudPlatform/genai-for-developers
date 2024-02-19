@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import click
-from util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches, list_tags, list_commits_for_tags
+from devai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches, list_tags, list_commits_for_tags
 from vertexai.language_models import CodeChatModel
 
 

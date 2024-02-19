@@ -14,7 +14,7 @@
 
 import click
 
-from commands import cmd,  prompt, review, release
+from devai.commands import cmd,  prompt, review, release
 
 
 @click.group()
