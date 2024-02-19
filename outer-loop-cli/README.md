@@ -4,7 +4,50 @@ This example demonstrates ways to integrate LLM models into a custom command lin
 
 This directory contains a sample cli implementation called devai, as well as a tutorial describing how to use it.
 
-## Getting started
+## Install and use
+The cli is provided as a package on PyPi for demonstration purposes only. It is not intended for production use as is. To install the package for use locally or in CICD systems run the following command
+
+```sh
+pip install -i https://test.pypi.org/simple/ devai
+```
+
+## Local execution
+
+Once installed you can use the CLI with its short name `devai` as follows
+
+```sh
+devai echo
+devai echo
+devai sub 
+
+devai prompt with_context  
+devai prompt with_msg
+devai prompt with_msg_streaming
+
+devai review code -c ../../sample-app/src/main/java
+devai review performance -c ../../sample-app/src/main/java
+devai review security -c ../../sample-app/src/main/java
+
+devai release notes_user_tag -t "v5.0.0"
+devai release notes_user -s "main" -e "feature-branch-name" 
+```
+
+## Use in CICD
+
+This can be added in any build pipeline following the examples below:
+
+GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
+
+```sh
+      - name: Code Review
+        run: echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
+        shell: bash
+```
+
+## Developers Guide
+
+### Getting started
 
 To start, setup your virtualenv, install requirements and run the sample command
 
@@ -19,39 +62,28 @@ Sample commands
 
 Change into the src directory
 
-```
+```sh
 cd src
 ```
 
 ```sh
-python devai.py  echo
-python devai.py  sub 
+python -m devai echo
+python -m devai sub 
 
-python devai.py prompt with_context  
-python devai.py prompt with_msg
-python devai.py prompt with_msg_streaming
+python -m devai prompt with_context  
+python -m devai prompt with_msg
+python -m devai prompt with_msg_streaming
 
-python devai.py review code -c ../../sample-app/src/main/java
-python devai.py review performance -c ../../sample-app/src/main/java
-python devai.py review security -c ../../sample-app/src/main/java
+python -m devai review code -c ../../sample-app/src/main/java
+python -m devai review performance -c ../../sample-app/src/main/java
+python -m devai review security -c ../../sample-app/src/main/java
 
-python devai.py release notes_user_tag -t "v5.0.0"
-python devai.py release notes_user -s "main" -e "feature-branch-name" 
+python -m devai release notes_user_tag -t "v5.0.0"
+python -m devai release notes_user -s "main" -e "feature-branch-name" 
 
 ```
 
-## Adding dependencies
-
-When adding new dependencies, first install the package with pip as seen in the following example. Then be sure to freeze the dependencies in the requirements.txt file.
-
-The following command is run from the projects base folder. 
-
-```sh
-pip install click
-pip freeze > src/requirements.txt
-```
-
-## Working with an installable app
+### Working with an installable app
 
 To create an installable CLI from the source, use setuptools to create the dai cli with the following command from the project base folder.
 
@@ -59,13 +91,7 @@ To create an installable CLI from the source, use setuptools to create the dai c
 pip install --editable ./src
 ```
 
-Once installed you can use the CLI with its short name `devai` as follows
-
-```sh
-devai echo
-```
-
-## Testing integrations with Cloud Build Jobs
+### Testing integrations with Cloud Build Jobs
 
 There are multiple cloudbuild files included in order to facilitate local builds and tests as well as automated CICD for this repo.
 
@@ -91,7 +117,7 @@ gcloud builds submit . --config=build/cloudbuild-pipeline-test.yaml
 
 ```
 
-## Containerized CLI
+### Containerized CLI
 
 To work with the CLI inside the container, build it locally and run it with your .config folder mounted to provide access to gcloud credentials
 
@@ -107,7 +133,7 @@ devai ai
 devai echo
 ```
 
-## Cleanup
+### Cleanup
 
 To uninstall the package run the following command
 
@@ -119,4 +145,22 @@ To deactivate virtual env run the following command
 
 ```sh
 deactivate
+```
+
+### Publish to PyPi
+
+```sh
+pip install build twine
+```
+
+```sh
+rm -rf src/dist
+python3 -m build src/
+
+python3 -m twine upload --repository testpypi src/dist/* --verbose
+```
+
+```sh
+pip install -i https://test.pypi.org/simple/ devai==0.1.4.2
+devai
 ```

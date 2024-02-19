@@ -29,3 +29,5 @@ build-job:
     - echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json 
     - export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
     - devai review code -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review performance -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review security -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
