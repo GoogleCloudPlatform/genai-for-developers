@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import click
-from commands.msg import standard, streaming
+from devai.commands.msg import standard, streaming
 
-from util.file_processor import get_text_files_contents
+from devai.util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 
 

@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='devai',
-    version='0.1.0',
+    version='0.1.4.2',
+    packages=find_packages(),
     py_modules=['devai'],
     install_requires=[
-        'Click',
+        'click==8.1.7',
+        'google-cloud-aiplatform'
     ],
     entry_points={
         'console_scripts': [
-            'devai = devai:devai',
+            'devai = devai.cli:devai',
         ],
     },
 )

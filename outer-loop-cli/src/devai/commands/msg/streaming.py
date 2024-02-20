@@ -14,7 +14,7 @@
 
 import click
 
-from util.file_processor import get_text_files_contents
+from devai.util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 
 @click.command(name='with_msg_streaming')
