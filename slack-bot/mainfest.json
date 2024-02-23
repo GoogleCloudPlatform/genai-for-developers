@@ -4,7 +4,7 @@
     },
     "features": {
         "app_home": {
-            "home_tab_enabled": true,
+            "home_tab_enabled": false,
             "messages_tab_enabled": true,
             "messages_tab_read_only_enabled": false
         },
@@ -28,9 +28,8 @@
     },
     "settings": {
         "event_subscriptions": {
-            "request_url": "https://c246-68-133-82-223.ngrok-free.app/slack/events",
+            "request_url": "<YOUR_HOST>/slack/events",
             "bot_events": [
-                "app_home_opened",
                 "message.channels",
                 "message.groups",
                 "message.im"
