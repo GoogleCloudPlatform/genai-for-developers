@@ -1,0 +1,26 @@
+{{ define "main" }}
+  <main class="container mx-auto">
+    {{ partial "header/basic.html" . }}
+
+
+    <!-- 404 Section -->
+    <div class="hero -mt-[4rem] min-h-screen text-primary-content">
+      <div class="hero-content mx-auto max-w-lg text-center md:max-w-full">
+        <div>
+          <h1 class="font-title mb-2 text-4xl font-extrabold sm:text-5xl lg:text-7xl">
+            {{ i18n "error.404_title" | emojify }}
+          </h1>
+          <h2 class="font-title mb-2 py-4 text-lg font-extrabold sm:text-2xl lg:text-3xl">
+            {{ i18n "error.404_error" | emojify }}
+          </h2>
+          <div class="mx-auto mb-5 max-w-lg">
+            {{ i18n "error.404_description" | emojify }}
+          </div>
+          <button class="btn btn-active btn-ghost normal-case lg:btn-lg">Go Home</button>
+        </div>
+      </div>
+    </div>
+
+    {{ partial "footer/column-with-mission.html" . }}
+  </main>
+{{ end }}

@@ -1,0 +1,9 @@
+baseURL: /
+languageCode: en-us
+defaultContentLanguage: "en"
+title: My New Hugo Site
+theme: "daisy-hugo"
+enableEmoji: true
+disableKinds:
+  - "taxonomy"
+  - "taxonomyTerm"

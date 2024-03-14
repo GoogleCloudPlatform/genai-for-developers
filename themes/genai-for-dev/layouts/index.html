@@ -1,0 +1,193 @@
+{{ define "main" }}
+  <!-- This is a unique template to define the home page of website. The homepage, similar to other list pages in Hugo, accepts content and front matter from an _index.md file. This file should live at the root of your content folder (i.e., content/_index.md). You can then add body copy and metadata to your homepage the way you would any other content file.-->
+
+    <!-- Main Banner Section -->
+    <div
+      class="hero -mt-[4rem] min-h-screen bg-gradient-to-br from-primary to-secondary text-primary-content"
+    >
+      <div class="hero-content mx-auto max-w-lg text-center md:max-w-full">
+        <div>
+          {{ with .Title | emojify }}
+            <h1 class="font-title mb-2 text-4xl font-extrabold sm:text-5xl lg:text-7xl">{{ . }}</h1>
+          {{ end }}
+          {{ with .Description | emojify }}
+            <h2 class="font-title mb-2 py-4 text-lg font-extrabold sm:text-2xl lg:text-3xl">
+              {{ . }}
+            </h2>
+          {{ end }}
+          <div class="mx-auto mb-5 max-w-lg">
+            {{ .Content }}
+          </div>
+          <button class="btn btn-active btn-ghost normal-case lg:btn-lg">Get Started</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="hero min-h-screen bg-neutral text-neutral-content">
+      <div class="hero-content mx-auto max-w-md text-center md:max-w-full">
+        <div>
+          <h2 class="mt-20 mb-2 text-4xl font-extrabold md:text-6xl">Highly customizable</h2>
+          <h3 class="mb-5 text-3xl font-bold">Powered by Tailwind CSS utility classes</h3>
+          <p class="mx-auto mb-5 max-w-lg">
+            daisyUI components have low CSS specificity so you can customize everything using
+            Tailwind CSS utility classes.<br />
+            You can even <a href="/docs/customize" class="link">use @apply</a> to add your custom
+            styles to components or you can
+            <a href="/docs/themes" class="link">change colors and other design decisions</a> using
+            CSS variables.
+          </p>
+          <div class="my-20 flex flex-col">
+            <div
+              class="mockup-code mx-auto w-full max-w-xs bg-neutral-focus text-left shadow-lg sm:max-w-none"
+            >
+              <pre><code>&lt;a class="<span>btn btn-primary</span>"&gt;Button&lt;/a&gt;</code></pre>
+            </div>
+            <div class="divider text-neutral-content text-opacity-30">↓</div>
+            <div
+              class="mockup-code mx-auto w-full max-w-xs bg-neutral-focus text-left shadow-lg sm:max-w-none"
+            >
+              <pre><code>&lt;a class="<span>btn btn-primary</span> <span class="text-teal-500">rounded-full</span>"&gt;Button&lt;/a&gt;</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="hero min-h-screen bg-gradient-to-br from-primary to-accent text-primary-content">
+      <div class="hero-content mx-auto max-w-md text-center md:max-w-full">
+        <div>
+          <h2 class="mt-20 mb-2 text-4xl font-extrabold md:text-6xl">Powerful theming</h2>
+          <h3 class="mb-5 text-3xl font-bold">Apply your own design decisions</h3>
+          <p class="mx-auto mb-5 w-full max-w-lg">
+            daisyUI adds a set of semantic color names to Tailwind. So instead of using constant
+            color names like <span class="badge badge-ghost">bg-blue-500</span>, we can use semantic
+            names like <span class="badge badge-ghost">bg-primary</span> or
+            <span class="badge badge-ghost">bg-success</span>. <br />
+            All colors are CSS variables so you can easily change the theme of your entire app
+            without having to edit your HTML.
+            <a href="/docs/themes" class="link">Read more about themes</a>
+          </p>
+          <div class="my-20 flex w-full flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+            <div
+              data-theme="luxury"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Luxury Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+            <div
+              data-theme="cupcake"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Cupcake Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+            <div
+              data-theme="cyberpunk"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Cyberpunk Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+          </div>
+          <a href="/docs/themes" class="btn btn-ghost btn-sm mb-20">Read more about themes</a>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+   
+{{ end }}
+ 

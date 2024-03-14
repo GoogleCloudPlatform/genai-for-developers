@@ -1,0 +1,17 @@
+<!-- The following defines a simple base template at _default/baseof.html. As a default template, it is the shell from which all your pages will be rendered -->
+<!DOCTYPE html>
+<html lang="{{ with .Site.LanguageCode }}{{ . }}{{ else }}en-us{{ end }}">
+  <head>
+    {{ partial "head.html" . }}
+  </head>
+
+  <body>
+    <main class="bg-base-100" x-data="{ showBar: false }">
+      {{ partial "header/basic.html" . }}
+
+    {{ block "main" . }}{{ end }}
+
+      {{ partial "footer/column-with-mission.html" . }}
+    </main>
+  </body>
+</html>

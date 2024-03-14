@@ -1,0 +1,39 @@
+<!-- a columnar footer with website mission, accepts a max of 4 columns -->
+<footer class="bg-base-200 text-base-content">
+  <div
+    class="footer footer-center mx-auto max-w-6xl px-4 py-20 sm:grid-flow-col sm:place-items-start sm:text-start"
+  >
+    <div class="sm:place-items-start">
+      <div class="font-title inline-flex text-3xl">
+        <span class="text-base-content">{{.Site.Title}}</span>
+      </div>
+      <p class="opacity-50">
+       {{.Site.Params.tagline}}
+      </p>
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Guides</span>
+      <a href="/docs/install" class="link link-hover">How to install</a>
+      <a href="/docs/use" class="link link-hover">How to use components</a>
+      <a href="/docs/customize" class="link link-hover">How to customize</a>
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Links</span>
+      <a
+        target="_blank"
+        rel="noopener"
+        href="https://github.com/GoogleCloudPlatform/genai-for-developers"
+        class="group link link-hover"
+      >
+        Github
+      </a>
+      
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Pages</span>
+      <a href="/docs" class="link link-hover">Docs</a>
+      <a href="/about" class="link link-hover">Profile</a>
+      <a href="/blog" class="link link-hover">Blogs</a>
+    </div>
+  </div>
+</footer>
