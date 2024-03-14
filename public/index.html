@@ -1,0 +1,516 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+	<meta name="generator" content="Hugo 0.111.3">
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+
+  
+  <link
+    rel="stylesheet"
+    href="/css/style.min.79b0931a06c52929bc795c70c744bc8828a006f2b8ef7ac4b2433f5879fa6b0d.css"
+    integrity="sha256-ebCTGgbFKSm8eVxwx0S8iCigBvK473rEskM/WHn6aw0="
+  />
+
+
+
+<script src="/js/alpine.js" defer></script>
+
+  </head>
+
+  <body>
+    
+  
+
+  <main class="bg-base-100" x-data="{ showBar: false }">
+    
+<header
+  class="sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100"
+  :class="showBar ? 'bg-base-100 text-base-content shadow-sm' : 'text-primary-content'"
+  @scroll.window="showBar = (window.pageYOffset > 40) ? true : false"
+>
+  <nav class="navbar w-full">
+    <div class="flex flex-1 md:gap-1 lg:gap-2">
+      <a href="/" class="btn btn-ghost px-2">
+        <div
+          class="font-title inline-flex text-lg text-primary transition-all duration-200 md:text-3xl"
+        >
+          <span class="normal-case" :class="showBar ? 'text-base-content' : 'text-primary-content'">
+            GenAI For Dev
+          </span>
+        </div>
+      </a>
+    </div>
+    <div class="flex-0">
+      <div class="form-control pr-2">
+        <label class="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="pointer-events-none absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+
+          <input
+            type="search"
+            placeholder="Search..."
+            class="input input-bordered input-sm w-full border-2 border-solid bg-transparent pl-10"
+          />
+        </label>
+      </div>
+
+      <ul class="menu menu-compact hidden p-0 lg:menu-horizontal">
+        <li tabindex="0">
+          <a class="p-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+            Docs
+          </a>
+        </li>
+        <li tabindex="1">
+          <a class="p-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+              />
+            </svg>
+            Blog
+          </a>
+        </li>
+        <li tabindex="2">
+          <a class="p-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+              />
+            </svg>
+            Theme
+            <svg
+              class="fill-current"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+            >
+              <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+            </svg>
+          </a>
+          <ul class="bg-base-100 p-2">
+            <li><a>Submenu 1</a></li>
+            <li><a>Submenu 2</a></li>
+          </ul>
+        </li>
+        <li tabindex="3">
+          <a class="p-2">
+            <img
+              class="h-5 w-5 rounded-full md:h-6 md:w-6"
+              src="https://placeimg.com/80/80/people"
+            />
+            About
+          </a>
+        </li>
+        <li tabindex="4">
+          <a class="p-2">
+            <svg
+              width="20"
+              height="20"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+              class="inline-block h-5 w-5 fill-current md:h-6 md:w-6"
+            >
+              <path
+                d="M256,32C132.3,32,32,134.9,32,261.7c0,101.5,64.2,187.5,153.2,217.9a17.56,17.56,0,0,0,3.8.4c8.3,0,11.5-6.1,11.5-11.4,0-5.5-.2-19.9-.3-39.1a102.4,102.4,0,0,1-22.6,2.7c-43.1,0-52.9-33.5-52.9-33.5-10.2-26.5-24.9-33.6-24.9-33.6-19.5-13.7-.1-14.1,1.4-14.1h.1c22.5,2,34.3,23.8,34.3,23.8,11.2,19.6,26.2,25.1,39.6,25.1a63,63,0,0,0,25.6-6c2-14.8,7.8-24.9,14.2-30.7-49.7-5.8-102-25.5-102-113.5,0-25.1,8.7-45.6,23-61.6-2.3-5.8-10-29.2,2.2-60.8a18.64,18.64,0,0,1,5-.5c8.1,0,26.4,3.1,56.6,24.1a208.21,208.21,0,0,1,112.2,0c30.2-21,48.5-24.1,56.6-24.1a18.64,18.64,0,0,1,5,.5c12.2,31.6,4.5,55,2.2,60.8,14.3,16.1,23,36.6,23,61.6,0,88.2-52.4,107.6-102.3,113.3,8,7.1,15.2,21.1,15.2,42.5,0,30.7-.3,55.5-.3,63,0,5.4,3.1,11.5,11.4,11.5a19.35,19.35,0,0,0,4-.4C415.9,449.2,480,363.1,480,261.7,480,134.9,379.7,32,256,32Z"
+              ></path>
+            </svg>
+            Github
+          </a>
+        </li>
+      </ul>
+
+      <div class="dropdown-end dropdown lg:hidden">
+        <label tabindex="0" class="btn btn-ghost p-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
+            />
+          </svg>
+        </label>
+        <ul
+          tabindex="0"
+          class="dropdown-content menu rounded-box menu-compact mt-3 w-48 bg-base-200 shadow"
+        >
+          <li>
+            <a class="p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                />
+              </svg>
+              Docs
+            </a>
+          </li>
+          <li>
+            <a class="p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+                />
+              </svg>
+              Blog
+            </a>
+          </li>
+          <li tabindex="0">
+            <a class="p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+                />
+              </svg>
+              Theme
+            </a>
+            <ul class="rounded-box -left-full w-48 bg-base-200 p-0">
+              <li><a>Submenu 1</a></li>
+              <li><a>Submenu 2</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="p-2">
+              <img
+                class="h-5 w-5 rounded-full md:h-6 md:w-6"
+                src="https://placeimg.com/80/80/people"
+              />
+              About
+            </a>
+          </li>
+          <li>
+            <a class="p-2">
+              <svg
+                width="20"
+                height="20"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                class="inline-block h-5 w-5 fill-current md:h-6 md:w-6"
+              >
+                <path
+                  d="M256,32C132.3,32,32,134.9,32,261.7c0,101.5,64.2,187.5,153.2,217.9a17.56,17.56,0,0,0,3.8.4c8.3,0,11.5-6.1,11.5-11.4,0-5.5-.2-19.9-.3-39.1a102.4,102.4,0,0,1-22.6,2.7c-43.1,0-52.9-33.5-52.9-33.5-10.2-26.5-24.9-33.6-24.9-33.6-19.5-13.7-.1-14.1,1.4-14.1h.1c22.5,2,34.3,23.8,34.3,23.8,11.2,19.6,26.2,25.1,39.6,25.1a63,63,0,0,0,25.6-6c2-14.8,7.8-24.9,14.2-30.7-49.7-5.8-102-25.5-102-113.5,0-25.1,8.7-45.6,23-61.6-2.3-5.8-10-29.2,2.2-60.8a18.64,18.64,0,0,1,5-.5c8.1,0,26.4,3.1,56.6,24.1a208.21,208.21,0,0,1,112.2,0c30.2-21,48.5-24.1,56.6-24.1a18.64,18.64,0,0,1,5,.5c12.2,31.6,4.5,55,2.2,60.8,14.3,16.1,23,36.6,23,61.6,0,88.2-52.4,107.6-102.3,113.3,8,7.1,15.2,21.1,15.2,42.5,0,30.7-.3,55.5-.3,63,0,5.4,3.1,11.5,11.4,11.5a19.35,19.35,0,0,0,4-.4C415.9,449.2,480,363.1,480,261.7,480,134.9,379.7,32,256,32Z"
+                ></path>
+              </svg>
+              Github
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+    
+    <div
+      class="hero -mt-[4rem] min-h-screen bg-gradient-to-br from-primary to-secondary text-primary-content"
+    >
+      <div class="hero-content mx-auto max-w-lg text-center md:max-w-full">
+        <div>
+          
+            <h1 class="font-title mb-2 text-4xl font-extrabold sm:text-5xl lg:text-7xl">GenAI For Dev</h1>
+          
+          
+          <div class="mx-auto mb-5 max-w-lg">
+            
+          </div>
+          <button class="btn btn-active btn-ghost normal-case lg:btn-lg">Get Started</button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="hero min-h-screen bg-neutral text-neutral-content">
+      <div class="hero-content mx-auto max-w-md text-center md:max-w-full">
+        <div>
+          <h2 class="mt-20 mb-2 text-4xl font-extrabold md:text-6xl">Highly customizable</h2>
+          <h3 class="mb-5 text-3xl font-bold">Powered by Tailwind CSS utility classes</h3>
+          <p class="mx-auto mb-5 max-w-lg">
+            daisyUI components have low CSS specificity so you can customize everything using
+            Tailwind CSS utility classes.<br />
+            You can even <a href="/docs/customize" class="link">use @apply</a> to add your custom
+            styles to components or you can
+            <a href="/docs/themes" class="link">change colors and other design decisions</a> using
+            CSS variables.
+          </p>
+          <div class="my-20 flex flex-col">
+            <div
+              class="mockup-code mx-auto w-full max-w-xs bg-neutral-focus text-left shadow-lg sm:max-w-none"
+            >
+              <pre><code>&lt;a class="<span>btn btn-primary</span>"&gt;Button&lt;/a&gt;</code></pre>
+            </div>
+            <div class="divider text-neutral-content text-opacity-30">↓</div>
+            <div
+              class="mockup-code mx-auto w-full max-w-xs bg-neutral-focus text-left shadow-lg sm:max-w-none"
+            >
+              <pre><code>&lt;a class="<span>btn btn-primary</span> <span class="text-teal-500">rounded-full</span>"&gt;Button&lt;/a&gt;</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="hero min-h-screen bg-gradient-to-br from-primary to-accent text-primary-content">
+      <div class="hero-content mx-auto max-w-md text-center md:max-w-full">
+        <div>
+          <h2 class="mt-20 mb-2 text-4xl font-extrabold md:text-6xl">Powerful theming</h2>
+          <h3 class="mb-5 text-3xl font-bold">Apply your own design decisions</h3>
+          <p class="mx-auto mb-5 w-full max-w-lg">
+            daisyUI adds a set of semantic color names to Tailwind. So instead of using constant
+            color names like <span class="badge badge-ghost">bg-blue-500</span>, we can use semantic
+            names like <span class="badge badge-ghost">bg-primary</span> or
+            <span class="badge badge-ghost">bg-success</span>. <br />
+            All colors are CSS variables so you can easily change the theme of your entire app
+            without having to edit your HTML.
+            <a href="/docs/themes" class="link">Read more about themes</a>
+          </p>
+          <div class="my-20 flex w-full flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+            <div
+              data-theme="luxury"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Luxury Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+            <div
+              data-theme="cupcake"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Cupcake Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+            <div
+              data-theme="cyberpunk"
+              class="card mx-auto w-full max-w-xs flex-1 bg-base-100 p-8 text-base-content"
+            >
+              <h3 class="text-sm font-bold">Cyberpunk Theme</h3>
+              <div class="mt-2 flex flex-col space-y-2">
+                <progress value="40" max="100" class="progress"></progress>
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="btn btn-accent btn-square btn-sm">
+                    <svg
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="inline-block h-4 w-4 stroke-current"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <label aria-label="toggle" class="label"
+                    ><input type="checkbox" class="toggle"
+                  /></label>
+                  <label aria-label="Checkbox" class="label"
+                    ><input type="checkbox" class="checkbox"
+                  /></label>
+                </div>
+                <button class="btn btn-primary btn-sm btn-block">Primary</button>
+                <button class="btn btn-secondary btn-sm btn-block">Secondary</button>
+                <button class="btn btn-outline btn-sm btn-block">Outline</button>
+              </div>
+            </div>
+          </div>
+          <a href="/docs/themes" class="btn btn-ghost btn-sm mb-20">Read more about themes</a>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    
+<footer class="bg-base-200 text-base-content">
+  <div
+    class="footer footer-center mx-auto max-w-6xl px-4 py-20 sm:grid-flow-col sm:place-items-start sm:text-start"
+  >
+    <div class="sm:place-items-start">
+      <div class="font-title inline-flex text-3xl">
+        <span class="lowercase text-primary">daisy</span>
+        <span class="text-base-content">Hugo</span>
+      </div>
+      <p class="opacity-50">
+        Free Component library <br />
+        For utility first CSS frameworks
+      </p>
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Guides</span>
+      <a href="/docs/install" class="link link-hover">How to install</a>
+      <a href="/docs/use" class="link link-hover">How to use components</a>
+      <a href="/docs/customize" class="link link-hover">How to customize</a>
+      <a href="/docs/themes" class="link link-hover">How to use themes</a>
+      <a href="/docs/colors" class="link link-hover">Color system</a>
+      <a href="/docs/config" class="link link-hover">Config</a>
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Links</span>
+      <a
+        target="_blank"
+        rel="noopener"
+        href="https://github.com/GoogleCloudPlatform/genai-for-developers"
+        class="group link link-hover"
+      >
+        Github
+      </a>
+      
+    </div>
+    <div class="sm:place-items-start">
+      <span class="footer-title">Pages</span>
+      <a href="/docs" class="link link-hover">Docs</a>
+      <a href="/about" class="link link-hover">Profile</a>
+      <a href="/blog" class="link link-hover">Blogs</a>
+    </div>
+  </div>
+</footer>
+
+  </main>
+
+  </body>
+</html>

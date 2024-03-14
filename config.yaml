@@ -1,0 +1,11 @@
+baseURL: /
+languageCode: en-us
+defaultContentLanguage: "en"
+title: GenAI For Dev
+theme: "genai-for-dev"
+enableEmoji: true
+disableKinds:
+  - "taxonomy"
+  - "taxonomyTerm"
+
+
