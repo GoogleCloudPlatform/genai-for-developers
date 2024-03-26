@@ -1,2 +1,8 @@
 click==8.1.7
 google-cloud-aiplatform==1.35.0
+google-cloud-aiplatform==1.42.1
+jira==3.6.0
+python-gitlab==4.4.0
+langchain==0.1.8
+langchain_google_vertexai==0.0.5
+atlassian-python-api==3.41.10
