@@ -1,0 +1,12 @@
+
+# Local dev
+
+```sh
+python3 -m venv venv
+source venv/bin/activate
+
+pip install --editable devai-core/
+
+cd devai-cli
+python -m devai echo
+```

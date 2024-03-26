@@ -1,0 +1,2 @@
+click==8.1.7
+google-cloud-aiplatform==1.35.0
