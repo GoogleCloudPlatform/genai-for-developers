@@ -16,8 +16,11 @@
 import click
 from devai.util.file_processor import format_files_as_string
 from vertexai.generative_models import GenerativeModel, ChatSession
-from devai.commands.jira import create_jira_issue
-from devai.commands.gitlab import create_gitlab_issue_comment
+
+# Uncomment after configuring JIRA and GitLab env variables - see README.md for details
+
+#from devai.commands.jira import create_jira_issue
+# from devai.commands.gitlab import create_gitlab_issue_comment
 
 parameters = {
     "max_output_tokens": 2048,
@@ -69,7 +72,7 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
 
     click.echo(f"Response from Model: {response.text}")
 
-    # create_jira_issue("Code Review Results", response.text)
+    #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
 
 
