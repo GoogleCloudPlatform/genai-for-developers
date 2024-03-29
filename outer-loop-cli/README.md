@@ -164,3 +164,51 @@ python3 -m twine upload --repository testpypi src/dist/* --verbose
 pip install -i https://test.pypi.org/simple/ devai==0.1.4.2
 devai
 ```
+
+### LangSmith LLM tracing configuration
+Create an account and generate API key.
+
+https://docs.smith.langchain.com/setup
+
+Set environment variables required for LangSmith integration.
+
+```sh
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+
+read -s LANGCHAIN_API_KEY
+export LANGCHAIN_API_KEY
+
+```
+
+### JIRA command configuration
+
+Create JIRA API token for your project.
+
+https://id.atlassian.com/manage-profile/security/api-tokens
+
+Set environment variables required for JIRA integration.
+
+```sh
+read -s JIRA_API_TOKEN
+export JIRA_API_TOKEN
+
+export JIRA_USERNAME = "email that you used to register with JIRA"
+export JIRA_INSTANCE_URL = "https://YOUR-PROJECT.atlassian.net"
+export JIRA_PROJECT_KEY = "JIRA project key"
+```
+
+Commands to test JIRA integration
+
+```sh
+# Will return list of JIRA issues in specified JIRA project
+devai jira list -c YOUR_JIRA_PROJECT_KEY
+
+# Will create a new JIRA issue with provided details as is
+devai jira create -c "New Feature request to implement Login Page.\nExample code block:\n {code}print(\"devai cli\"){code}"
+
+# Will generate implementation and create a new JIRA issue with details
+devai jira fix -c "write ring buffer implementation in Rust"
+```
+
+### GitLab command configuration
