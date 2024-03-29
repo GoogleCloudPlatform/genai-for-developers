@@ -15,6 +15,7 @@
 import click
 
 from devai.commands import cmd,  prompt, review, release
+# from devai.commands import jira
 
 
 @click.group()
@@ -34,6 +35,8 @@ devai.add_command(cmd.sub)
 devai.add_command(prompt.prompt)
 devai.add_command(review.review)
 devai.add_command(release.release)
+
+# devai.add_command(jira.jira)
 
 
 if __name__ == '__main__':
