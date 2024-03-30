@@ -223,7 +223,7 @@ Create Project Access Token with following details:
 
 https://gitlab.com/YOUR-USERID/YOUR-PROJECT/-/settings/access_tokens
 
-Set environment variables required for JIRA integration.
+Set environment variables required for GitLab integration.
 
 ```sh
 read -s GITLAB_PERSONAL_ACCESS_TOKEN 
