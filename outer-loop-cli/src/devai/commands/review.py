@@ -19,7 +19,7 @@ from vertexai.generative_models import GenerativeModel, ChatSession
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
-#from devai.commands.jira import create_jira_issue
+# from devai.commands.jira import create_jira_issue
 # from devai.commands.gitlab import create_gitlab_issue_comment
 
 parameters = {
