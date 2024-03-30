@@ -197,6 +197,9 @@ export JIRA_USERNAME = "email that you used to register with JIRA"
 export JIRA_INSTANCE_URL = "https://YOUR-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY = "JIRA project key"
 ```
+Un-comment imports and function calls to use JIRA commands
+- cli.py
+- review.py
 
 Commands to test JIRA integration
 
@@ -212,3 +215,38 @@ devai jira fix -c "write ring buffer implementation in Rust"
 ```
 
 ### GitLab command configuration
+
+Set environment variables required for JIRA integration.
+
+```sh
+read -s GITLAB_PERSONAL_ACCESS_TOKEN 
+export GITLAB_PERSONAL_ACCESS_TOKEN
+
+export GITLAB_URL="https://gitlab.com"
+export GITLAB_REPOSITORY="USERID/REPOSITORY"
+export GITLAB_BRANCH="FIX-BRANCH"
+export GITLAB_BASE_BRANCH="main"
+```
+
+Un-comment imports and function calls to use GitLab commands
+- cli.py
+- review.py
+
+Commands to test GitLab integration
+
+```sh
+# Will create a new merge request with provided details
+# Requires a branch to be created off main - manual step at this point
+# export GITLAB_BRANCH="fix-branch"
+devai gitlab create-pr -c "Details with file changes, docs, etc"
+
+# Will create a new GitLab issue with provided details as is
+devai gitlab fix-issue -c 4
+
+# Will add a comment to GitLab issue 
+# issue name defaults to 'CICD AI Insights' for demonstration
+devai gitlab create-comment -c "new comment content goes here"
+
+# Will add a comment to GitLab issue with name 'CICD AI Insights'
+devai gitlab create-comment -i "CICD AI Insights" -c "new comment content goes here"
+```
