@@ -37,7 +37,7 @@ jobs:
         shell: bash
 
       - name: Security Review
-        run: echo '## Performance Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+        run: echo '## Security Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review security -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
