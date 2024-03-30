@@ -1,4 +1,4 @@
-# GenAI CLI on Palm2 for Development
+# GenAI CLI with Gemini Pro for Development
 
 This example demonstrates ways to integrate LLM models into a custom command line utility for use by developers both locally and in automation processes such as CICD pipelines.
 
