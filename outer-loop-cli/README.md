@@ -216,6 +216,13 @@ devai jira fix -c "write ring buffer implementation in Rust"
 
 ### GitLab command configuration
 
+Create Project Access Token with following details:
+
+- role: Maintainer
+- selected scopes: api
+
+https://gitlab.com/YOUR-USERID/YOUR-PROJECT/-/settings/access_tokens
+
 Set environment variables required for JIRA integration.
 
 ```sh
