@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import click
-import os
+import os, json
 from langchain.agents import AgentType, initialize_agent
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -47,7 +47,7 @@ def create_gitlab_issue_comment(context, issue_name='CICD AI Insights'):
     prompt = """Get GitLab issue with name '{}' and add a comment:
 
     
-    {}""".format(issue_name, context)
+    {}""".format(issue_name, json.dumps(context))
 
     return agent.invoke(prompt)
 
