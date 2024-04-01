@@ -70,6 +70,8 @@ gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVI
 
 Add following environment variables/secrets to your CICD pipeline.
 
+If you have JIRA, GitLab and LangSmith integrations enabled, add additional env variables for respective systems, see details in sections below.
+
 - GOOGLE_CLOUD_CREDENTIALS
 - PROJECT_ID
 - LOCATION
@@ -86,11 +88,28 @@ This can be added in any build pipeline following the examples below:
 
 GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
 
+[devai-review.yaml](../.github/workflows/devai-review.yml)
+
 ```sh
       - name: Code Review
         run: echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
         shell: bash
+```
+
+GitLab Pipeline example
+
+[.gitlab-ci.yml](../.gitlab-ci.yml)
+
+```sh
+build-job:
+  stage: build
+  script:
+  .
+  .
+    - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 ```
 
 ## Developers Guide
@@ -279,7 +298,7 @@ export GITLAB_PERSONAL_ACCESS_TOKEN
 
 export GITLAB_URL="https://gitlab.com"
 export GITLAB_REPOSITORY="USERID/REPOSITORY"
-export GITLAB_BRANCH="FIX-BRANCH"
+export GITLAB_BRANCH="devai"
 export GITLAB_BASE_BRANCH="main"
 ```
 
