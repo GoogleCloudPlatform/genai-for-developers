@@ -39,6 +39,47 @@ devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
 ```
 
+## Enable APIs
+
+Enable Gemini chat and Vertex AI APIs.
+
+```sh
+gcloud services enable \
+    aiplatform.googleapis.com \
+    cloudaicompanion.googleapis.com
+```
+
+## Configure Service Account
+
+Run commands below to create service account and keys.
+
+```sh
+PROJECT_ID=$(gcloud config get-value project)
+SERVICE_ACCOUNT_NAME='vertex-client'
+DISPLAY_NAME='Vertex Client'
+KEY_FILE_NAME='vertex-client-key'
+
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "$DISPLAY_NAME"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.admin" --condition None
+
+gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
+```
+
+## Configure Environment Variables in CICD
+
+Add following environment variables/secrets to your CICD pipeline.
+
+- GOOGLE_CLOUD_CREDENTIALS
+- PROJECT_ID
+- LOCATION
+
+For GOOGLE_CLOUD_CREDENTIALS variable value, use service account key created in section above.
+
+```sh
+cat $KEY_FILE_NAME.json
+```
+
 ## Use in CICD
 
 This can be added in any build pipeline following the examples below:
