@@ -12,7 +12,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - cd cli-code-api/src
+  - cd outer-loop-cli/src
   - pip install -r requirements.txt
   - pip install --editable .
   - cd ../..
@@ -30,6 +30,6 @@ build-job:
     - export GOOGLE_CLOUD_CREDENTIALS=$(echo $GOOGLE_CLOUD_CREDENTIALS)
     - echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json
     - export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
-    - devai review code -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
-    - devai review performance -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
-    - devai review security -c ./cli-code-api/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
