@@ -7,6 +7,13 @@ This directory contains a sample cli implementation called devai, as well as a t
 ## Install and use
 The cli is provided as a package on PyPi for demonstration purposes only. It is not intended for production use as is. To install the package for use locally or in CICD systems run the following command
 
+Set environment variables in your local environment or in CICD pipeline environment variables.
+
+```sh
+export PROJECT_ID=YOUR_GCP_PROJECT_ID
+export LOCATION=us-central1
+```
+
 ```sh
 pip install -i https://test.pypi.org/simple/ devai
 ```
