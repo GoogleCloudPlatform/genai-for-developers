@@ -113,6 +113,26 @@ build-job:
     - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 ```
 
+CircleCI Pipeline example
+
+[config.yml](../.circleci/config.yml)
+
+```sh
+version: 2.1
+
+jobs:
+  ai-insights-code-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              .
+              .
+              devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader            
+```
+
 ## Developers Guide
 
 ### Getting started
