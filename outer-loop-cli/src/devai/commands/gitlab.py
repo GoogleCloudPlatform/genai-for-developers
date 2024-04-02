@@ -44,7 +44,9 @@ def create_pull_request(context):
 
 def create_gitlab_issue_comment(context, issue_name='CICD AI Insights'):
 
-    prompt = """Get GitLab issue with name '{}' and add a comment:
+    prompt = """You need to do two tasks only.
+    First task: Get GitLab issue with title '{}'.
+    Second task: add content below as a comment to the issue you found in first task:
 
     
     {}""".format(issue_name, json.dumps(context))
