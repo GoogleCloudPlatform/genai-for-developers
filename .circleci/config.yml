@@ -1,0 +1,145 @@
+version: 2.1
+
+jobs:
+  ai-insights-code-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              pip install virtualenv
+              virtualenv venv
+              source venv/bin/activate
+              cd outer-loop-cli/src
+              pip install -r requirements.txt
+              pip install --editable .
+              cd ../..
+              devai echo
+              echo $(pwd)
+    
+              export PROJECT_ID=$(echo $PROJECT_ID)
+              export LOCATION=$(echo $LOCATION)
+
+              export JIRA_USERNAME=$(echo $JIRA_USERNAME)
+              export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+              export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
+              export JIRA_API_TOKEN=$(echo $JIRA_API_TOKEN)
+
+              export GITLAB_URL=$(echo $GITLAB_URL)
+              export GITLAB_REPOSITORY=$(echo $GITLAB_REPOSITORY)
+              export GITLAB_PERSONAL_ACCESS_TOKEN=$(echo $GITLAB_PERSONAL_ACCESS_TOKEN)
+              export GITLAB_BRANCH=$(echo $GITLAB_BRANCH)
+              export GITLAB_BASE_BRANCH=$(echo $GITLAB_BASE_BRANCH)
+
+              export LANGCHAIN_TRACING_V2=$(echo $LANGCHAIN_TRACING_V2)
+              export LANGCHAIN_ENDPOINT=$(echo $LANGCHAIN_ENDPOINT)
+              export LANGCHAIN_API_KEY=$(echo $LANGCHAIN_API_KEY)
+
+              export GOOGLE_CLOUD_CREDENTIALS=$(echo $GOOGLE_CLOUD_CREDENTIALS)
+              echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json 
+              export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
+              echo ""
+              echo "============================================================="
+              echo "Code Review"
+              devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+              echo ""
+              echo "============================================================="
+
+  ai-insights-security-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              pip install virtualenv
+              virtualenv venv
+              source venv/bin/activate
+              cd outer-loop-cli/src
+              pip install -r requirements.txt
+              pip install --editable .
+              cd ../..
+              devai echo
+              echo $(pwd)
+    
+              export PROJECT_ID=$(echo $PROJECT_ID)
+              export LOCATION=$(echo $LOCATION)
+
+              export JIRA_USERNAME=$(echo $JIRA_USERNAME)
+              export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+              export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
+              export JIRA_API_TOKEN=$(echo $JIRA_API_TOKEN)
+
+              export GITLAB_URL=$(echo $GITLAB_URL)
+              export GITLAB_REPOSITORY=$(echo $GITLAB_REPOSITORY)
+              export GITLAB_PERSONAL_ACCESS_TOKEN=$(echo $GITLAB_PERSONAL_ACCESS_TOKEN)
+              export GITLAB_BRANCH=$(echo $GITLAB_BRANCH)
+              export GITLAB_BASE_BRANCH=$(echo $GITLAB_BASE_BRANCH)
+
+              export LANGCHAIN_TRACING_V2=$(echo $LANGCHAIN_TRACING_V2)
+              export LANGCHAIN_ENDPOINT=$(echo $LANGCHAIN_ENDPOINT)
+              export LANGCHAIN_API_KEY=$(echo $LANGCHAIN_API_KEY)
+
+              export GOOGLE_CLOUD_CREDENTIALS=$(echo $GOOGLE_CLOUD_CREDENTIALS)
+              echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json 
+              export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
+              echo ""
+              echo "============================================================="
+              echo "Performance Review"
+              devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+              echo ""
+              echo "============================================================="
+
+  ai-insights-performance-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              pip install virtualenv
+              virtualenv venv
+              source venv/bin/activate
+              cd outer-loop-cli/src
+              pip install -r requirements.txt
+              pip install --editable .
+              cd ../..
+              devai echo
+              echo $(pwd)
+    
+              export PROJECT_ID=$(echo $PROJECT_ID)
+              export LOCATION=$(echo $LOCATION)
+
+              export JIRA_USERNAME=$(echo $JIRA_USERNAME)
+              export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+              export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
+              export JIRA_API_TOKEN=$(echo $JIRA_API_TOKEN)
+
+              export GITLAB_URL=$(echo $GITLAB_URL)
+              export GITLAB_REPOSITORY=$(echo $GITLAB_REPOSITORY)
+              export GITLAB_PERSONAL_ACCESS_TOKEN=$(echo $GITLAB_PERSONAL_ACCESS_TOKEN)
+              export GITLAB_BRANCH=$(echo $GITLAB_BRANCH)
+              export GITLAB_BASE_BRANCH=$(echo $GITLAB_BASE_BRANCH)
+
+              export LANGCHAIN_TRACING_V2=$(echo $LANGCHAIN_TRACING_V2)
+              export LANGCHAIN_ENDPOINT=$(echo $LANGCHAIN_ENDPOINT)
+              export LANGCHAIN_API_KEY=$(echo $LANGCHAIN_API_KEY)
+
+              export GOOGLE_CLOUD_CREDENTIALS=$(echo $GOOGLE_CLOUD_CREDENTIALS)
+              echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json 
+              export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
+              echo ""
+              echo "============================================================="
+              echo "Security Review"
+              devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+              echo ""
+              echo "============================================================="
+
+workflows:
+  ai-insights-workflow:
+    jobs:
+      - ai-insights-code-review
+      - ai-insights-security-review
+      - ai-insights-performance-review
+

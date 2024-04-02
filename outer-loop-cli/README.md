@@ -1,4 +1,4 @@
-# GenAI CLI on Palm2 for Development
+# GenAI CLI with Gemini Pro for Development
 
 This example demonstrates ways to integrate LLM models into a custom command line utility for use by developers both locally and in automation processes such as CICD pipelines.
 
@@ -6,6 +6,13 @@ This directory contains a sample cli implementation called devai, as well as a t
 
 ## Install and use
 The cli is provided as a package on PyPi for demonstration purposes only. It is not intended for production use as is. To install the package for use locally or in CICD systems run the following command
+
+Set environment variables in your local environment or in CICD pipeline environment variables.
+
+```sh
+export PROJECT_ID=YOUR_GCP_PROJECT_ID
+export LOCATION=us-central1
+```
 
 ```sh
 pip install -i https://test.pypi.org/simple/ devai
@@ -32,17 +39,98 @@ devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
 ```
 
+## Enable APIs
+
+Enable Gemini chat and Vertex AI APIs.
+
+```sh
+gcloud services enable \
+    aiplatform.googleapis.com \
+    cloudaicompanion.googleapis.com \
+    cloudresourcemanager.googleapis.com
+```
+
+## Configure Service Account
+
+Run commands below to create service account and keys.
+
+```sh
+PROJECT_ID=$(gcloud config get-value project)
+SERVICE_ACCOUNT_NAME='vertex-client'
+DISPLAY_NAME='Vertex Client'
+KEY_FILE_NAME='vertex-client-key'
+
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "$DISPLAY_NAME"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.admin" --condition None
+
+gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
+```
+
+## Configure Environment Variables in CICD
+
+Add following environment variables/secrets to your CICD pipeline.
+
+If you have JIRA, GitLab and LangSmith integrations enabled, add additional env variables for respective systems, see details in sections below.
+
+- GOOGLE_CLOUD_CREDENTIALS
+- PROJECT_ID
+- LOCATION
+
+For GOOGLE_CLOUD_CREDENTIALS variable value, use service account key created in section above.
+
+```sh
+cat $KEY_FILE_NAME.json
+```
+
 ## Use in CICD
 
 This can be added in any build pipeline following the examples below:
 
 GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
 
+[devai-review.yaml](../.github/workflows/devai-review.yml)
+
 ```sh
       - name: Code Review
         run: echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
         shell: bash
+```
+
+GitLab Pipeline example
+
+[.gitlab-ci.yml](../.gitlab-ci.yml)
+
+```sh
+build-job:
+  stage: build
+  script:
+  .
+  .
+    - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+```
+
+CircleCI Pipeline example
+
+[config.yml](../.circleci/config.yml)
+
+```sh
+version: 2.1
+
+jobs:
+  ai-insights-code-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              .
+              .
+              devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader            
 ```
 
 ## Developers Guide
@@ -163,4 +251,97 @@ python3 -m twine upload --repository testpypi src/dist/* --verbose
 ```sh
 pip install -i https://test.pypi.org/simple/ devai==0.1.4.2
 devai
+```
+
+### LangSmith LLM tracing configuration
+Create an account and generate API key.
+
+https://docs.smith.langchain.com/setup
+
+Set environment variables required for LangSmith integration.
+
+```sh
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+
+read -s LANGCHAIN_API_KEY
+export LANGCHAIN_API_KEY
+
+```
+
+### JIRA command configuration
+
+Create JIRA API token for your project.
+
+https://id.atlassian.com/manage-profile/security/api-tokens
+
+Set environment variables required for JIRA integration.
+
+```sh
+read -s JIRA_API_TOKEN
+export JIRA_API_TOKEN
+
+export JIRA_USERNAME = "email that you used to register with JIRA"
+export JIRA_INSTANCE_URL = "https://YOUR-PROJECT.atlassian.net"
+export JIRA_PROJECT_KEY = "JIRA project key"
+```
+Un-comment imports and function calls to use JIRA commands
+- cli.py
+- review.py
+
+Commands to test JIRA integration
+
+```sh
+# Will return list of JIRA issues in specified JIRA project
+devai jira list -c YOUR_JIRA_PROJECT_KEY
+
+# Will create a new JIRA issue with provided details as is
+devai jira create -c "New Feature request to implement Login Page.\nExample code block:\n {code}print(\"devai cli\"){code}"
+
+# Will generate implementation and create a new JIRA issue with details
+devai jira fix -c "write ring buffer implementation in Rust"
+```
+
+### GitLab command configuration
+
+Create Project Access Token with following details:
+
+- role: Maintainer
+- selected scopes: api
+
+https://gitlab.com/YOUR-USERID/YOUR-PROJECT/-/settings/access_tokens
+
+Set environment variables required for GitLab integration.
+
+```sh
+read -s GITLAB_PERSONAL_ACCESS_TOKEN 
+export GITLAB_PERSONAL_ACCESS_TOKEN
+
+export GITLAB_URL="https://gitlab.com"
+export GITLAB_REPOSITORY="USERID/REPOSITORY"
+export GITLAB_BRANCH="devai"
+export GITLAB_BASE_BRANCH="main"
+```
+
+Un-comment imports and function calls to use GitLab commands
+- cli.py
+- review.py
+
+Commands to test GitLab integration
+
+```sh
+# Will create a new merge request with provided details
+# Requires a branch to be created off main - manual step at this point
+# export GITLAB_BRANCH="fix-branch"
+devai gitlab create-pr -c "Details with file changes, docs, etc"
+
+# Will create a new GitLab issue with provided details as is
+devai gitlab fix-issue -c 4
+
+# Will add a comment to GitLab issue 
+# issue name defaults to 'CICD AI Insights' for demonstration
+devai gitlab create-comment -c "new comment content goes here"
+
+# Will add a comment to GitLab issue with name 'CICD AI Insights'
+devai gitlab create-comment -i "CICD AI Insights" -c "new comment content goes here"
 ```

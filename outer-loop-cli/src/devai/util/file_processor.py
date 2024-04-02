@@ -37,7 +37,7 @@ def get_text_files_contents(path, ignore=None):
     :return: Dictionary with file paths as keys and file contents as values
     """
     if ignore is None:
-        ignore = []
+        ignore = set(['venv', '__pycache__', '.gitignore'])
 
     result = {}
     for dirpath, dirnames, filenames in os.walk(path):
@@ -56,8 +56,8 @@ def get_text_files_contents(path, ignore=None):
 def format_files_as_string(input):
     def process_file(file_path):
         if not is_ascii_text(file_path):
-            # return f"file: {file_path}\nsource: [Binary File - Not ASCII Text]\n"
-            pass
+            return f"file: {file_path}\nsource: [Binary File - Not ASCII Text]\n"
+            # pass
 
         with open(file_path, 'r') as file:
             content = file.read()
@@ -65,10 +65,15 @@ def format_files_as_string(input):
             # return f"{content}\n\n"
 
     formatted_string = ""
-    
+
+    exclude_directories = set(['venv', '__pycache__', '.gitignore']) 
+
     if isinstance(input, str):
         if os.path.isdir(input):
+            
             for root, dirs, files in os.walk(input):
+                dirs[:] = [d for d in dirs if d not in exclude_directories]
+                files[:] = [f for f in files if f not in exclude_directories]
                 for file in files:
                     file_path = os.path.join(root, file)
                     if os.path.exists(file_path):
