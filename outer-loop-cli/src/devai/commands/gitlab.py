@@ -18,8 +18,11 @@ from langchain.agents import AgentType, initialize_agent
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 from langchain_community.utilities.gitlab import GitLabAPIWrapper
+  
+USER_AGENT = 'cloud-solutions/genai-outer-loop-devai'
 
-llm = ChatVertexAI(model_name="gemini-pro",
+with telemetry.tool_context_manager(USER_AGENT):
+  llm = ChatVertexAI(model_name="gemini-pro",
                    convert_system_message_to_human=True,
                    project=os.environ["PROJECT_ID"],
                    location=os.environ["LOCATION"])
