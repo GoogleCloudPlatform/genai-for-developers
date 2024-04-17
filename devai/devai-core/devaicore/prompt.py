@@ -12,29 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 
-from devai.commands import  prompt, review, release
-
-
-@click.group()
-def devai():
-    pass
+from vertexai.language_models import CodeChatModel, ChatModel
 
 
-@click.command()
-def echo():
-    click.echo('Command echo')
+def basic(query, context):
+    print("Prompt with context")
+    code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
+  
+    chat = code_chat_model.start_chat(context=context)
+    response = chat.send_message(query)
+    
+    return response.text
 
 
-# Empty Test Commands
-devai.add_command(echo)
 
 
-devai.add_command(prompt.prompt)
-devai.add_command(review.review)
-devai.add_command(release.release)
 
-
-if __name__ == '__main__':
-    devai()

@@ -14,27 +14,25 @@
 
 import click
 
-from devai.commands import  prompt, review, release
+from devaicore.prompt import basic
+
+
+
+@click.command(name='simple')
+@click.option('-q', '--query', required=False, type=str, default="Provide a summary of this source code")
+@click.option('-c', '--context', required=False, type=str, default="")
+def simple(query, context):
+    click.echo("Simple Prompt")
+
+    response = basic(query=query, context=context)
+
+    click.echo(response)
+
 
 
 @click.group()
-def devai():
+def prompt():
     pass
 
+prompt.add_command(simple)
 
-@click.command()
-def echo():
-    click.echo('Command echo')
-
-
-# Empty Test Commands
-devai.add_command(echo)
-
-
-devai.add_command(prompt.prompt)
-devai.add_command(review.review)
-devai.add_command(release.release)
-
-
-if __name__ == '__main__':
-    devai()
