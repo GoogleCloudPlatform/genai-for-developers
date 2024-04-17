@@ -3,12 +3,13 @@
 The apps contained in this folder provide various features to support developers throughout the SDLC.
 
 The apps are published to pypi at the following locations:
-- https://test.pypi.org/project/devaicore
 - https://test.pypi.org/project/devaicli
+- https://test.pypi.org/project/devaicore
 
-**DevAI Core** contains centralized logic and prompts to be used by many different interfaces including: CLI, Chrome Extensions, Slackbot and more.
 
 **DevAI CLI** is a command line interface exposing devai capabilities directly to developer in the terminal or utilized in CICD processes for automation.
+
+**DevAI Core** contains centralized logic and prompts to be used by many different interfaces including: CLI, Chrome Extensions, Slackbot and more.
 
 ## Usage
 
@@ -27,10 +28,17 @@ NOTE:
 
 Install and run the devai cli with the following commands:
 
+
 ```sh
 pip install -i https://test.pypi.org/simple/ devaicli
 
 devai echo
+devai review code -c ../sample-app/src/main/java
+devai review performance -c ../sample-app/src/main/java
+devai review security -c ../sample-app/src/main/java
+
+devai release notes -t "v5.0.0"
+devai release report -t "v5.0.0"
 ```
 
 Include devaicore in your application with the following command:

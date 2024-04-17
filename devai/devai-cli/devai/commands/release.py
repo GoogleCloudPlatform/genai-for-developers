@@ -14,8 +14,69 @@
 
 import click
 import sys
-
 from devai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches, list_tags, list_commits_for_tags
+from vertexai.language_models import CodeChatModel
+
+
+parameters = {
+    "max_output_tokens": 2048,
+    "temperature": 0.2
+}
+
+source = '''
+GIT DIFFS:
+{}
+
+GIT COMMITS:
+{}
+
+FINAL CODE:
+{}
+
+'''
+report_qry = '''
+INSTRUCTIONS:
+You are senior software engineer doing a code review. You are given following information:
+GIT DIFFS - new code changes
+GIT COMMITS - developer written comments for new code changes
+FINAL CODE - final version of the source code
+
+GIT DIFFS show lines added and removed with + and - indicators.
+Here's an example:
+This line shows that code was changed/removed from the FINAL CODE section:
+-            return f"file: source: [Binary File - Not ASCII Text]"
+This line shows that code was changed/added in the FINAL CODE section:
++            # return f"file: source: [Binary File - Not ASCII Text]
+
+GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+
+Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
+and write explanation for internal company change management about what has changed in several sentences with bullet points.
+Use professional tone for explanation.
+Only write explanation for new code changes and not for existing code in the FINAL CODE section.
+'''
+
+user_notes_qry = '''
+INSTRUCTIONS:
+You are senior software engineer doing a code review. You are given following information:
+GIT DIFFS - new code changes
+GIT COMMITS - developer written comments for new code changes
+FINAL CODE - final version of the source code
+
+GIT DIFFS show lines added and removed with + and - indicators.
+Here's an example:
+This line shows that code was changed/removed from the FINAL CODE section:
+-            return f"file: source: [Binary File - Not ASCII Text]"
+This line shows that code was changed/added in the FINAL CODE section:
++            # return f"file: source: [Binary File - Not ASCII Text]
+
+GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+
+Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
+and write end user summary about what has changed in several sentences with bullet points.
+Use user humorous tone for explanation. MUST INCLUDE ONE JOKE
+Only write explanation for new code changes and not for existing code in the FINAL CODE section.
+'''
 
 
 @click.command(name="report")
@@ -50,7 +111,6 @@ def check_if_string_is_in_list(string, list):
 
 def summary_for_tag(tag, qry):
     tags = list_tags()
-    
 
     if len(tags) == 0:
         click.echo("No tags found")
@@ -81,17 +141,17 @@ def summary_for_tag(tag, qry):
     end_sha = list[0]
 
     files = list_files(start_sha, end_sha, refer_commit_parent)
+
     changes = list_changes(start_sha, end_sha, refer_commit_parent)
+
     commit_messages = list_commit_messages(
         start_sha, end_sha, refer_commit_parent)
 
-    # Format the source prompt with the data
     prompt_context = source.format(
         changes, commit_messages, format_files_as_string(files))
 
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
     chat = code_chat_model.start_chat(context=prompt_context, **parameters)
-    
     response = chat.send_message(qry)
 
     return response

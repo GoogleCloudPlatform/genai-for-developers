@@ -81,7 +81,7 @@ Output the findings with class and method names followed by the found issues.
     response = chat.send_message(qry)
 
     click.echo(f"Response from Model: {response.text}")
-
+ 
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")

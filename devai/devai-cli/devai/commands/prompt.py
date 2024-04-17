@@ -14,25 +14,31 @@
 
 import click
 
-from devaicore.prompt import basic
+
+from devai.util.file_processor import get_text_files_contents
+from vertexai.language_models import CodeChatModel, ChatModel
 
 
-
-@click.command(name='simple')
-@click.option('-q', '--query', required=False, type=str, default="Provide a summary of this source code")
+@click.command(name='with_context')
+@click.option('-q', '--qry', required=False, type=str, default="Provide a summary of this source code")
 @click.option('-c', '--context', required=False, type=str, default="")
-def simple(query, context):
-    click.echo("Simple Prompt")
+def with_context(qry, context):
+    click.echo("Prompt with context")
+    code_chat_model = ChatModel.from_pretrained("chat-bison")
 
-    response = basic(query=query, context=context)
+    code_chat_model = CodeChatModel.from_pretrained("codechat-bison")
+    # context=""
 
-    click.echo(response)
+    chat = code_chat_model.start_chat(context=context)
+    response = chat.send_message(qry)
 
+    click.echo(response.text)
 
 
 @click.group()
 def prompt():
     pass
 
-prompt.add_command(simple)
+
+prompt.add_command(with_context)
 

@@ -1,4 +1,8 @@
-# Publishing
+# DevAI Core
+
+Centralized logic for AI developer support
+
+## Publishing
 
 To publish on pypi follow the steps below
 
