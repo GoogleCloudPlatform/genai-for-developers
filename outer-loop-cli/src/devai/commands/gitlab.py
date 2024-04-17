@@ -18,6 +18,7 @@ from langchain.agents import AgentType, initialize_agent
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 from langchain_community.utilities.gitlab import GitLabAPIWrapper
+from google.cloud.aiplatform import telemetry
   
 USER_AGENT = 'cloud-solutions/genai-outer-loop-devai'
 
