@@ -16,6 +16,10 @@ import click
 
 from devai.commands import cmd,  prompt, review, release
 
+# Uncomment after configuring JIRA and GitLab env variables - see README.md for details
+# from devai.commands import jira
+# from devai.commands import gitlab
+
 
 @click.group()
 def devai():
@@ -34,6 +38,9 @@ devai.add_command(cmd.sub)
 devai.add_command(prompt.prompt)
 devai.add_command(review.review)
 devai.add_command(release.release)
+
+# devai.add_command(jira.jira)
+# devai.add_command(gitlab.gitlab)
 
 
 if __name__ == '__main__':
