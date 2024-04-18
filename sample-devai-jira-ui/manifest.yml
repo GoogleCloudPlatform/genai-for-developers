@@ -1,0 +1,25 @@
+modules:
+  jira:issuePanel:
+    - key: devai-jira-ui-qwiklabs-hello-world-issue-panel
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: devai-jira-ui-qwiklabs
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  id: ari:cloud:ecosystem::app/07fca444-181a-45d2-9985-9c30b3547558
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+  external:
+    fetch:
+      client:
+        - devai-api-7su2ctuqpq-uc.a.run.app/generate
