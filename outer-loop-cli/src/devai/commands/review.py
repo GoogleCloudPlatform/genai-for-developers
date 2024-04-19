@@ -16,16 +16,15 @@
 import click
 from devai.util.file_processor import format_files_as_string
 from vertexai.generative_models import GenerativeModel, ChatSession
+from google.cloud.aiplatform import telemetry
+
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
+model_name="gemini-1.5-pro-preview-0409"
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
 # from devai.commands.jira import create_jira_issue
 # from devai.commands.gitlab import create_gitlab_issue_comment
-
-parameters = {
-    "max_output_tokens": 2048,
-    "temperature": 0.2
-}
 
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
@@ -58,8 +57,9 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel("gemini-1.0-pro")
-    code_chat = code_chat_model.start_chat()
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
     code_chat.send_message(qry)
     response = code_chat.send_message(source)
 
@@ -104,8 +104,9 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel("gemini-1.0-pro")
-    code_chat = code_chat_model.start_chat()
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
     code_chat.send_message(qry)
     response = code_chat.send_message(source)
 
@@ -139,8 +140,9 @@ If no issues are found, output "No issues found".
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel("gemini-1.0-pro")
-    code_chat = code_chat_model.start_chat()
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
     code_chat.send_message(qry)
     response = code_chat.send_message(source)
 
