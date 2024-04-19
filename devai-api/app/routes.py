@@ -28,15 +28,17 @@ from langchain.agents import AgentType, initialize_agent
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 from langchain_community.utilities.gitlab import GitLabAPIWrapper
 from langchain_google_vertexai import ChatVertexAI
-
+from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 model_name="gemini-1.5-pro-preview-0409"
 
-llm = ChatVertexAI(model_name=model_name,
-    convert_system_message_to_human=True,
-    temperature=0.2,
-    max_output_tokens=4096)
+with telemetry.tool_context_manager(USER_AGENT):
+    llm = ChatVertexAI(model_name=model_name,
+        convert_system_message_to_human=True,
+        temperature=0.2,
+        max_output_tokens=4096)
 
 gitlab = GitLabAPIWrapper()
 toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
@@ -63,7 +65,8 @@ async def root():
 @routes.get("/test")
 async def test():
     """Test endpoint"""
-    code_chat = code_chat_model.start_chat()
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
     response = code_chat.send_message("Tell me about Google Gemini 1.5 capabilities")
     print(f"Response from Model:\n{response.text}\n")
     return {"message": response.text}
@@ -81,11 +84,11 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     REQUIREMENTS:
     {prompt}
     """
-
-    code_chat = code_chat_model.start_chat()
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
     response = code_chat.send_message(instructions)
     print(f"Response from Model:\n{response.text}\n")
-    # GitLab Agent Call
+
     # resp_text = response.candidates[0].content.parts[0].text
 
     # pr_prompt = f"""Create GitLab merge request using provided details below.

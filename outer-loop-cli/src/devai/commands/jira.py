@@ -22,12 +22,16 @@ from langchain_community.agent_toolkits.jira.toolkit import JiraToolkit
 from langchain_community.utilities.jira import JiraAPIWrapper
 from langchain_google_vertexai import ChatVertexAI
 from jira import JIRA
+from google.cloud.aiplatform import telemetry
 
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
+model_name="gemini-1.5-pro-preview-0409"
 
-llm = ChatVertexAI(model_name="gemini-pro",
-                   convert_system_message_to_human=True,
-                   project=os.environ["PROJECT_ID"],
-                   location=os.environ["LOCATION"])
+with telemetry.tool_context_manager(USER_AGENT):
+    llm = ChatVertexAI(model_name=model_name,
+                    convert_system_message_to_human=True,
+                    project=os.environ["PROJECT_ID"],
+                    location=os.environ["LOCATION"])
 
 jira = JiraAPIWrapper()
 toolkit = JiraToolkit.from_jira_api_wrapper(jira)
