@@ -11,7 +11,7 @@ jobs:
               pip install virtualenv
               virtualenv venv
               source venv/bin/activate
-              cd outer-loop-cli/src
+              cd devai-cli/src
               pip install -r requirements.txt
               pip install --editable .
               cd ../..
@@ -56,7 +56,7 @@ jobs:
               pip install virtualenv
               virtualenv venv
               source venv/bin/activate
-              cd outer-loop-cli/src
+              cd devai-cli/src
               pip install -r requirements.txt
               pip install --editable .
               cd ../..
@@ -101,7 +101,7 @@ jobs:
               pip install virtualenv
               virtualenv venv
               source venv/bin/activate
-              cd outer-loop-cli/src
+              cd devai-cli/src
               pip install -r requirements.txt
               pip install --editable .
               cd ../..
