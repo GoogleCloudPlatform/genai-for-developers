@@ -15,8 +15,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='devai',
-    version='0.1.4.2',
+    name='devai-cli',
+    version='0.0.0a1',
     packages=find_packages(),
     py_modules=['devai'],
     install_requires=[
