@@ -15,7 +15,7 @@ export LOCATION=us-central1
 ```
 
 ```sh
-pip install -i https://test.pypi.org/simple/ devai
+pip install devai-cli
 ```
 
 ## Local execution
@@ -237,19 +237,28 @@ deactivate
 
 ### Publish to PyPi
 
+To publish manually
+- Update version number in setup.py
+  - Follow semantic versioning
+  - versioned in order as follows (`.devN, aN, bN, rcN, <no suffix>, .postN`)
+- Retrieve a personal API key from https://pypi.org/manage/account/token/ to publish
+  - You will need rights to publish to the pypi project
+- Run the commands below an supply your API key when prompted
+
 ```sh
 pip install build twine
 ```
 
 ```sh
 rm -rf src/dist
+rm -rf src/devai_cli.egg-info
 python3 -m build src/
 
-python3 -m twine upload --repository testpypi src/dist/* --verbose
+python3 -m twine upload src/dist/* --verbose
 ```
 
 ```sh
-pip install -i https://test.pypi.org/simple/ devai==0.1.4.2
+pip install devai-cli==0.0.0a1
 devai
 ```
 
