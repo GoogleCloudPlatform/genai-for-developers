@@ -251,6 +251,7 @@ pip install build twine
 
 ```sh
 rm -rf src/dist
+rm -rf src/devai_cli.egg-info
 python3 -m build src/
 
 python3 -m twine upload src/dist/* --verbose
