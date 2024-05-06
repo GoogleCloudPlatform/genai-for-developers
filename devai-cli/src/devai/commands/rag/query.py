@@ -1,18 +1,18 @@
 import click
-from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
 from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_google_vertexai import ChatVertexAI
-import os
+
 
 
 @click.command()
 @click.option('-q', '--qry', required=False, type=str, default="")
-def query(qry):
+@click.option('-d', '--db_path', required=False, type=str, default="./chroma_db_store", help="Provide the path to persist the DB")
+def query(qry, db_path):
 
     # Load the ChromaDB
-    persist_directory = "./chroma_db_store"
+    persist_directory = db_path
     EMBEDDING_QPM = 100
     EMBEDDING_NUM_BATCH = 5
     embeddings = VertexAIEmbeddings(
