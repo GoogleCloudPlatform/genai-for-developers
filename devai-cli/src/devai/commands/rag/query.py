@@ -6,13 +6,6 @@ from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_google_vertexai import ChatVertexAI
 import os
 
-# TODO: Remove API KEY
-
-# Load environment variables for Gemini Pro
-# load_dotenv()
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-# # AIzaSyDRkzVLmGe-ze3wNX0mcv7dBPF4tpXESmw
-
 
 @click.command()
 @click.option('-q', '--qry', required=False, type=str, default="")
@@ -20,17 +13,26 @@ def query(qry):
 
     # Load the ChromaDB
     persist_directory = "./chroma_db_store"
-    embedding_function = VertexAIEmbeddings(
-        requests_per_minute=100,  # Adjust rate limiting as needed
-        num_instances_per_batch=5,
-        model_name="textembedding-gecko@latest"
+    EMBEDDING_QPM = 100
+    EMBEDDING_NUM_BATCH = 5
+    embeddings = VertexAIEmbeddings(
+        requests_per_minute=EMBEDDING_QPM,
+        num_instances_per_batch=EMBEDDING_NUM_BATCH,
+        model_name="textembedding-gecko@latest",
     )
-    db = Chroma(persist_directory=persist_directory,
-                embedding_function=embedding_function)
+    db = Chroma(
+        persist_directory=persist_directory,
+        embedding_function=embeddings,
+        collection_name="source_code_embeddings"
+    )
 
     # Create a retriever from ChromaDB (adjust parameters as needed)
     # Get top 3 most similar documents
-    retriever = db.as_retriever(search_kwargs={"k": 3})
+    retriever = db.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 3, 
+                       "mmr_repetition_penalty": 1.2,
+                       })
 
     # Load the Gemini Pro model
 
@@ -39,18 +41,24 @@ def query(qry):
         # model_name="gemini-1.5-pro-latest",
         model_name="gemini-pro",
         safety_settings={},
-        temperature=.2,
+        temperature=.1,
         # max_output_tokens=256,
         # top_p=0.9,
         # presence_penalty=0.1,
         convert_system_message_to_human=True
     )
 
+    question = qry
+
+
+    result_direct_retreival = retriever.get_relevant_documents(question)
+    
     # Create a RetrievalQA chain
     qa = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+        llm=llm, chain_type="refine", retriever=retriever, return_source_documents=True)
 
-    query = qry
+    template="Respond to the following query as best you can using the context provided. Keep your answers short and concise. If you don't know say you don't know. {qry}"
+    query = template.format(qry=qry)
     result = qa.invoke({"query": query})
     answer = result['result']
     source_documents = result['source_documents']

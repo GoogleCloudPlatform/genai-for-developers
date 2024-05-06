@@ -37,6 +37,9 @@ devai review security -c ../../sample-app/src/main/java
 
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
+
+devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
+devai rag query -q "What does devai do"
 ```
 
 ## Enable APIs
@@ -168,6 +171,12 @@ python -m devai review security -c ../../sample-app/src/main/java
 
 python -m devai release notes_user_tag -t "v5.0.0"
 python -m devai release notes_user -s "main" -e "feature-branch-name" 
+
+
+python -m devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
+python -m devai rag query -q "What does devai do"
+
+
 
 ```
 

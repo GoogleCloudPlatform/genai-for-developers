@@ -28,14 +28,21 @@ def load_docs(repo_path, branch, local_dir, allowed_extensions):
 
     loader = GitLoader(local_dir, branch=branch, file_filter=file_filter)
     return loader.load()
-
+ 
 
 @click.command()
-def load():
-    repo_path = "https://github.com/GoogleCloudPlatform/generative-ai"
-    branch = "main"
-    local_dir = "./generative-ai"
-
+@click.option('-r', '--repo', required=True, type=str, help="Provide the git repo location to load" )
+@click.option('-b', '--branch', required=False, type=str, default="main", help="Provide the git branch to load")
+@click.option('-d', '--db_path', required=False, type=str, default="./chroma_db_store", help="Provide the path to persist the DB")
+def load(repo, branch, db_path):
+   
+    repo_path = repo
+    branch = branch
+    local_dir = "./repo"
+    try: 
+        shutil.rmtree(local_dir)
+    except:
+        pass
     # Common source code file extensions and markdown
     allowed_extensions = [
         ".py", ".java", ".cpp", ".c", ".cs", ".js", ".ts",
@@ -59,22 +66,35 @@ def load():
         model_name="textembedding-gecko@latest",
     )
 
+
     # 4. Store in ChromaDB
+    #cleanup previous run
+    try:
+        shutil.rmtree(db_path)
+    except:
+        pass
+
     db = Chroma.from_documents(
         texts, embeddings,
-        persist_directory="./chroma_db_store",
+        persist_directory=db_path,
         collection_name="source_code_embeddings"
     )
     db.persist()
-
+    # cleanup clone
+    try:
+        shutil.rmtree(local_dir)
+    except:
+        pass
     print("Done with load")
 
 
 @click.command()
-def testdb():
+@click.option('-d', '--db_path', required=False, type=str, default="./chroma_db_store", help="Provide the path to the DB")
+@click.option('-q', '--qry', required=False, type=str, default="", help="Sample Query")
+def testdb(db_path, qry):
     # 1. Load existing ChromaDB if it exists
     db = None
-    persist_directory = "./chroma_db_store"
+    persist_directory = db_path
     if Path(persist_directory).exists():
         # Assuming same embeddings were used to create the DB
         EMBEDDING_QPM = 100
@@ -93,7 +113,7 @@ def testdb():
     # 2. Simple test if DB loaded
     if db:
         # Sample query
-        sample_query = "what is Cymbal starlight"
+        sample_query = qry
         docs = db.similarity_search(sample_query)
 
         if docs:
