@@ -55,7 +55,9 @@ def query(qry, db_path):
     
     # Create a RetrievalQA chain
     qa = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="refine", retriever=retriever, return_source_documents=True)
+        llm=llm, chain_type="stuff", 
+        retriever=retriever, 
+        return_source_documents=True)
 
     template="Respond to the following query as best you can using the context provided. Keep your answers short and concise. If you don't know say you don't know. {qry}"
     query = template.format(qry=qry)
