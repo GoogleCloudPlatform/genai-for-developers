@@ -79,7 +79,7 @@ def format_files_as_string(input):
                     if os.path.exists(file_path):
                         formatted_string += process_file(file_path)
         else:
-            if os.path.exists(file_path):
+            if os.path.exists(input):
                 formatted_string += process_file(input)
     elif isinstance(input, list):
         for file_path in input:
