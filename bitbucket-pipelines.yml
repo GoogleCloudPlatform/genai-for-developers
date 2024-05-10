@@ -1,0 +1,34 @@
+image: python:3.11-slim
+
+pipelines:
+  default:
+      - step:
+          name: DevAI CLI
+          caches:
+            - pip
+          script:
+            - pip install virtualenv
+            - virtualenv venv
+            - source venv/bin/activate
+            - cd devai-cli/src
+            - pip install -r requirements.txt
+            - pip install --editable .
+            - export GIT_PYTHON_REFRESH=quiet
+            - devai echo
+            - cd ../..
+
+            - export GOOGLE_CLOUD_CREDENTIALS=$(echo $GOOGLE_CLOUD_CREDENTIALS)
+            - echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json 
+            - export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
+
+            - export PROJECT_ID=$(echo $PROJECT_ID)
+            - export LOCATION=$(echo $LOCATION)
+
+            - export JIRA_API_TOKEN=$(echo $JIRA_API_TOKEN)
+            - export JIRA_USERNAME=$(echo $JIRA_USERNAME)
+            - export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
+            - export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+
+            - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+            - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+            - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
