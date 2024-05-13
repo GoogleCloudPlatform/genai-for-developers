@@ -34,8 +34,8 @@ import sys
 sys.path.append('../../package') 
 from secret_manager import get_access_secret
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
-PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
+
 INSTRUCTION_ID='generate_handler_instruction'
 model_name="gemini-1.5-pro-preview-0409"
 
@@ -83,7 +83,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    instructions = get_access_secret(PROJECT_ID, INSTRUCTION_ID, USER_AGENT)
+    instructions = get_access_secret( INSTRUCTION_ID)
     
     if instructions is None:
         instructions = f"""You are principal software engineer at Google and given requirements below for implementation.

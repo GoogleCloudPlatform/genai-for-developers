@@ -10,7 +10,6 @@ from secret_manager import get_access_secret
 
 PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
 LOCATION = os.environ.get('GCP_REGION', '-')
-USER_AGENT = "cloud-solutions/genai-for-developers-v1.0"
 
 client = google.cloud.logging.Client(project=PROJECT_ID)
 client.setup_logging()
@@ -36,7 +35,7 @@ def devai(request):
     vertexai.init(project=PROJECT_ID, location=LOCATION)
     model = TextGenerationModel.from_pretrained("text-bison")
     
-    prompt = get_access_secret(PROJECT_ID, PROMPT_ID, USER_AGENT)
+    prompt = get_access_secret(PROMPT_ID)
     
     if prompt is None:
         prompt = f'''

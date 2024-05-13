@@ -27,8 +27,6 @@ from secret_manager import get_access_secret
 
 def with_msg(query, path):
     
-    PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
-    USER_AGENT = "cloud-solutions/genai-for-developers-v1.0"
     INITIAL_ID = "init_prompt_id"
 
     # code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
@@ -36,7 +34,7 @@ def with_msg(query, path):
     # code_chat_model = CodeChatModel.from_pretrained("codechat-bison-32k")  
     # code_chat_model = ChatModel.from_pretrained("chat-bison@001")
 
-    initial_prompt = get_access_secret(PROJECT_ID, INITIAL_ID, USER_AGENT)
+    initial_prompt = get_access_secret(INITIAL_ID)
     
     if initial_prompt is None:
         initial_prompt='''

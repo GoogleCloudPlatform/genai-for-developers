@@ -3,7 +3,9 @@ from google.api_core.exceptions import NotFound
 from google.api_core.gapic_v1.client_info import ClientInfo
 import logging
  
-def get_access_secret(project_id: str, secret_id: str, user_agent: str) -> str:
+def get_access_secret( secret_id: str) -> str:
+    PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
+    USER_AGENT = "cloud-solutions/genai-for-developers-v1.1"
 
     client = secretmanager.SecretManagerServiceClient(
         client_info=ClientInfo(user_agent=user_agent)

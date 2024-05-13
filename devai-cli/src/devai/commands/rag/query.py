@@ -12,11 +12,8 @@ from secret_manager import get_access_secret
 @click.option('-q', '--qry', required=False, type=str, default="")
 @click.option('-d', '--db_path', required=False, type=str, default="./chroma_db_store", help="Provide the path to persist the DB")
 def query(qry, db_path):
-
     TEMPLATE_ID='template_query'
-    USER_AGENT = "cloud-solutions/genai-for-developers-v1.0"
-    PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
-    
+
     # Load the ChromaDB
     persist_directory = db_path
     EMBEDDING_QPM = 100
@@ -61,7 +58,7 @@ def query(qry, db_path):
         llm=llm, chain_type="stuff", 
         retriever=retriever, 
         return_source_documents=True)
-    template = get_access_secret(PROJECT_ID, TEMPLATE_ID, USER_AGENT)
+    template = get_access_secret(TEMPLATE_ID)
     
     if template is None:
         template="Respond to the following query as best you can using the context provided. Keep your answers short and concise. If you don't know say you don't know. {qry}"
