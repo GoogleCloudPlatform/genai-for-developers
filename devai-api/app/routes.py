@@ -31,7 +31,7 @@ from langchain_google_vertexai import ChatVertexAI
 from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 import sys
-sys.path.append('../../package') 
+sys.path.append('../package') 
 from secret_manager import get_access_secret
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'

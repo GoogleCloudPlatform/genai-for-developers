@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import os
 import click
 import sys
 from devai.util.file_processor import format_files_as_string, list_files, list_changes, list_commit_messages, list_commits_for_branches, list_tags, list_commits_for_tags
 from vertexai.language_models import CodeChatModel
+import sys
+sys.path.append('../package') 
+from secret_manager import get_access_secret
 
 
 parameters = {
@@ -34,48 +37,53 @@ FINAL CODE:
 {}
 
 '''
-report_qry = '''
-INSTRUCTIONS:
-You are senior software engineer doing a code review. You are given following information:
-GIT DIFFS - new code changes
-GIT COMMITS - developer written comments for new code changes
-FINAL CODE - final version of the source code
 
-GIT DIFFS show lines added and removed with + and - indicators.
-Here's an example:
-This line shows that code was changed/removed from the FINAL CODE section:
--            return f"file: source: [Binary File - Not ASCII Text]"
-This line shows that code was changed/added in the FINAL CODE section:
-+            # return f"file: source: [Binary File - Not ASCII Text]
+report_qry = get_access_secret('report_qry')
+if report_qry is None:
+    report_qry = '''
+    INSTRUCTIONS:
+    You are senior software engineer doing a code review. You are given following information:
+    GIT DIFFS - new code changes
+    GIT COMMITS - developer written comments for new code changes
+    FINAL CODE - final version of the source code
 
-GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+    GIT DIFFS show lines added and removed with + and - indicators.
+    Here's an example:
+    This line shows that code was changed/removed from the FINAL CODE section:
+    -            return f"file: source: [Binary File - Not ASCII Text]"
+    This line shows that code was changed/added in the FINAL CODE section:
+    +            # return f"file: source: [Binary File - Not ASCII Text]
 
-Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
-and write explanation for internal company change management about what has changed in several sentences with bullet points.
-Use professional tone for explanation.
-Only write explanation for new code changes and not for existing code in the FINAL CODE section.
-'''
+    GIT COMMITS show the commit messages provided by developer that you can use for extra context.
 
-user_notes_qry = '''
-INSTRUCTIONS:
-You are senior software engineer doing a code review. You are given following information:
-GIT DIFFS - new code changes
-GIT COMMITS - developer written comments for new code changes
-FINAL CODE - final version of the source code
+    Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
+    and write explanation for internal company change management about what has changed in several sentences with bullet points.
+    Use professional tone for explanation.
+    Only write explanation for new code changes and not for existing code in the FINAL CODE section.
+    '''
 
-GIT DIFFS show lines added and removed with + and - indicators.
-Here's an example:
-This line shows that code was changed/removed from the FINAL CODE section:
--            return f"file: source: [Binary File - Not ASCII Text]"
-This line shows that code was changed/added in the FINAL CODE section:
-+            # return f"file: source: [Binary File - Not ASCII Text]
+user_notes_qry = get_access_secret('user_notes_qry')
+if user_notes_qry is None:
+    user_notes_qry = '''
+    INSTRUCTIONS:
+    You are senior software engineer doing a code review. You are given following information:
+    GIT DIFFS - new code changes
+    GIT COMMITS - developer written comments for new code changes
+    FINAL CODE - final version of the source code
 
-GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+    GIT DIFFS show lines added and removed with + and - indicators.
+    Here's an example:
+    This line shows that code was changed/removed from the FINAL CODE section:
+    -            return f"file: source: [Binary File - Not ASCII Text]"
+    This line shows that code was changed/added in the FINAL CODE section:
+    +            # return f"file: source: [Binary File - Not ASCII Text]
 
-Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
-and write end user summary about what has changed in several sentences with bullet points.
-Use user humorous tone for explanation. MUST INCLUDE ONE JOKE
-Only write explanation for new code changes and not for existing code in the FINAL CODE section.
+    GIT COMMITS show the commit messages provided by developer that you can use for extra context.
+
+    Using this pattern, analyze provided GIT DIFFS, GIT COMMITS and FINAL CODE section 
+    and write end user summary about what has changed in several sentences with bullet points.
+    Use user humorous tone for explanation. MUST INCLUDE ONE JOKE
+    Only write explanation for new code changes and not for existing code in the FINAL CODE section.
 '''
 
 

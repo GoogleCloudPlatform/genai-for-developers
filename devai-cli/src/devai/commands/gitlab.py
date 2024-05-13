@@ -19,6 +19,9 @@ from langchain_google_vertexai import ChatVertexAI
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 from langchain_community.utilities.gitlab import GitLabAPIWrapper
 from google.cloud.aiplatform import telemetry
+import sys
+sys.path.append('../package') 
+from secret_manager import get_access_secret
   
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 model_name="gemini-1.5-pro-preview-0409"
@@ -48,21 +51,24 @@ def create_pull_request(context):
 
 
 def create_gitlab_issue_comment(context, issue_name='CICD AI Insights'):
+    prompt = get_access_secret("create_gitlab_issue_comment_prompt")
+    if prompt is None:
+        prompt = """You need to do two tasks only.
+        First task: Get GitLab issue with title '{}'.
+        Second task: add content below as a comment to the issue you found in first task:
 
-    prompt = """You need to do two tasks only.
-    First task: Get GitLab issue with title '{}'.
-    Second task: add content below as a comment to the issue you found in first task:
-
-    
-    {}""".format(issue_name, json.dumps(context))
+        
+        {}""".format(issue_name, json.dumps(context))
 
     return agent.invoke(prompt)
 
 def fix_gitlab_issue_comment(context):
-    prompt = """You have the software engineering capabilities of a Google Principle engineer.
-    You are tasked with completing issues on a gitlab repository.
-    Please look at the open issue #{} and complete it by creating pull request that solves the issue."
-    """.format(context)
+    prompt = get_access_secret("fix_gitlab_issue_comment_prompt")
+    if prompt is None:
+        prompt = """You have the software engineering capabilities of a Google Principle engineer.
+        You are tasked with completing issues on a gitlab repository.
+        Please look at the open issue #{} and complete it by creating pull request that solves the issue."
+        """.format(context)
     
     return agent.invoke(prompt)
 

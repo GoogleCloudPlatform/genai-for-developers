@@ -23,6 +23,9 @@ from langchain_community.utilities.jira import JiraAPIWrapper
 from langchain_google_vertexai import ChatVertexAI
 from jira import JIRA
 from google.cloud.aiplatform import telemetry
+import sys
+sys.path.append('../package') 
+from secret_manager import get_access_secret
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 model_name="gemini-1.5-pro-preview-0409"
@@ -117,23 +120,25 @@ def create(context):
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def fix(context):
-
-    prompt = """
-        INSTRUCTIONS:
-        You are principal software engineer and given requirements to implement.
-        Please provide implementation details and documentation.
-        
-        CONTEXT:
-        {}
-        """.format(context)
+    prompt = get_access_secret('jira-fix-prompt')
+    if prompt is None:
+        prompt = """
+            INSTRUCTIONS:
+            You are principal software engineer and given requirements to implement.
+            Please provide implementation details and documentation.
+            
+            CONTEXT:
+            {}
+            """.format(context)
 
     fix = llm.invoke(
         prompt
     )
-
-    create_prompt = """Create a new JIRA issue with description below:
-                 CONTENT:
-                 {}""".format(json.dumps(fix.content))
+    create_prompt = get_access_secret('jira-create-prompt')
+    if createprompt is None:
+        create_prompt = """Create a new JIRA issue with description below:
+                    CONTENT:
+                    {}""".format(json.dumps(fix.content))
 
     cleaned_prompt = create_prompt.strip()
     cleaned_prompt = cleaned_prompt.replace("```", "{code}")    
