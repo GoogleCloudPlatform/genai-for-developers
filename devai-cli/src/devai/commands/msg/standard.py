@@ -17,7 +17,7 @@ import click
 from devai.util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 import sys
-sys.path.append('../package') 
+sys.path.append('../../package') 
 from secret_manager import get_access_secret
 
 @click.command(name='with_msg')
