@@ -52,7 +52,8 @@ Enable Gemini chat and Vertex AI APIs.
 gcloud services enable \
     aiplatform.googleapis.com \
     cloudaicompanion.googleapis.com \
-    cloudresourcemanager.googleapis.com
+    cloudresourcemanager.googleapis.com \
+    secretmanager.googleapis.com
 ```
 
 ## Configure Service Account
