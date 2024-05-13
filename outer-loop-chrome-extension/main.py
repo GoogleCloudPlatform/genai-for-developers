@@ -5,7 +5,7 @@ import google.cloud.logging
 import vertexai
 from vertexai.language_models import TextGenerationModel
 import sys
-sys.path.append('../package') 
+sys.path.append('package') 
 from secret_manager import get_access_secret
 
 PROJECT_ID = os.environ.get('GCP_PROJECT', '-')

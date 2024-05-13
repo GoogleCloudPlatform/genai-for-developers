@@ -13,6 +13,17 @@ Copyright 2024 Google LLC
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+# Enable Service Usage API
+module "project-service-serviceusage" {
+  source  = "terraform-google-modules/project-factory/google//modules/project_services"
+  version = "4.0.0"
+
+  project_id = var.project_id
+
+  activate_apis = [
+    "serviceusage.googleapis.com"
+  ]
+}
 
 # Enable Cloud Resource Manager API
 module "project-service-cloudresourcemanager" {
@@ -38,5 +49,5 @@ module "project-services" {
     "cloudaicompanion.googleapis.com",
     "secretmanager.googleapis.com"
   ]
-  depends_on = [module.project-service-cloudresourcemanager]
+  depends_on = [module.project-service-serviceusage, module.project-service-cloudresourcemanager]
 }

@@ -21,7 +21,7 @@ import sys
 sys.path.append('../package') 
 from secret_manager import get_access_secret
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 model_name="gemini-1.5-pro-preview-0409"
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details

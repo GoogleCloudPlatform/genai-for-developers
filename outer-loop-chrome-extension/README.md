@@ -13,10 +13,16 @@ export GCP_PROJECT='<Your GCP Project Id>'  # Change this
 export GCP_REGION='us-central1'  
 ```
 
+Enable services
+   ```bash
+   terraform -chdir=terraform init
+   terraform -chdir=terraform apply -var project_id=$GCP_PROJECT
+   ```
+
 Execute the following command to deploy the function
 
    ```bash
-
+   cp -a ../package .
    gcloud functions deploy devai \
    --gen2 \
    --runtime=python311 \
