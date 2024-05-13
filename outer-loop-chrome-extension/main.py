@@ -10,6 +10,7 @@ from secret_manager import get_access_secret
 
 PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
 LOCATION = os.environ.get('GCP_REGION', '-')
+PROMPT_ID = "outloop-prompt"
 
 client = google.cloud.logging.Client(project=PROJECT_ID)
 client.setup_logging()
