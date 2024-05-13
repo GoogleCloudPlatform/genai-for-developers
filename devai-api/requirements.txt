@@ -17,3 +17,6 @@ PyGithub==2.2.0
 jira==3.6.0
 pydantic==2.6.1
 atlassian-python-api==3.41.10
+langchain-community
+google-cloud-secret-manager==2.16.1
+google-crc32c==1.5.0

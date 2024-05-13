@@ -3,7 +3,9 @@ from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
 from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_google_vertexai import ChatVertexAI
-
+import sys
+sys.path.append('../../package') 
+from secret_manager import get_access_secret
 
 
 @click.command()
@@ -11,6 +13,10 @@ from langchain_google_vertexai import ChatVertexAI
 @click.option('-d', '--db_path', required=False, type=str, default="./chroma_db_store", help="Provide the path to persist the DB")
 def query(qry, db_path):
 
+    TEMPLATE_ID='template_query'
+    USER_AGENT = "cloud-solutions/genai-for-developers-v1.0"
+    PROJECT_ID = os.environ.get('GCP_PROJECT', '-')
+    
     # Load the ChromaDB
     persist_directory = db_path
     EMBEDDING_QPM = 100
@@ -48,7 +54,6 @@ def query(qry, db_path):
 
     question = qry
 
-
     result_direct_retreival = retriever.get_relevant_documents(question)
     
     # Create a RetrievalQA chain
@@ -56,8 +61,10 @@ def query(qry, db_path):
         llm=llm, chain_type="stuff", 
         retriever=retriever, 
         return_source_documents=True)
-
-    template="Respond to the following query as best you can using the context provided. Keep your answers short and concise. If you don't know say you don't know. {qry}"
+    template = get_access_secret(PROJECT_ID, TEMPLATE_ID, USER_AGENT)
+    
+    if template is None:
+        template="Respond to the following query as best you can using the context provided. Keep your answers short and concise. If you don't know say you don't know. {qry}"
     query = template.format(qry=qry)
     result = qa.invoke({"query": query})
     answer = result['result']
