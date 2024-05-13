@@ -34,7 +34,7 @@ import sys
 sys.path.append('../../package') 
 from secret_manager import get_access_secret
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 
 INSTRUCTION_ID='generate_handler_instruction'
 model_name="gemini-1.5-pro-preview-0409"
