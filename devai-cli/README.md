@@ -49,10 +49,8 @@ devai rag query -q "What does devai do"
 Enable Gemini chat and Vertex AI APIs.
 
 ```sh
-gcloud services enable \
-    aiplatform.googleapis.com \
-    cloudaicompanion.googleapis.com \
-    cloudresourcemanager.googleapis.com
+terraform -chdir=../terraform/devai-cli init
+terraform -chdir=../terraform/devai-cli apply -var project_id=${PROJECT_ID} -var location=${LOCATION}
 ```
 
 ## Configure Service Account
