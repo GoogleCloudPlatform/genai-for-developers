@@ -50,3 +50,15 @@ module "project-services" {
   ]
   depends_on = [module.project-service-serviceusage, module.project-service-cloudresourcemanager]
 }
+
+# Create Artifact Registry
+module "artifact_registry" {
+  source  = "GoogleCloudPlatform/artifact-registry/google"
+  version = "~> 0.2"
+
+  # Required variables
+  project_id    = var.project_id
+  location      = var.location
+  format        = "docker"
+  repository_id = "app-image-repo"
+}
