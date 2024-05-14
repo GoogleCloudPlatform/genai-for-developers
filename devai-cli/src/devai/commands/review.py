@@ -120,6 +120,7 @@ CODE:
     qry = get_access_secret('review_query')
 
     if qry is None:
+        print("No review query found")
         qry='''
 INSTRUCTIONS:
 You are a seasoned application performance tuning expert with deep knowledge of Java's nuances. Conduct a meticulous code review focused on identifying performance pitfalls and optimization opportunities within the codebase. Pay close attention to:
