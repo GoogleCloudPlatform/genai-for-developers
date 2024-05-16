@@ -14,7 +14,7 @@
 
 steps:
 - id: duet-ai-run
-  name: us-central1-docker.pkg.dev/${PROJECT_ID}/app-image-repo/devai-cli
+  name: ${LOCATION}-docker.pkg.dev/${PROJECT_ID}/app-image-repo/devai-cli
   
   script: |
     #!/usr/bin/env bash
