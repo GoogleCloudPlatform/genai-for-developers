@@ -35,7 +35,7 @@ def ensure_env_variable(var_name):
         raise EnvironmentError(f"Required environment variable '{var_name}' is not set.")
     return value
 
-def get_access_secret( secret_id: str) -> str:
+def get_prompt( secret_id: str) -> str:
     try:
         project_id = ensure_env_variable('PROJECT_ID')
         logging.info("PROJECT_ID:", project_id)
@@ -71,7 +71,7 @@ CODE:
 {}
 
 '''
-    qry = get_access_secret('review_query')
+    qry = get_promptt('review_query')
 
     if qry is None:
         qry='''
@@ -117,7 +117,7 @@ CODE:
 {}
 
 '''
-    qry = get_access_secret('review_query')
+    qry = get_prompt('review_query')
 
     if qry is None:
         print("No review query found")
