@@ -234,8 +234,7 @@ There are multiple cloudbuild files included in order to facilitate local builds
 First ensure you have an AR repo created to hold your image
 
 ```sh
-gcloud artifacts repositories describe app-image-repo --location=$LOC
-ATION
+gcloud artifacts repositories describe app-image-repo --location=$LOCATION
 ```
 
 To trigger a build in Cloud Build manually run the following command. This build file does not use the ${SHORT_SHA} tag as seen in the standard webhook model
