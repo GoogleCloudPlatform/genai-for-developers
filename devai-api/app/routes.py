@@ -34,11 +34,10 @@ from vertexai.generative_models import GenerativeModel
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 model_name="gemini-1.5-pro-preview-0409"
 
-with telemetry.tool_context_manager(USER_AGENT):
-    llm = ChatVertexAI(model_name=model_name,
-        convert_system_message_to_human=True,
-        temperature=0.2,
-        max_output_tokens=4096)
+llm = ChatVertexAI(model_name=model_name,
+    convert_system_message_to_human=True,
+    temperature=0.2,
+    max_output_tokens=4096)
 
 gitlab = GitLabAPIWrapper()
 toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
@@ -67,7 +66,7 @@ async def test():
     """Test endpoint"""
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
-    response = code_chat.send_message("Tell me about Google Gemini 1.5 capabilities")
+        response = code_chat.send_message("Tell me about Google Gemini 1.5 capabilities")
     print(f"Response from Model:\n{response.text}\n")
     return {"message": response.text}
 
@@ -86,7 +85,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     """
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
-    response = code_chat.send_message(instructions)
+        response = code_chat.send_message(instructions)
     print(f"Response from Model:\n{response.text}\n")
 
     # resp_text = response.candidates[0].content.parts[0].text
