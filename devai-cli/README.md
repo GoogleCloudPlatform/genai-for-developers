@@ -44,15 +44,14 @@ devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
 devai rag query -q "What does devai do"
 ```
 
-## Enable APIs
+## Enable APIs and Create an Artifact Registry
 
-Enable Gemini chat and Vertex AI APIs.
-
+- Enable Gemini chat, Vertex AI, Artifact Registry, Cloud Build and Secrets Manager APIs.
+- Creates an Artifact registry
+  
 ```sh
-gcloud services enable \
-    aiplatform.googleapis.com \
-    cloudaicompanion.googleapis.com \
-    cloudresourcemanager.googleapis.com
+terraform -chdir=../terraform/devai-cli init
+terraform -chdir=../terraform/devai-cli apply -var project_id=${PROJECT_ID} -var location=${LOCATION}
 ```
 
 ## Configure Service Account
@@ -235,9 +234,7 @@ There are multiple cloudbuild files included in order to facilitate local builds
 First ensure you have an AR repo created to hold your image
 
 ```sh
-gcloud artifacts repositories create app-image-repo \
-    --repository-format=docker \
-    --location=us-central1
+gcloud artifacts repositories describe app-image-repo --location=$LOCATION
 ```
 
 To trigger a build in Cloud Build manually run the following command. This build file does not use the ${SHORT_SHA} tag as seen in the standard webhook model
