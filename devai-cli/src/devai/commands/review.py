@@ -167,7 +167,7 @@ CODE:
 {}
 '''
     
-    qry = get_access_secret('review_query')
+    qry = get_prompt('review_query')
 
     if qry is None:
         qry='''
