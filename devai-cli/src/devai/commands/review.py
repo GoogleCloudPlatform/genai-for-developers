@@ -98,8 +98,8 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
-    code_chat.send_message(qry)
-    response = code_chat.send_message(source)
+        code_chat.send_message(qry)
+        response = code_chat.send_message(source)
 
     click.echo(f"Response from Model: {response.text}")
 
@@ -149,8 +149,8 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
-    code_chat.send_message(qry)
-    response = code_chat.send_message(source)
+        code_chat.send_message(qry)
+        response = code_chat.send_message(source)
 
     click.echo(f"Response from Model: {response.text}")
 
@@ -189,8 +189,8 @@ If no issues are found, output "No issues found".
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
-    code_chat.send_message(qry)
-    response = code_chat.send_message(source)
+        code_chat.send_message(qry)
+        response = code_chat.send_message(source)
 
     click.echo(f"Response from Model: {response.text}")
 

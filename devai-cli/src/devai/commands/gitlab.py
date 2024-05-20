@@ -23,8 +23,7 @@ from google.cloud.aiplatform import telemetry
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
 model_name="gemini-1.5-pro-preview-0409"
 
-with telemetry.tool_context_manager(USER_AGENT):
-  llm = ChatVertexAI(model_name=model_name,
+llm = ChatVertexAI(model_name=model_name,
                    convert_system_message_to_human=True,
                    project=os.environ["PROJECT_ID"],
                    location=os.environ["LOCATION"])
@@ -43,7 +42,8 @@ agent = initialize_agent(
 )
 
 def create_pull_request(context):
-    return agent.invoke("""Create GitLab merge request, use provided details below: 
+    with telemetry.tool_context_manager(USER_AGENT):
+        return agent.invoke("""Create GitLab merge request, use provided details below: 
     {}""".format(context))
 
 
@@ -56,7 +56,8 @@ def create_gitlab_issue_comment(context, issue_name='CICD AI Insights'):
     
     {}""".format(issue_name, json.dumps(context))
 
-    return agent.invoke(prompt)
+    with telemetry.tool_context_manager(USER_AGENT):
+        return agent.invoke(prompt)
 
 def fix_gitlab_issue_comment(context):
     prompt = """You have the software engineering capabilities of a Google Principle engineer.
@@ -64,7 +65,8 @@ def fix_gitlab_issue_comment(context):
     Please look at the open issue #{} and complete it by creating pull request that solves the issue."
     """.format(context)
     
-    return agent.invoke(prompt)
+    with telemetry.tool_context_manager(USER_AGENT):
+        return agent.invoke(prompt)
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
