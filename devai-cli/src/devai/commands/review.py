@@ -250,6 +250,54 @@ Provide report which files and methods that test coverage and ones that are miss
     # create_jira_issue("Code Coverage Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
 
+@click.command()
+@click.option('-c', '--context', required=False, type=str, default="")
+def blockers(context):
+
+
+    source='''
+CODE: 
+{}
+'''
+    qry='''
+    INSTRUCTIONS:
+Analyze the code and check if there are components that are in the BLOCKERS list below.
+Provide explanation why you made the decision.
+
+BLOCKERS: "IBM MQ"
+
+Output a JSON response using following JSON schema:
+{
+  "onboarding_status": "",
+  "blockers": []
+}
+
+JSON example when BLOCKER is detected:
+{
+  "onboarding_status": "BLOCKED",
+  "blockers": ['Jenkins']
+}
+
+JSON example when BLOCKER is NOT detected:
+{
+  "onboarding_status": "APPROVED",
+  "blockers": []
+}
+'''
+    # Load files as text into source variable
+    source=source.format(format_files_as_string(context))
+    
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
+    code_chat.send_message(qry)
+    response = code_chat.send_message(source)
+
+    click.echo(f"Response from Model: {response.text}")
+
+    # create_jira_issue("Blockers Review Results", response.text)
+    # create_gitlab_issue_comment(response.text)
+
 
 @click.group()
 def review():
@@ -262,3 +310,4 @@ review.add_command(code)
 review.add_command(performance)
 review.add_command(security)
 review.add_command(testcoverage)
+review.add_command(blockers)
