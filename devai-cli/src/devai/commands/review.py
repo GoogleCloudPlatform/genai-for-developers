@@ -25,7 +25,7 @@ import logging
 
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
-USER_AGENT_ALT = 'cloud-solutions/genai-for-developers-v1.1'
+
 model_name="gemini-1.5-pro-preview-0409"
 
 def ensure_env_variable(var_name):
@@ -41,7 +41,7 @@ def get_prompt( secret_id: str) -> str:
         logging.info("PROJECT_ID:", project_id)
 
         client = secretmanager.SecretManagerServiceClient(
-        client_info=ClientInfo(user_agent=USER_AGENT_ALT)
+        client_info=ClientInfo(user_agent=USER_AGENT)
         )
         name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
         try:
