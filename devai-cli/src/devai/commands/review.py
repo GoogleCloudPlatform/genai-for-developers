@@ -26,7 +26,8 @@ import logging
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 
-model_name="gemini-1.5-pro-preview-0409"
+model_name="gemini-1.5-pro-preview-0514"
+
 
 def ensure_env_variable(var_name):
     """Ensure an environment variable is set."""
@@ -64,6 +65,12 @@ def get_prompt( secret_id: str) -> str:
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
 def code(context):
+    """
+    This function performs a code review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('code')
     
     source='''
@@ -110,6 +117,12 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def performance(context):
+    """
+    This function performs a performance review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('performance')
     
     source='''
@@ -160,6 +173,12 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def security(context):
+    """
+    This function performs a security review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('simple security')
 
     source='''
@@ -197,11 +216,98 @@ If no issues are found, output "No issues found".
     # create_jira_issue("Security Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
 
+@click.command()
+@click.option('-c', '--context', required=False, type=str, default="")
+def testcoverage(context):
+    """
+    This function performs a test coverage review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
+
+    source='''
+CODE: 
+{}
+'''
+    qry='''
+    INSTRUCTIONS:
+Analyze the code and check for unit test coverage.
+Provide report which files and methods that test coverage and ones that are missing test coverage.
+
+'''
+    # Load files as text into source variable
+    source=source.format(format_files_as_string(context))
+    
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
+        code_chat.send_message(qry)
+        response = code_chat.send_message(source)
+
+    click.echo(f"Response from Model: {response.text}")
+
+    # create_jira_issue("Code Coverage Review Results", response.text)
+    # create_gitlab_issue_comment(response.text)
+
+@click.command()
+@click.option('-c', '--context', required=False, type=str, default="")
+def blockers(context):
+
+
+    source='''
+CODE: 
+{}
+'''
+    qry='''
+    INSTRUCTIONS:
+Analyze the code and check if there are components that are in the BLOCKERS list below.
+Provide explanation why you made the decision.
+
+BLOCKERS: "IBM MQ"
+
+Output a JSON response using following JSON schema:
+{
+  "onboarding_status": "",
+  "blockers": []
+}
+
+JSON example when BLOCKER is detected:
+{
+  "onboarding_status": "BLOCKED",
+  "blockers": ['Jenkins']
+}
+
+JSON example when BLOCKER is NOT detected:
+{
+  "onboarding_status": "APPROVED",
+  "blockers": []
+}
+'''
+    # Load files as text into source variable
+    source=source.format(format_files_as_string(context))
+    
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
+        code_chat.send_message(qry)
+        response = code_chat.send_message(source)
+
+    click.echo(f"Response from Model: {response.text}")
+
+    # create_jira_issue("Blockers Review Results", response.text)
+    # create_gitlab_issue_comment(response.text)
+
 
 @click.group()
 def review():
+    """
+    This group of commands provides code review functionalities.
+    """
     pass
 
 review.add_command(code)
 review.add_command(performance)
 review.add_command(security)
+review.add_command(testcoverage)
+review.add_command(blockers)
