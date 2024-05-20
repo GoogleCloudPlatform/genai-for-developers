@@ -29,6 +29,12 @@ model_name="gemini-1.5-pro-preview-0409"
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
 def code(context):
+    """
+    This function performs a code review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('code')
     
     source='''
@@ -72,6 +78,12 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def performance(context):
+    """
+    This function performs a performance review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('performance')
     
     source='''
@@ -118,6 +130,12 @@ No Issues:  If your review uncovers no significant areas for improvement, state 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def security(context):
+    """
+    This function performs a security review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+    """
     #click.echo('simple security')
 
     source='''
@@ -154,6 +172,9 @@ If no issues are found, output "No issues found".
 
 @click.group()
 def review():
+    """
+    This group of commands provides code review functionalities.
+    """
     pass
 
 review.add_command(code)
