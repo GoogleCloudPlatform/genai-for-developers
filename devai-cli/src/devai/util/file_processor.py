@@ -22,8 +22,8 @@ def is_ascii_text(file_path):
     :return: Boolean indicating whether the file contains ASCII text
     """
     try:
-        with open(file_path, 'rb') as f:
-            f.read().decode('ascii')
+        with open(file_path, 'r', encoding='utf-8') as f:
+            f.read()
         return True
     except UnicodeDecodeError:
         return False
