@@ -32,7 +32,7 @@ from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
-model_name="gemini-1.5-pro-preview-0409"
+model_name="gemini-1.5-pro-preview-0514"
 
 llm = ChatVertexAI(model_name=model_name,
     convert_system_message_to_human=True,

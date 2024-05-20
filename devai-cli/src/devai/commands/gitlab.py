@@ -21,7 +21,7 @@ from langchain_community.utilities.gitlab import GitLabAPIWrapper
 from google.cloud.aiplatform import telemetry
   
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
-model_name="gemini-1.5-pro-preview-0409"
+model_name="gemini-1.5-pro-preview-0514"
 
 llm = ChatVertexAI(model_name=model_name,
                    convert_system_message_to_human=True,

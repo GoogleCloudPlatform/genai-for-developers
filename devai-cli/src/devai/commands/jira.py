@@ -25,7 +25,7 @@ from jira import JIRA
 from google.cloud.aiplatform import telemetry
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
-model_name="gemini-1.5-pro-preview-0409"
+model_name="gemini-1.5-pro-preview-0514"
 
 with telemetry.tool_context_manager(USER_AGENT):
     llm = ChatVertexAI(model_name=model_name,
