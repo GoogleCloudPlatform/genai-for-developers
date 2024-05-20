@@ -17,9 +17,45 @@ import click
 from devai.util.file_processor import format_files_as_string
 from vertexai.generative_models import GenerativeModel, ChatSession
 from google.cloud.aiplatform import telemetry
+import os
+from google.cloud import secretmanager
+from google.api_core.exceptions import NotFound
+from google.api_core.gapic_v1.client_info import ClientInfo
+import logging
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
+
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
+
 model_name="gemini-1.5-pro-preview-0514"
+
+
+def ensure_env_variable(var_name):
+    """Ensure an environment variable is set."""
+    value = os.getenv(var_name)
+    if value is None:
+        raise EnvironmentError(f"Required environment variable '{var_name}' is not set.")
+    return value
+
+def get_prompt( secret_id: str) -> str:
+    try:
+        project_id = ensure_env_variable('PROJECT_ID')
+        logging.info("PROJECT_ID:", project_id)
+
+        client = secretmanager.SecretManagerServiceClient(
+        client_info=ClientInfo(user_agent=USER_AGENT)
+        )
+        name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+        try:
+            response = client.access_secret_version(name=name)
+            payload = response.payload.data.decode("utf-8")
+            logging.info(f"ID: {secret_id} in project {project_id}")
+            return payload
+        except NotFound:
+            logging.info(f"ID not found: {secret_id} in project {project_id}")
+            return None
+    except EnvironmentError as e:
+        logging.error(e)
+
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
@@ -42,7 +78,10 @@ CODE:
 {}
 
 '''
-    qry='''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
 INSTRUCTIONS:
 You are an experienced software architect renowned for your ability to identify code quality issues, optimization opportunities, and adherence to best practices. Conduct a thorough code review of the provided codebase with the following focus:
 Key Areas
@@ -91,7 +130,11 @@ CODE:
 {}
 
 '''
-    qry='''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        print("No review query found")
+        qry='''
 INSTRUCTIONS:
 You are a seasoned application performance tuning expert with deep knowledge of Java's nuances. Conduct a meticulous code review focused on identifying performance pitfalls and optimization opportunities within the codebase. Pay close attention to:
 Performance Bottlenecks:
@@ -142,7 +185,11 @@ def security(context):
 CODE: 
 {}
 '''
-    qry='''
+    
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
     INSTRUCTIONS:
 You are an experienced security programmer doing a code review. Looking for security violations in the code.
 Examine the attached code for potential security issues. Issues to look for, look for instances of insecure cookies, insecure session management, any instances of SQL injection, cross-site scripting (XSS), 
