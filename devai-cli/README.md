@@ -34,9 +34,13 @@ devai prompt with_msg_streaming
 devai review code -c ../sample-app/src/main/java
 devai review performance -c ../sample-app/src/main/java
 devai review security -c ../sample-app/src/main/java
-devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 
 devai review code -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader/BalanceReaderController.java
+
+devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+
+devai review blockers -c ../sample-app/pom.xml
+devai review blockers -c ../sample-app/setup.md
 
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
@@ -210,15 +214,15 @@ python -m devai review performance -c ../sample-app/src/main/java
 python -m devai review security -c ../sample-app/src/main/java
 python -m devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 
+python -m devai review blockers -c ../sample-app/pom.xml
+python -m devai review blockers -c ../sample-app/setup.md
+
 python -m devai release notes_user_tag -t "v5.0.0"
 python -m devai release notes_user -s "main" -e "feature-branch-name" 
 
 
 python -m devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
 python -m devai rag query -q "What does devai do"
-
-
-
 ```
 
 ### Working with an installable app
@@ -401,4 +405,62 @@ devai gitlab create-comment -c "new comment content goes here"
 
 # Will add a comment to GitLab issue with name 'CICD AI Insights'
 devai gitlab create-comment -i "CICD AI Insights" -c "new comment content goes here"
+```
+
+
+## Review code for blockers
+
+```sh
+cd devai-cli
+
+devai review blockers -c ../sample-app/pom.xml
+```
+
+Output:
+```sh
+Response from Model: 
+{
+  "onboarding_status": "BLOCKED",
+  "blockers": ["IBM MQ"]
+}
+
+
+**Explanation:**
+
+The provided `pom.xml` file includes the following dependency, which indicates the usage of IBM MQ:
+
+
+<dependency>
+    <groupId>com.ibm.mq</groupId>
+    <artifactId>com.ibm.mq.allclient</artifactId>
+    <version>9.2.2.0</version>
+</dependency>
+
+
+As "IBM MQ" is listed as a blocker, the onboarding status is marked as "BLOCKED". 
+```
+
+## Review docs
+
+```sh
+cd devai-cli
+
+devai review blockers -c ../sample-app/setup.md
+```
+Output
+
+```
+Response from Model: 
+{
+  "onboarding_status": "BLOCKED",
+  "blockers": ["IBM MQ"]
+}
+
+
+## Explanation:
+
+The provided code snippet explicitly references "IBM MQ" in multiple instances, indicating a direct dependency on this technology.  Here's why the code triggers the blocker:
+
+* **Maven Dependencies:** The code includes Maven dependency declarations for `com.ibm.mq.allclient` and `wmq.jmsra`, which are libraries specifically associated with IBM MQ.
+* **File Content:** The content of the `setup.md` file discusses Java application development using a Maven repository in the context of IBM MQ, further confirming the reliance on this technology. 
 ```
