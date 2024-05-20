@@ -34,6 +34,7 @@ devai prompt with_msg_streaming
 devai review code -c ../sample-app/src/main/java
 devai review performance -c ../sample-app/src/main/java
 devai review security -c ../sample-app/src/main/java
+devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 
 devai review code -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader/BalanceReaderController.java
 
@@ -208,6 +209,7 @@ python -m devai prompt with_msg_streaming
 python -m devai review code -c ../sample-app/src/main/java
 python -m devai review performance -c ../sample-app/src/main/java
 python -m devai review security -c ../sample-app/src/main/java
+python -m devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 
 python -m devai release notes_user_tag -t "v5.0.0"
 python -m devai release notes_user -s "main" -e "feature-branch-name" 
