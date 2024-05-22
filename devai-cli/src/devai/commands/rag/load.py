@@ -1,14 +1,13 @@
 import click
-from google.cloud import aiplatform
-import os
 import shutil
 from pathlib import Path
 from git import Repo
 
 from langchain_community.document_loaders import GitLoader
+from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_community.vectorstores import Chroma
+
 
 
 def load_docs(repo_path, branch, local_dir, allowed_extensions):
