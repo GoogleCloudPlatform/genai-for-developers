@@ -24,4 +24,4 @@ See [`CODE-OF-CONDUCT.md`](CODE-OF-CONDUCT.md) for details.
 
 ## License
 
-Apache 2.0; see [`LICENSE`](LICENSE) for details.
+Apache 2.0; see [`LICENSE`](LICENSE) for details. 
