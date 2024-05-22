@@ -6,6 +6,7 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/devai-cli") {
                     sh '''
+                    apt-get update && apt-get install -y git
                     python3 -m venv ./venv
                     . ./venv/bin/activate
                     ./venv/bin/pip install -r src/requirements.txt

@@ -12,6 +12,7 @@ cache:
     - .cache/pip
 
 before_script:
+  - apt-get update && apt-get install -y git
   - python --version ; pip --version  # For debugging
   - pip install virtualenv
   - virtualenv venv
