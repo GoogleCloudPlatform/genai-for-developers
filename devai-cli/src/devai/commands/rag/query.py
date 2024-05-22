@@ -1,9 +1,7 @@
 import click
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_google_vertexai import ChatVertexAI
-
+from langchain_google_vertexai import VertexAIEmbeddings, ChatVertexAI
 
 
 @click.command()
