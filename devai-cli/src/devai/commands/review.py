@@ -235,36 +235,68 @@ def performance(context):
     #click.echo('performance')
     
     source='''
-CODE:
-{}
+            ### Context (code) ###
+            {}
 
-'''
+            '''
     qry = get_prompt('review_query')
 
     if qry is None:
         print("No review query found")
         qry='''
-INSTRUCTIONS:
-You are a seasoned application performance tuning expert with deep knowledge of Java's nuances. Conduct a meticulous code review focused on identifying performance pitfalls and optimization opportunities within the codebase. Pay close attention to:
-Performance Bottlenecks:
-Inefficient Operations: Pinpoint constructs known to be slow in the language, such as excessive string concatenation, unnecessary object creation, or suboptimal loop structures.
-I/O-bound Operations: Examine file access, database queries, and network communication calls that could introduce latency.
-Algorithmic Complexity: Analyze algorithms used for time and space complexity. Look for potential improvements using more efficient data structures or algorithms.
-Memory Management:
-Memory Leaks: Identify objects that are no longer referenced but not garbage collected, leading to gradual memory consumption.
-Memory Bloat: Look for unnecessary object allocations, the use of overly large data structures, or the retention of data beyond its useful life.
-Concurrency:
-Race Conditions: Hunt for scenarios where multiple threads access shared data without proper synchronization, leading to unpredictable results.
-Deadlocks: Detect situations where threads hold locks on resources while waiting for each other, causing the application to hang.
-Output Guidance:
-Structure:  Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring. 
-Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
-"Could we explore an alternative algorithm here to potentially improve performance?"
-"Would refactoring this logic into smaller functions enhance readability and maintainability?"
-Specificity:  Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
-Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
-No Issues:  If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
-'''
+            ### Instruction ###
+            You are a seasoned application performance tuning expert with deep knowledge of the nuances of various programming languages. Your task is to meticulously review the provided code snippet (please specify the language), focusing on identifying performance pitfalls and optimization opportunities. Tailor your analysis to the specific programming language used.
+            If the code snippet involves a framework or library, consider performance implications related to that technology.
+            If possible, suggest alternative approaches or code snippets that demonstrate potential optimizations.
+
+            If the code's purpose is unclear, ask clarifying questions to better understand its intent.
+
+            Pay close attention to the following aspects during your review:
+
+            Inefficient Operations: Identify constructs known to be slow in the specific language, such as:
+
+            Excessive string concatenation or manipulation.
+            Unnecessary object creation or excessive memory allocation.
+            Suboptimal loop structures or inefficient iteration patterns.
+            Redundant computations or repeated function calls.
+            I/O-bound Operations: Examine:
+
+            File access and manipulation.
+            Database queries and interactions.
+            Network communication calls (e.g., APIs, web requests).
+            Any blocking operations that could introduce latency.
+            Algorithmic Complexity: Analyze algorithms for:
+
+            Time complexity (e.g., O(n^2), O(n log n), O(n)).
+            Space complexity (memory usage).
+            Look for potential improvements using more efficient data structures or algorithms.
+            Memory Management: Identify:
+
+            Memory leaks (objects that are no longer needed but still consume memory).
+            Memory bloat (unnecessarily large data structures or excessive memory usage).
+            Data retention beyond its useful life.
+            Concurrency (if applicable): Look for:
+
+            Race conditions (where multiple threads access shared data simultaneously, leading to unpredictable results).
+            Deadlocks (where two or more processes are waiting for each other to release resources, causing a standstill).
+            Thread starvation (where a thread is unable to access resources it needs).
+
+
+            ### Output Format ###
+            Structure: Organize your findings by file and function/method names for clear context.
+            Tone: Frame your findings as constructive suggestions or open-ended questions.
+            Example: "Could we consider a more efficient way to handle string concatenation in this loop?"
+            Specificity: Provide detailed explanations for each issue, referencing language-specific documentation or best practices where relevant.
+            Prioritization: Indicate the severity or potential impact of each issue (e.g., critical, high, medium, low).
+            No Issues: If no major performance issues are found, clearly state this.
+
+
+            ### Example Dialogue ###
+
+            User: (Provides Python code snippet)
+
+            AI: (Provides output following the structured format, including language-specific insights, constructive suggestions, and prioritized recommendations)
+            '''
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
