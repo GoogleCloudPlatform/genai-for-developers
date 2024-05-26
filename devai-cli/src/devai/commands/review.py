@@ -323,26 +323,84 @@ def security(context):
     #click.echo('simple security')
 
     source='''
-CODE: 
-{}
-'''
+            ### Context (code) ###: 
+            {}
+            '''
     
     qry = get_prompt('review_query')
 
     if qry is None:
         qry='''
-    INSTRUCTIONS:
-You are an experienced security programmer doing a code review. Looking for security violations in the code.
-Examine the attached code for potential security issues. Issues to look for, look for instances of insecure cookies, insecure session management, any instances of SQL injection, cross-site scripting (XSS), 
-or other vulnerabilities that could compromise user data or allow unauthorized access to the application. 
-Provide a comprehensive report of any identified vulnerabilities and recommend appropriate remediation measures.
-Output the findings with class and method names followed by the found issues.
-Example of the output format to use:
-Class name.Method name: 
-Issue: 
-Recommendation: 
-If no issues are found, output "No issues found".
-'''
+            ### Instruction ###
+            You are an experienced security programmer conducting a code review. Your task is to meticulously examine the provided code snippet (please specify the language) for potential security vulnerabilities. Tailor your review to the specific programming language and its security considerations. Consider the context of the code snippet (e.g., web application, backend service) to assess the relevance and impact of vulnerabilities. 
+
+            Pay close attention to the following types of security vulnerabilities during your review:
+
+            Input Validation and Sanitization:
+
+            Identify instances where user-supplied input is not properly validated or sanitized before being used in:
+            Database queries (SQL injection, NoSQL injection).
+            Command execution (command injection).
+            File system operations (path traversal).
+            Displaying content (cross-site scripting - XSS).
+            Authentication and Authorization:
+
+            Examine how the code handles authentication (verifying user identity). Look for:
+            Weak or easily guessable passwords.
+            Hardcoded credentials.
+            Missing or inadequate authentication mechanisms.
+            Review authorization (granting access to resources). Ensure:
+            Proper access controls are in place.
+            Users are not able to escalate their privileges.
+            Session Management:
+
+            Evaluate how sessions are managed. Look for:
+            Insecure cookie settings (e.g., missing "Secure" and "HttpOnly" flags).
+            Session fixation vulnerabilities.
+            Predictable session IDs.
+            Inadequate session timeout enforcement.
+            Data Protection:
+
+            Assess how sensitive data is handled. Ensure:
+            Data is encrypted in transit and at rest (if applicable).
+            Appropriate hashing algorithms are used for passwords and sensitive data.
+            Sensitive data is not unnecessarily logged or exposed.
+            Error Handling and Logging:
+
+            Examine error handling mechanisms. Make sure:
+            Errors are handled gracefully and do not reveal sensitive information.
+            Sufficient logging is in place to aid in debugging and incident response.
+            Other Vulnerabilities:
+
+            Be vigilant for additional issues such as:
+            Cross-site request forgery (CSRF).
+            Insecure direct object references (IDOR).
+            Business logic flaws.
+            Dependency vulnerabilities (outdated or insecure libraries/components).
+
+            ### Output Format ###
+            Structure: Group findings by file and function/method names for clarity.
+            Issue: Provide a clear, concise description of each vulnerability found, including:
+            Type of vulnerability (e.g., XSS, SQL injection).
+            Location in the code (file, function/method).
+            Potential impact.
+            Recommendation: Offer detailed guidance on how to remediate the issue, including:
+            Specific code changes or patterns to use.
+            Relevant security libraries or frameworks to consider.
+            References to secure coding guidelines or best practices.
+            Prioritization: Indicate the severity of each issue (critical, high, medium, low).
+            No Issues: If no significant vulnerabilities are found, clearly state this.
+
+            Use clear, concise language, avoiding unnecessary jargon.
+            Prioritize critical issues that could lead to serious security breaches. If the code's purpose is unclear, ask clarifying questions.
+            If you identify an issue, but are unsure of the best solution, recommend further research or consultation with a security specialist
+
+
+            ### Example Dialogue ###
+            User: (Provides PHP code snippet)
+
+            AI: (Provides output following the structured format, including language-specific insights and security recommendations relevant to PHP)
+            '''
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
