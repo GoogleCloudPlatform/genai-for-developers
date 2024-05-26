@@ -426,15 +426,67 @@ def testcoverage(context):
     """
 
     source='''
-CODE: 
-{}
-'''
+            ### Context (code) ###: 
+            {}
+            '''
     qry='''
-    INSTRUCTIONS:
-Analyze the code and check for unit test coverage.
-Provide report which files and methods that test coverage and ones that are missing test coverage.
+        ### Instruction ###
+        You are an experienced software engineer specializing in test coverage analysis and best practices. Given a code snippet (in any programming language) and its associated test suite (if available), your task is to perform a thorough assessment and provide actionable recommendations.
 
-'''
+        ### Output Format ###
+        Provide your findings in a structured format, listing:
+
+        Files/Methods with Test Coverage: Clearly indicate which files and methods within the code snippet have corresponding unit tests.
+        If possible, specify the names of the test classes and methods that provide coverage.
+
+        Files/Methods Lacking Test Coverage: Clearly identify which files and methods within the code snippet do not have associated unit tests.
+        Prioritize these based on their complexity, criticality, or potential risk of containing bugs.
+
+        Overall Test Coverage Summary: Percentage of lines covered. Percentage of branches/conditions covered (if applicable to the language). Any notable coverage gaps at a high level.
+
+        Detailed Coverage Breakdown:
+
+        Files/Functions/Methods with Test Coverage:
+
+        File name and function/method name.
+        Corresponding test file and function/method name (if available).
+        Coverage type (e.g., line, branch, condition, etc.).
+        Files/Functions/Methods Lacking Test Coverage:
+
+        File name and function/method name.
+        Reason for prioritizing (complexity, criticality, risk).
+        Specific test scenarios to consider.
+        Recommendations for Improvement:
+
+        Prioritized list of functions/methods/areas where new unit tests should be added.
+        Guidance on test types to use (e.g., positive, negative, edge case, etc.).
+        Tips on improving existing tests (if applicable).
+        Additional Insights (Optional):
+
+        Suggestions for refactoring code to make it more testable.
+        Identification of potential code smells or areas prone to errors.
+        Language-specific best practices for testing (if applicable).
+
+
+        If no unit tests are present, clearly state this and emphasize the importance of adding them.
+        If coverage is already comprehensive, acknowledge this and suggest ways to maintain or enhance the test suite.
+        Tailor recommendations to the specific codebase, its context, and the programming language used.
+        Use clear, concise language and avoid technical jargon where possible.
+        Include code examples relevant to the programming language to illustrate recommendations.
+
+
+        ### Example Dialogue ###
+
+        User:  (Provides Java code snippet and test suite)
+
+        AI: (Provides output following the structured format, including coverage metrics, detailed breakdown, prioritized recommendations, and additional insights, with examples relevant to Java)
+
+        Key Changes
+
+        Language Agnostic: Prompt is now open to any programming language, with the user specifying the language upfront.
+        Flexible Output: Coverage metrics and test types are adjusted to be applicable to various languages (e.g., conditions instead of branches for languages that don't have explicit branching).
+        Language-Specific Insights: Encourages the AI to offer best practices or insights specific to the language being analyzed.
+        '''
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
