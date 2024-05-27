@@ -507,34 +507,39 @@ def blockers(context):
 
 
     source='''
-CODE: 
-{}
-'''
+            ### Context (code) ###: 
+            {}
+            '''
     qry='''
-    INSTRUCTIONS:
-Analyze the code and check if there are components that are in the BLOCKERS list below.
-Provide explanation why you made the decision.
+        ### Instruction ###
+        You are an experienced software engineer specializing in blocking. Analyze the code and check if there are components that are in the BLOCKERS list below.
+        Provide explanation why you made the decision.
 
-BLOCKERS: "IBM MQ"
+        BLOCKERS: "IBM MQ"
 
-Output a JSON response using following JSON schema:
-{
-  "onboarding_status": "",
-  "blockers": []
-}
+        
+        ### Output Format ###
+        Provide your findings in a structured JSON format using following JSON schema:
+        {
+        "onboarding_status": "",
+        "blockers": []
+        }
 
-JSON example when BLOCKER is detected:
-{
-  "onboarding_status": "BLOCKED",
-  "blockers": ['Jenkins']
-}
+        JSON example when BLOCKER is detected:
+        {
+        "onboarding_status": "BLOCKED",
+        "blockers": ['Jenkins']
+        }
 
-JSON example when BLOCKER is NOT detected:
-{
-  "onboarding_status": "APPROVED",
-  "blockers": []
-}
-'''
+        JSON example when BLOCKER is NOT detected:
+        {
+        "onboarding_status": "APPROVED",
+        "blockers": []
+        }
+
+
+        ### Example Dialogue ###
+        '''
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
