@@ -1,0 +1,16 @@
+### Output Format ###
+Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+
+Structure:  Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring. 
+Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
+"Could we explore an alternative algorithm here to potentially improve performance?"
+"Would refactoring this logic into smaller functions enhance readability and maintainability?"
+Specificity:  Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
+Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
+No Issues:  If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices.
+
+Provide an overview or overall impression entry for the code as the first entry.
+
+Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low).
+If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices."
+Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"

@@ -22,12 +22,16 @@ from google.cloud import secretmanager
 from google.api_core.exceptions import NotFound
 from google.api_core.gapic_v1.client_info import ClientInfo
 import logging
+import json
+from json_repair import repair_json
 
+from rich.console import Console 
+from rich.table import Table
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
-
 model_name="gemini-1.5-pro-preview-0514"
 
+PROMPTS_DIR = "src/devai/prompts"  # Directory to store prompt files
 
 def ensure_env_variable(var_name):
     """Ensure an environment variable is set."""
@@ -37,6 +41,14 @@ def ensure_env_variable(var_name):
     return value
 
 def get_prompt( secret_id: str) -> str:
+    """Retrieves a prompt from Google Secret Manager.
+
+    Args:
+        secret_id (str): The ID of the secret containing the prompt.
+
+    Returns:
+        str: The prompt string, or None if the secret was not found.
+    """
     try:
         project_id = ensure_env_variable('PROJECT_ID')
         logging.info("PROJECT_ID:", project_id)
@@ -56,6 +68,50 @@ def get_prompt( secret_id: str) -> str:
     except EnvironmentError as e:
         logging.error(e)
 
+def load_prompt_from_file(filename):
+    """Loads a prompt from a text file.
+
+    Args:
+        filename (str): The name of the file in the PROMPTS_DIR.
+
+    Returns:
+        str: The loaded prompt string.
+
+    Raises:
+        FileNotFoundError: If the specified prompt file is not found.
+    """
+    filepath = os.path.join(PROMPTS_DIR, filename)
+    try:
+        with open(filepath, "r") as file:
+            return file.read()
+    except FileNotFoundError:
+        click.echo(f"Error: Prompt file '{filename}' not found in '{PROMPTS_DIR}'.")
+        # You can decide whether to raise an error or return a default prompt here.
+        raise  # This will stop the execution of the command if the file is not found.
+
+def validate_and_correct_json(json_text):
+    """Validates and attempts to correct JSON text.
+
+    Args:
+        json_text (str): The JSON text to validate.
+
+    Returns:
+        str: The original or corrected JSON text if valid, None otherwise.
+    """
+    try:
+        # Validate the JSON
+        json.loads(json_text)
+        return json_text  # JSON is already valid
+    except json.JSONDecodeError:
+        try:
+            # If invalid, attempt to repair
+            return repair_json(json_text) 
+        except ValueError:
+            click.echo(
+                "Error: Model output is not valid JSON and could not be repaired."
+            )
+            return None
+
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
@@ -64,150 +120,29 @@ def get_prompt( secret_id: str) -> str:
 
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
-def code(context):
+@click.option('-o', '--output', type=click.Choice(['markdown', 'json', 'table']), default='markdown')
+def code(context, output):
     """
     This function performs a code review using the Generative Model API.
 
     Args:
         context (str): The code to be reviewed.
+        output (str): The desired output format (markdown, json, or table).
     """
-    #click.echo('code')
+    # Load prompts from files
+    base_instruction = load_prompt_from_file("review-code.txt")
+    
+    if output == 'markdown':
+        output_format_str = load_prompt_from_file("review-code-output-markdown.txt")  
+    else :    
+        output_format_str = load_prompt_from_file(f"review-code-output-json.txt")
+
+    qry = f"{base_instruction}\n{output_format_str}"    
     
     source='''
             ### Context (code) ###
             {}
-
             '''
-    qry = get_prompt('review_query')
-
-    if qry is None:
-        qry='''
-            ### Instruction ###
-            You are a senior software engineer and architect with over 20 years of experience, specializing in the language of the provided code snippet and adhering to clean code principles. You are meticulous, detail-oriented, and possess a deep understanding of software design and best practices.
-
-            Your task is to perform a comprehensive code review of the provided code snippet. Evaluate the code with a focus on the following key areas:
-
-            Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
-            Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
-            Maintainability: Assess the code's readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
-            Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
-            Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
-
-            ### Output Format ###
-            Structure:  Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring. 
-            Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
-            "Could we explore an alternative algorithm here to potentially improve performance?"
-            "Would refactoring this logic into smaller functions enhance readability and maintainability?"
-            Specificity:  Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
-            Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
-            No Issues:  If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices.
-
-            Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low).
-            If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices."
-            Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"
-
-            ### Example Dialogue ###
-            <query> First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
-                    import "fmt"
-                    
-                    func main() {
-                        name := "Alice"
-                        greeting := fmt.Sprintf("Hello, %s!", name)
-                        fmt.Println(greeting)
-                    }
-                    
-                    
-                    <response> [
-                        {
-                            "question": "Indentation",
-                            "answer": "yes",
-                            "description": "Code is consistently indented with spaces (as recommended by Effective Go)"
-                        },
-                        {
-                            "question": "Variable Naming",
-                            "answer": "yes",
-                            "description": "Variables ("name", "greeting") use camelCase as recommended"
-                        },
-                        {
-                            "question": "Line Length",
-                            "answer": "yes",
-                            "description": "Lines are within reasonable limits" 
-                        },
-                        {
-                            "question": "Package Comments", 
-                            "answer": "n/a",
-                            "description": "This code snippet is too small for a package-level comment"
-                        }
-                    ]
-                    
-                    
-                    <query> Identify common issues such as code smells, anti-patterns, potential bugs, performance bottlenecks, and security vulnerabilities. Offer actionable recommendations to address these issues and improve the overall quality of the code.
-                    
-                    "package main
-                    
-                    import (
-                        "fmt"
-                        "math/rand"
-                        "time"
-                    )
-                    
-                    // Global variable, potentially unnecessary 
-                    var globalCounter int = 0 
-                    
-                    func main() {
-                        items := []string{"apple", "banana", "orange"}
-                    
-                        // Very inefficient loop with nested loop for a simple search
-                        for _, item := range items {
-                            for _, search := range items {
-                                if item == search {
-                                    fmt.Println("Found:", item)
-                                }
-                            }
-                        }
-                    
-                        // Sleep without clear reason, potential performance bottleneck
-                        time.Sleep(5 * time.Second) 
-                    
-                        calculateAndPrint(10)
-                    }
-                    
-                    // Potential divide-by-zero risk
-                    func calculateAndPrint(input int) {
-                        result := 100 / input 
-                        fmt.Println(result)
-                    }"
-                    
-                    <response> [
-                        {
-                            "question": "Global Variables",
-                            "answer": "no",
-                            "description": "Potential issue: Unnecessary use of the global variable 'globalCounter'. Consider passing values as arguments for better encapsulation." 
-                        },
-                        {
-                            "question": "Algorithm Efficiency",
-                            "answer": "no",
-                            "description": "Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets."
-                        },
-                        {
-                            "question": "Performance Bottlenecks",
-                            "answer": "no",
-                            "description": "'time.Sleep' without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use."
-                        },
-                        {
-                            "question": "Potential Bugs",
-                            "answer": "no",
-                            "description": "'calculateAndPrint' function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately."
-                        },
-                        { 
-                            "question": "Code Readability",
-                            "answer": "no",
-                            "description": "Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code."
-                        } 
-                    ]
-
-            '''
-
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
@@ -217,7 +152,50 @@ def code(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    # Process Output
+    if output in ["json", "table"]:
+        cleaned_json = response.text
+        if cleaned_json.startswith("`json\n") and cleaned_json.endswith("\n`"):
+            cleaned_json = cleaned_json[8:-3]  # Remove backticks if present
+
+        valid_json = validate_and_correct_json(cleaned_json)
+        if valid_json:
+            if output == "json":
+                # click.echo(valid_json)
+
+                parsed_data = json.loads(valid_json)
+                formatted_json = json.dumps(parsed_data, indent=4)  # Format with indentation
+                click.echo(formatted_json)
+            elif output == "table":
+                try:
+                    data = json.loads(valid_json)
+
+                    # Create Rich Table
+                    console = Console()
+                    table = Table(show_header=True, header_style="bold green")
+
+                    if isinstance(data, list) and all(isinstance(item, dict) for item in data):
+                        headers = list(data[0].keys())
+                        for header in headers:
+                            table.add_column(header)
+                        for row in data:
+                            table.add_row(*[str(row.get(h, "")) for h in headers])
+                    elif isinstance(data, dict):
+                        for key, value in data.items():
+                            table.add_column(key)
+                            table.add_row(str(value))
+                    else:
+                        click.echo("Error: Model output is not in a format suitable for a table.")
+                        return
+
+                    console.print(table)  # Print the table using Rich
+
+                except json.JSONDecodeError as e:
+                    click.echo(f"Error processing JSON data: {e}")
+    else:  # Default to markdown output
+        click.echo(f"Response from Model: {response.text}")
+
+# TODO add an -o option that actually outputs md, json and table
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
