@@ -299,6 +299,77 @@ JSON example when BLOCKER is NOT detected:
     # create_gitlab_issue_comment(response.text)
 
 
+@click.command(name='impact')
+@click.option('-c', '--current', required=True, type=str, default="")
+@click.option('-t', '--target', required=True, type=str, default="")
+def impact(current, target):
+    """
+    This function performs an impact analysis using the Generative Model API.
+
+    Args:
+        current (str): Path to current version of code.
+        target (str): Path to target version of code.
+    """
+
+    
+    current_source='''
+CURRENT VERSION: 
+{}
+
+'''
+    target_source='''
+TARGET VERSION:
+{}
+
+'''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
+INSTRUCTIONS:
+You need to analyze two versions of a codebase and provide impact analysis tht will help with migration from current version to target version.
+I have two versions of a codebase: [CURRENT] and [TARGET].
+
+Please perform a detailed impact analysis comparing these versions. Specifically, I need you to:
+
+Identify the changes:
+List all files modified, added, or deleted between the two versions.
+For each modified file, highlight the specific lines of code that were changed.
+Categorize the changes:
+Classify the changes into categories like bug fixes, new features, performance improvements, refactoring, etc.
+Provide a brief explanation for each category.
+Analyze the impact:
+For each change, explain its potential impact on the application's functionality, performance, security, and any other relevant aspects.
+Identify any potential risks or regressions introduced by the changes.
+Suggest testing areas:
+Based on the analysis, recommend specific areas of the application that require thorough testing to ensure the changes haven't introduced any unexpected behavior.
+Provide code snippets:
+Whenever possible, include relevant code snippets to illustrate the changes and their potential impact.
+Please present your analysis in a clear and concise manner, using Markdown formatting for readability.
+
+Optional:
+
+If you have access to the repository history, you can analyze the commit messages and pull requests associated with the changes for additional context.
+If the codebase has unit tests, you can suggest which tests need to be updated or created based on your analysis.
+
+'''
+
+    # Load files as text into source variable
+    current_source=current_source.format(format_files_as_string(current))
+    target_source=target_source.format(format_files_as_string(target))
+    
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
+        code_chat.send_message(qry)
+        response = code_chat.send_message(current_source)
+        response = code_chat.send_message(target_source)
+
+    click.echo(f"{response.text}")
+
+    #create_jira_issue("Code Review Results", response.text)
+    # create_gitlab_issue_comment(response.text)
+
 @click.group()
 def review():
     """
@@ -311,3 +382,4 @@ review.add_command(performance)
 review.add_command(security)
 review.add_command(testcoverage)
 review.add_command(blockers)
+review.add_command(impact)
