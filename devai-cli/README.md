@@ -37,10 +37,14 @@ devai review security -c ../sample-app/src/main/java
 
 devai review code -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader/BalanceReaderController.java
 
-devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+devai review testcoverage -c ../sample-app/src
 
 devai review blockers -c ../sample-app/pom.xml
 devai review blockers -c ../sample-app/setup.md
+
+devai review impact \
+  --current ~/github/repo/service-v1.0.0/modules/login \
+  --target ~/github/repo/service-v2.0.0/modules/login
 
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
@@ -212,10 +216,14 @@ python -m devai prompt with_msg_streaming
 python -m devai review code -c ../sample-app/src/main/java
 python -m devai review performance -c ../sample-app/src/main/java
 python -m devai review security -c ../sample-app/src/main/java
-python -m devai review testcoverage -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+python -m devai review testcoverage -c ../sample-app/src
 
 python -m devai review blockers -c ../sample-app/pom.xml
 python -m devai review blockers -c ../sample-app/setup.md
+
+python -m devai review impact \
+  --current ~/github/repo/service-v1.0.0/modules/login \
+  --target ~/github/repo/service-v2.0.0/modules/login
 
 python -m devai release notes_user_tag -t "v5.0.0"
 python -m devai release notes_user -s "main" -e "feature-branch-name" 
@@ -463,4 +471,14 @@ The provided code snippet explicitly references "IBM MQ" in multiple instances, 
 
 * **Maven Dependencies:** The code includes Maven dependency declarations for `com.ibm.mq.allclient` and `wmq.jmsra`, which are libraries specifically associated with IBM MQ.
 * **File Content:** The content of the `setup.md` file discusses Java application development using a Maven repository in the context of IBM MQ, further confirming the reliance on this technology. 
+```
+
+## Perform impact analysis between two versions of the codebase
+
+
+```sh
+devai review impact \
+  --current ~/github/repo/service-v1.0.0/modules/login \
+  --target ~/github/repo/service-v2.0.0/modules/login \
+  > "review-$(date +%Y-%m-%d_%H-%M-%S).md"
 ```
