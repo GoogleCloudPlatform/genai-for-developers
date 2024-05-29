@@ -575,46 +575,46 @@ def impact(current, target):
 
     
     current_source='''
-CURRENT VERSION: 
-{}
+    CURRENT VERSION: 
+    {}
 
-'''
+    '''
     target_source='''
-TARGET VERSION:
-{}
+    TARGET VERSION:
+    {}
 
-'''
+    '''
     qry = get_prompt('review_query')
 
     if qry is None:
         qry='''
-INSTRUCTIONS:
-You need to analyze two versions of a codebase and provide impact analysis tht will help with migration from current version to target version.
-I have two versions of a codebase: [CURRENT] and [TARGET].
+        INSTRUCTIONS:
+        You need to analyze two versions of a codebase and provide impact analysis tht will help with migration from current version to target version.
+        I have two versions of a codebase: [CURRENT] and [TARGET].
 
-Please perform a detailed impact analysis comparing these versions. Specifically, I need you to:
+        Please perform a detailed impact analysis comparing these versions. Specifically, I need you to:
 
-Identify the changes:
-List all files modified, added, or deleted between the two versions.
-For each modified file, highlight the specific lines of code that were changed.
-Categorize the changes:
-Classify the changes into categories like bug fixes, new features, performance improvements, refactoring, etc.
-Provide a brief explanation for each category.
-Analyze the impact:
-For each change, explain its potential impact on the application's functionality, performance, security, and any other relevant aspects.
-Identify any potential risks or regressions introduced by the changes.
-Suggest testing areas:
-Based on the analysis, recommend specific areas of the application that require thorough testing to ensure the changes haven't introduced any unexpected behavior.
-Provide code snippets:
-Whenever possible, include relevant code snippets to illustrate the changes and their potential impact.
-Please present your analysis in a clear and concise manner, using Markdown formatting for readability.
+        Identify the changes:
+        List all files modified, added, or deleted between the two versions.
+        For each modified file, highlight the specific lines of code that were changed.
+        Categorize the changes:
+        Classify the changes into categories like bug fixes, new features, performance improvements, refactoring, etc.
+        Provide a brief explanation for each category.
+        Analyze the impact:
+        For each change, explain its potential impact on the application's functionality, performance, security, and any other relevant aspects.
+        Identify any potential risks or regressions introduced by the changes.
+        Suggest testing areas:
+        Based on the analysis, recommend specific areas of the application that require thorough testing to ensure the changes haven't introduced any unexpected behavior.
+        Provide code snippets:
+        Whenever possible, include relevant code snippets to illustrate the changes and their potential impact.
+        Please present your analysis in a clear and concise manner, using Markdown formatting for readability.
 
-Optional:
+        Optional:
 
-If you have access to the repository history, you can analyze the commit messages and pull requests associated with the changes for additional context.
-If the codebase has unit tests, you can suggest which tests need to be updated or created based on your analysis.
+        If you have access to the repository history, you can analyze the commit messages and pull requests associated with the changes for additional context.
+        If the codebase has unit tests, you can suggest which tests need to be updated or created based on your analysis.
 
-'''
+        '''
 
     # Load files as text into source variable
     current_source=current_source.format(format_files_as_string(current))
