@@ -429,7 +429,10 @@ def testcoverage(context):
             ### Context (code) ###: 
             {}
             '''
-    qry='''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
         ### Instruction ###
         You are an experienced software engineer specializing in test coverage analysis and best practices. Given a code snippet (in any programming language) and its associated test suite (if available), your task is to perform a thorough assessment and provide actionable recommendations.
 
@@ -510,7 +513,10 @@ def blockers(context):
             ### Context (code) ###: 
             {}
             '''
-    qry='''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
         ### Instruction ###
         You are an experienced software engineer specializing in blocking. Analyze the code and check if there are components that are in the BLOCKERS list below.
         Provide explanation why you made the decision.
