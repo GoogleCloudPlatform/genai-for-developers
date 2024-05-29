@@ -28,7 +28,7 @@ jobs:
       - run: virtualenv venv
       - run: source venv/bin/activate
       - run: pip install -r ${{ github.workspace }}/devai-cli/src/requirements.txt
-      - run: pip install --editable .
+      - run: pip install --editable ${{ github.workspace }}/devai-cli/src
       # - run: cd ../..
 
       - name: Authorize. with GCP 
