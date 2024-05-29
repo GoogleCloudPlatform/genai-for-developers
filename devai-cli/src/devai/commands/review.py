@@ -26,7 +26,7 @@ import logging
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 
-model_name="gemini-1.5-pro-preview-0514"
+model_name="gemini-1.5-pro"
 
 
 def ensure_env_variable(var_name):
@@ -217,7 +217,7 @@ def code(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    click.echo(f"{response.text}")
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -306,7 +306,7 @@ def performance(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    click.echo(f"{response.text}")
 
     # create_jira_issue("Performance Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -410,7 +410,7 @@ def security(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    click.echo(f"{response.text}")
 
     # create_jira_issue("Security Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -499,7 +499,7 @@ def testcoverage(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    click.echo(f"{response.text}")
 
     # create_jira_issue("Code Coverage Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -555,7 +555,7 @@ def blockers(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"Response from Model: {response.text}")
+    click.echo(f"{response.text}")
 
     # create_jira_issue("Blockers Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
