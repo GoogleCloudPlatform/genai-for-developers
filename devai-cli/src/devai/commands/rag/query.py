@@ -35,7 +35,7 @@ def query(qry, db_path):
     # Load the Gemini Pro model
 
     llm = ChatVertexAI(
-        model_name="gemini-1.5-pro-preview-0514",
+        model_name="gemini-1.5-pro",
         safety_settings={},
         temperature=.1,
         # max_output_tokens=256,
