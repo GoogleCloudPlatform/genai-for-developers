@@ -23,7 +23,7 @@ jobs:
       # - run: pip install -i https://test.pypi.org/simple/ devai
       # - run: apt-get update && apt-get install -y git
       # - run: python --version ; pip --version  # For debugging
-      - run: cd devai-cli
+      - run: cd ${{ github.workspace }}/devai-cli
       - run: pip install virtualenv
       - run: virtualenv venv
       - run: source venv/bin/activate
