@@ -57,7 +57,7 @@ jobs:
         shell: bash
 
       - name: Blockers Review
-        run: echo '## Security Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+        run: echo '## Blockers Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review blockers -c ${{ github.workspace }}/sample-app/pom.xml)" >> $GITHUB_STEP_SUMMARY
         shell: bash
               
