@@ -31,13 +31,16 @@ from langchain_google_vertexai import ChatVertexAI
 from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
+from .jira import create_jira_issue
+
+USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 model_name="gemini-1.5-pro"
 
-llm = ChatVertexAI(model_name=model_name,
-    convert_system_message_to_human=True,
-    temperature=0.2,
-    max_output_tokens=4096)
+with telemetry.tool_context_manager(USER_AGENT):
+    llm = ChatVertexAI(model_name=model_name,
+        convert_system_message_to_human=True,
+        temperature=0.2,
+        max_output_tokens=8192)
 
 gitlab = GitLabAPIWrapper()
 toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
@@ -86,7 +89,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
         response = code_chat.send_message(instructions)
-    print(f"Response from Model:\n{response.text}\n")
+        print(f"{response.text}\n")
 
     # resp_text = response.candidates[0].content.parts[0].text
 
@@ -101,5 +104,56 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     # print(pr_prompt)
     # agent.invoke(pr_prompt)
 
+    # create_jira_issue("Code Review Results", response.text)
+
     return response.text
 
+@routes.post("/create-jira-issue", response_class=PlainTextResponse)
+async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
+    """Handler for JIRA Issue Creation Content Requests"""
+    # Retrieve user prompt
+    if not prompt:
+        raise HTTPException(status_code=400, detail="Error: Prompt is required")
+
+    instructions = f"""You are senior staff software engineer at Google and will be given REQUIREMENT below.
+    Write a very detailed technical prompt for JIRA user story based on input requirements. 
+    
+    EXAMPLE:
+    create a url shortener in python using FASTAPI framework. Output must include python source code, unit tests, documentation.
+    
+    GEMINI OUTPUT:
+    Create a URL Shortener Microservice using FastAPI
+    As a developer, I want to create a URL shortener microservice using FastAPI to shorten long URLs and retrieve the original URLs from short codes.
+    Acceptance Criteria:
+    Functionality:
+    The service must accept a long URL as input and generate a short code.
+    The service must be able to retrieve the original URL based on the short code.
+    The short codes should be unique and randomly generated.
+    The service should provide a simple API for both shortening and retrieving URLs.
+    Implementation:
+    The microservice should be built using FastAPI framework.
+    The service should store the URL mappings in a database. (Choose a suitable database based on your needs)
+    The code should be well-documented and follow best practices.
+    The service should include unit tests for all core functionalities.
+    Documentation:
+    Create a comprehensive documentation with API specifications, usage instructions, and deployment details.
+    The documentation should be accessible through a README file.
+    Code Structure:
+    The code should be organized into separate modules for different functionalities.
+    The source code should be properly formatted and adhere to PEP 8 style guide.
+    Output:
+    Python Source Code: Provide the complete Python code for the URL shortener microservice.
+    Unit Tests: Include a comprehensive set of unit tests covering all core functionalities.
+    Documentation: Create a detailed README file containing API specifications, usage instructions, deployment guide, and any other relevant information.
+    
+    REQUIREMENTS:
+    {prompt}
+    """
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat()
+        response = code_chat.send_message(instructions)
+        print(f"Response from Model:\n{response.text}\n")
+
+        create_jira_issue("New JIRA Issue", response.text)
+
+    return response.text
