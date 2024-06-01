@@ -19,7 +19,7 @@ from vertexai.generative_models import GenerativeModel, ChatSession
 from google.cloud.aiplatform import telemetry
 import os
 from google.cloud import secretmanager
-from google.api_core.exceptions import NotFound
+from google.api_core.exceptions import NotFound, PermissionDenied
 from google.api_core.gapic_v1.client_info import ClientInfo
 import logging
 
@@ -37,6 +37,14 @@ def ensure_env_variable(var_name):
     return value
 
 def get_prompt( secret_id: str) -> str:
+    """Retrieves a secret value from Google Secret Manager.
+
+    Args:
+        secret_id: The ID of the secret to retrieve.
+
+    Returns:
+        The secret value as a string, or None if the secret is not found or the user lacks permission.
+    """    
     try:
         project_id = ensure_env_variable('PROJECT_ID')
         logging.info("PROJECT_ID:", project_id)
@@ -48,11 +56,21 @@ def get_prompt( secret_id: str) -> str:
         try:
             response = client.access_secret_version(name=name)
             payload = response.payload.data.decode("utf-8")
-            logging.info(f"ID: {secret_id} in project {project_id}")
+            logging.info(f"Successfully retrieved secret ID: {secret_id} in project {project_id}")
             return payload
-        except NotFound:
-            logging.info(f"ID not found: {secret_id} in project {project_id}")
+        
+        except PermissionDenied:
+            logging.warning(f"Insufficient permissions to access secret {secret_id} in project {project_id}")
             return None
+        
+        except NotFound:
+            logging.info(f"Secret ID not found: {secret_id} in project {project_id}")
+            return None
+        
+        except Exception as e:  # Catching a broader range of potential errors
+            logging.error(f"An unexpected error occurred while retrieving secret '{secret_id}': {e}")
+            return None
+    
     except EnvironmentError as e:
         logging.error(e)
 
