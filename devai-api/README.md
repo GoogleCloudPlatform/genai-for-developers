@@ -7,6 +7,7 @@ This application defines the routes for the DevAI API.
 The API provides two main endpoints:
 
 `/generate`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate code and documentation based on the prompt.
+
 `/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
 
 The API includes a `/test` endpoint for testing purposes.
