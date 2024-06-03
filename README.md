@@ -10,7 +10,11 @@ The contents of this repository should not be considered an official google prod
 
 ## Integrations
 
+[DevAI CLI](./devai-cli/)
+
 ![Devai CLI integration](./images/code-review-github.png "Devai CLI integration")
+
+[DevAI API](./devai-api/)
 
 ![Devai API integration](./images/devai-api.png "Devai API integration")
 
