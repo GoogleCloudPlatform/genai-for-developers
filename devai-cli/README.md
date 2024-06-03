@@ -1,4 +1,6 @@
-# GenAI CLI with Gemini Pro for Development
+# DevAI CLI with Gemini Pro for Development
+
+![Devai CLI integration](../images/code-review-github.png "Devai CLI integration")
 
 This example demonstrates ways to integrate LLM models into a custom command line utility for use by developers both locally and in automation processes such as CICD pipelines.
 
@@ -100,7 +102,7 @@ cat $KEY_FILE_NAME.json
 
 This can be added in any build pipeline following the examples below:
 
-GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
+### GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
 
 [devai-review.yaml](../.github/workflows/devai-review.yml)
 
@@ -111,7 +113,7 @@ GitHub Actions (Full example at ${repoRoot/.github/workflows/devai-review.yml})
         shell: bash
 ```
 
-GitLab Pipeline example
+### GitLab Pipeline example
 
 [.gitlab-ci.yml](../.gitlab-ci.yml)
 
@@ -126,27 +128,7 @@ build-job:
     - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 ```
 
-CircleCI Pipeline example
-
-[config.yml](../.circleci/config.yml)
-
-```sh
-version: 2.1
-
-jobs:
-  ai-insights-code-review:
-    docker:
-      - image: python:3.11-slim
-    steps:
-      - checkout
-      - run:
-            command: |
-              .
-              .
-              devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader            
-```
-
-Jenkins Pipeline example
+### Jenkins Pipeline example
 
 [Jenkinsfile](../Jenkinsfile)
 
@@ -182,6 +164,49 @@ pipeline {
         }
     }
 }         
+```
+
+### BitBucket Pipeline example
+
+[BitBucket](../bitbucket-pipelines.yml)
+
+```sh
+image: python:3.11-slim
+
+pipelines:
+  default:
+      - step:
+          name: DevAI CLI
+          caches:
+            - pip
+          script:
+            - apt-get update && apt-get install -y git
+            .
+            .
+            - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+            - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+            - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+  
+```
+
+### CircleCI Pipeline example
+
+[config.yml](../.circleci/config.yml)
+
+```sh
+version: 2.1
+
+jobs:
+  ai-insights-code-review:
+    docker:
+      - image: python:3.11-slim
+    steps:
+      - checkout
+      - run:
+            command: |
+              .
+              .
+              devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader            
 ```
 
 ## Developers Guide
