@@ -2,7 +2,53 @@
 
 Devai API is a python based application that is built with FastAPI framework.
 
-Devai API application is used in multiple integrations.
+This application defines the routes for the DevAI API. 
+
+The API provides two main endpoints:
+
+`/generate`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate code and documentation based on the prompt.
+`/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
+
+The API includes a `/test` endpoint for testing purposes.
+
+The code uses the following libraries:
+
+- FastAPI: A web framework for building APIs in Python.
+- Google Cloud AI Platform: A cloud service for building and deploying machine learning models.
+- LangChain: A library for building and deploying language models.
+- Vertex AI: A cloud service for building and deploying machine learning models.
+- Jira: A project management tool.
+- GitLab: A code hosting platform.
+
+The code uses the following environment variables:
+
+- PROJECT_ID: The Google Cloud project ID.
+- LOCATION: The Google Cloud region.
+
+For integration with JIRA:
+
+- JIRA_API_TOKEN: The JIRA API token.
+- JIRA_USERNAME: The JIRA username.
+- JIRA_INSTANCE_URL: The JIRA instance URL.
+- JIRA_PROJECT_KEY: The JIRA project key.
+
+For integration with GitLab:
+
+- GITLAB_URL: The GitLab URL.
+- GITLAB_REPOSITORY: The GitLab repository.
+- GITLAB_BRANCH: The GitLab branch.
+- GITLAB_BASE_BRANCH: The GitLab base branch.
+
+For integration with LAngSmith:
+
+- LANGCHAIN_TRACING_V2: The LangChain tracing flag.
+- LANGCHAIN_ENDPOINT: The LangChain endpoint.
+
+The code uses the following secrets:
+
+- LANGCHAIN_API_KEY: The LangChain API key.
+- GITLAB_PERSONAL_ACCESS_TOKEN: The GitLab personal access token.
+- JIRA_API_TOKEN: The JIRA API token.
 
 ## JIRA User story implementation
 
