@@ -8,6 +8,18 @@ In this repository you will find samples, demos and tutorials to help developers
 
 The contents of this repository should not be considered an official google product. The materials are provided for educational purposes only.
 
+## Integrations
+
+[DevAI CLI](./devai-cli/)
+
+![Devai CLI integration](./images/code-review-github.png "Devai CLI integration")
+
+[DevAI API](./devai-api/)
+
+![Devai API integration](./images/devai-api.png "Devai API integration")
+
+![Devai API integration](./images/devai-api-slack.png "Devai API integration")
+
 ## Data Governance
 
 The samples in this repository require you to configure a GCP project for use with the examples. The data is sent to an isolated model within this project and is not accessible by Google or the general public. Additionally Gemini doesn't use your prompts or its responses as data to train its models.
