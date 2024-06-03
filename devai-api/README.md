@@ -1,7 +1,18 @@
 # Devai API
 
+Devai API is a python based application that is built with FastAPI framework.
+
+Devai API application is used in multiple integrations.
+
+## JIRA User story implementation
+
 ![Devai API integration](../images/devai-api.png "Devai API integration")
 
+## Backend/API for GenAI Agent
+
+![Devai API integration](../images/devai-api-slack.png "Devai API integration")
+
+## Service deployment steps
 
 Set your GCP project and location:
 
