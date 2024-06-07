@@ -48,6 +48,10 @@ devai review impact \
   --current ~/github/repo/service-v1.0.0/modules/login \
   --target ~/github/repo/service-v2.0.0/modules/login
 
+devai review imgdiff \
+  -c /ui/main-page-after-upgrade.png \
+  -t /ui/main-page-before-upgrade.png  
+
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
 

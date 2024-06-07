@@ -16,7 +16,7 @@ import os
 from typing import Any, Mapping, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import PlainTextResponse, RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse, JSONResponse
 from fastapi import APIRouter, Body, FastAPI, HTTPException, Request
 
 
@@ -108,7 +108,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 
     return response.text
 
-@routes.post("/create-jira-issue", response_class=PlainTextResponse)
+@routes.post("/create-jira-issue", response_class=JSONResponse)
 async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for JIRA Issue Creation Content Requests"""
     # Retrieve user prompt
@@ -156,4 +156,4 @@ async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=T
 
         create_jira_issue("New JIRA Issue", response.text)
 
-    return response.text
+    return {"message": "JIRA issue was created: https://cymbal-eats.atlassian.net/jira/software/projects/CYMEATS/boards/1"}
