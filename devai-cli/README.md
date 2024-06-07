@@ -52,6 +52,10 @@ devai review imgdiff \
   -c /ui/main-page-after-upgrade.png \
   -t /ui/main-page-before-upgrade.png  
 
+devai review image \
+  -f /tmp/diagram.png \
+  -p "Review and summarize this diagram"
+
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
 
