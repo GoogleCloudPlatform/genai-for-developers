@@ -15,7 +15,10 @@
 
 import click
 from devai.util.file_processor import format_files_as_string
-from vertexai.generative_models import GenerativeModel, ChatSession
+from vertexai.generative_models import (
+    GenerativeModel,
+    Image,
+)
 from google.cloud.aiplatform import telemetry
 import os
 from google.cloud import secretmanager
@@ -74,6 +77,16 @@ def get_prompt( secret_id: str) -> str:
     except EnvironmentError as e:
         logging.error(e)
 
+def load_image_from_path(image_path: str) -> Image:
+    """Loads an image from a local path.
+
+    Args:
+        image_path: The path to the image file.
+
+    Returns:
+        A Image object representing the loaded image.
+    """
+    return Image.load_from_file(image_path)
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
@@ -650,6 +663,46 @@ def impact(current, target):
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
 
+@click.command(name='imgdiff')
+@click.option('-c', '--current', required=True, type=str, default="")
+@click.option('-t', '--target', required=True, type=str, default="")
+def imgdiff(current, target):
+    """
+    This function performs an image diff analysis using the Generative Model API.
+
+    Args:
+        current (str): current state.
+        target (str): target state.
+    """
+
+    before_state='''
+    BEFORE UPGRADE STATE: 
+
+    '''
+    after_state='''
+    AFTER UPGRADE STATE:
+
+    '''
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry='''
+        INSTRUCTIONS:
+        Analyze images of the Web page and write the report about what UI elements are missing between the two images.
+        Explain how you reached this decision.
+        '''
+    
+    contents = [qry, after_state, load_image_from_path(current),
+                before_state, load_image_from_path(target)]
+
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        responses = code_chat_model.generate_content(contents, stream=True)
+
+    for response in responses:
+        print(response.text, end="")
+
+
 @click.group()
 def review():
     """
@@ -663,3 +716,4 @@ review.add_command(security)
 review.add_command(testcoverage)
 review.add_command(blockers)
 review.add_command(impact)
+review.add_command(imgdiff)
