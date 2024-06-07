@@ -702,6 +702,34 @@ def imgdiff(current, target):
     for response in responses:
         print(response.text, end="")
 
+@click.command(name='image')
+@click.option('-f', '--file', required=True, type=str, default="")
+@click.option('-p', '--prompt', required=True, type=str, default="")
+def image(file, prompt):
+    """
+    This function performs an image analysis using the Generative Model API.
+
+    Args:
+        file (str): path to image.
+        prompt (str): question about image.
+    """
+
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry=f'''
+        INSTRUCTIONS:
+        {prompt}
+        '''
+    
+    contents = [qry, load_image_from_path(file)]
+
+    code_chat_model = GenerativeModel(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        responses = code_chat_model.generate_content(contents, stream=True)
+
+    for response in responses:
+        print(response.text, end="")
 
 @click.group()
 def review():
@@ -717,3 +745,4 @@ review.add_command(testcoverage)
 review.add_command(blockers)
 review.add_command(impact)
 review.add_command(imgdiff)
+review.add_command(image)
