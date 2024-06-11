@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+import os, json
 from typing import Any, Mapping, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -42,19 +42,19 @@ with telemetry.tool_context_manager(USER_AGENT):
         temperature=0.2,
         max_output_tokens=8192)
 
-gitlab = GitLabAPIWrapper()
-toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
+# gitlab = GitLabAPIWrapper()
+# toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
 
-agent = initialize_agent(
-    toolkit.get_tools(), 
-    llm, 
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
-    verbose=True,
-    handle_parsing_errors=True,
-    max_iterations=5,
-    return_intermediate_steps=True,
-    early_stopping_method="generate",
-)
+# agent = initialize_agent(
+#     toolkit.get_tools(), 
+#     llm, 
+#     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
+#     verbose=True,
+#     handle_parsing_errors=True,
+#     max_iterations=5,
+#     return_intermediate_steps=True,
+#     early_stopping_method="generate",
+# )
 
 routes = APIRouter()
 code_chat_model = GenerativeModel(model_name)
@@ -73,15 +73,36 @@ async def test():
     print(f"Response from Model:\n{response.text}\n")
     return {"message": response.text}
 
-@routes.post("/generate", response_class=PlainTextResponse)
+def query_jira(project_id: str):
+    # Make API calls to your JIRA instance to pull required information
+
+    return """
+    CUSTOMERS:
+    Customer-A
+        Issues:
+            Issue-1: Taking too long to get issues fixed for new users
+            Issue-2: Can't find my logs for mobile application TEST-M
+            Issue-3: Can't login
+    Customer-B
+        Issues:
+            Issue-1: Taking too long to get issues fixed for existing users
+            Issue-2: Can't find my logs for desktop application TEST-D
+            Issue-3: Can't login into Liferay portal
+    """
+
+@routes.post("/generate", response_class=JSONResponse)
 async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for Generate Content Requests"""
     # Retrieve user prompt
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    instructions = f"""You are principal software engineer at Google and given requirements below for implementation.
-    Please provide implementation details and document the implementation.
+    project_details = query_jira(prompt)
+
+    instructions = f"""Analyze JIRA project status and provide summary of the impacted customers and their reported issues.
+
+    PROJECT DETAILS:
+    {project_details}
     
     REQUIREMENTS:
     {prompt}
@@ -106,7 +127,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 
     # create_jira_issue("Code Review Results", response.text)
 
-    return response.text
+    return {"message": json.dumps(response.text)}
 
 @routes.post("/create-jira-issue", response_class=JSONResponse)
 async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
