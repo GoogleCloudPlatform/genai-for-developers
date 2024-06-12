@@ -46,7 +46,6 @@ async function readSecret(secretName: string): Promise<string | null> {
     // Build the resource name of the secret.
     const name = client.secretPath(GCP_PROJECT_ID, secretName);
 
-    // const name = "projects/658618582232/secrets/DT_REVIEW_PROMPT/versions/latest";
     // Access the secret version.
     const [version] = await client.accessSecretVersion({ name });
 
