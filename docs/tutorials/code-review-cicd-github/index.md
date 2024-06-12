@@ -1,5 +1,12 @@
 # CICD Code Review with GitHub
 
+## Getstarted
+
+- Open the [google cloud console](https://console.cloud.google.com/)
+- Activate Cloud Shell
+
+
+
 ## Setup
 
 ### Create Service Account
@@ -37,26 +44,31 @@ gcloud services enable \
 
 **Fork the Repo**
 
-Fork GitHub repo to your personal GitHub repo
-Go to https://github.com/GoogleCloudPlatform/genai-for-developers/fork and select your github userid as an owner. Uncheck option to copy only the "main" branch.
-
-Click "Create fork".
+- [Fork GitHub repo](https://github.com/GoogleCloudPlatform/genai-for-developers/fork)
+- Select your github userid as an owner.
+- Uncheck option to copy only the "main" branch.
+- Click "Create fork".
 
 **Enable GitHub Actions**
 
-Open a forked repo in the browser and switch to the "Actions" tab to activate workflows.
+- Open the forked repo in the browser
+- Switch to the "Actions" tab
+- Enable GitHub workflows
 
 **Create a secret**
 
-Next create a repository secret, to hold the GCP API credentials,  under "Settings / Secrets and variables / Actions" in the GitHub repository.
+Next create a repository secret, to hold the GCP API credentials,  
 
-Add Repository secret "GOOGLE_API_CREDENTIALS"
-
-For secret value, run the command below in the terminal and copy/paste the file content.
+- Navigate to "Settings / Secrets and variables / Actions" in the GitHub repository.
+- Add Repository secret called "GOOGLE_API_CREDENTIALS"
+- Run the following command in your terminal to generate the secret
 
 ```sh
 cat ~/vertex-client-key.json
 ```
+
+- Copy the output and past into the secret value for GOOGLE_API_CREDENTIALS
+- Click Add Secret
 
 **Configure local git**
 
@@ -95,12 +107,20 @@ For the key name use "qwiklabs-key" and copy/paste the output from the last comm
 
 Go back to the terminal and clone the repository. Replace with your repository url.
 
+```sh
 mkdir github
 cd github
+```
 
+Be sure to replace your user ID in the next command
+
+```sh
 git clone git@github.com:YOUR-USERID/genai-for-developers.git
-
+```
+Change into the directory
+```
 cd genai-for-developers
+```
 
 ## Make Code Changes
 
@@ -121,3 +141,5 @@ Stage, commit and push the changes you made to update the project id.
 **Review AI Output in CICD**
 
 In the browser, Open the GitHub "Actions" tab and review the workflow output.
+
+Click on Summary for the action and scroll down to see the review summaries that were performed.
