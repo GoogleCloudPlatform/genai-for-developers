@@ -10,7 +10,7 @@ Devai extension was extended to do prompt lookup in Secret Manager.
 
 ![Devai VS Code Extension Commands](../images/extension-devai-commands.png "Devai VS Code Extension Commands")
 
-### Review Output - markdown preview for redability
+### Review Output - markdown preview for readability
 
 ![Devai VS Code Extension Output](../images/extension-review-output.png "Devai VS Code Extension Output")
 
