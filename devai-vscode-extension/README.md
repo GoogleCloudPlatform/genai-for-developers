@@ -18,6 +18,12 @@ Devai extension was extended to do prompt lookup in Secret Manager.
 
 ![Devai VS Code Extension Review Prompt](../images/extension-custom-review-prompt.png "Devai VS Code Extension Review Prompt")
 
+Store review prompt in Secret Manager:
+
+```sh
+gcloud secrets create CUSTOM_REVIEW_PROMPT --data-file=CUSTOM_REVIEW_PROMPT.txt
+ ```
+
 
 ## Setup
 

@@ -1,0 +1,8 @@
+Reviewing code for Your Coding Style guide compliance.
+
+1) Check that python-json-logger library is used for logging.
+2) Check that all methods have detailed python docstrings.
+3) Check for Your copyright header
+
+Provide short report with findings.
+Show this link to developer to read about internal logging practices: https://internal.confluence.com/team/logging.
