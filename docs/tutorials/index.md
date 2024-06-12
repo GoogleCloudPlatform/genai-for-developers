@@ -1,3 +1,3 @@
 # GenAI For Developers - Tutorials
 
-- [Code Review in CICD with GitHub](code-review-cicd-github.md)
+- [Code Review in CICD with GitHub](code-review-cicd-github)
