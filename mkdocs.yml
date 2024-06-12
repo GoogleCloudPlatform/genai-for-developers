@@ -1,4 +1,5 @@
 site_name: GenAI for Developers
+docs_dir: docs
 theme:
   name: 'material'
   feature:
@@ -7,10 +8,7 @@ theme:
 nav:
 - 'Home': 'index.md'
 - 'Tutorials': 'tutorials/index.md'
-- 'Creating Images': 'two.md'
-- 'Writing your docs': 'three.md'
-- 'Styling your docs': 'four.md'
-- 'About': 'five.md'
+
 
 markdown_extensions:
   - codehilite
