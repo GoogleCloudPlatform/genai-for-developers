@@ -134,7 +134,7 @@ def code(context, output):
         context (str): The code to be reviewed.
         output (str): The desired output format (markdown, json, or table).
     """
-    source_code = '''
+    source = '''
             ### Context (code) ###
             {}
 
@@ -293,7 +293,7 @@ Provide an overview or overall impression entry for the code as the first entry.
 
             '''
     # Load files as text into the source variable
-    # source = source_code.format(format_files_as_string(context))
+    source = source.format(format_files_as_string(context))
 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
