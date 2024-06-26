@@ -61,6 +61,9 @@ devai release notes_user -s "main" -e "feature-branch-name"
 
 devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
 devai rag query -q "What does devai do"
+
+devai document readme -c ../sample-app/src/main/java
+devai document releasenotes -c ../sample-app/src/main/java
 ```
 
 ## Enable APIs and Create an Artifact Registry
