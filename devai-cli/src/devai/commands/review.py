@@ -26,6 +26,11 @@ from google.api_core.exceptions import NotFound, PermissionDenied
 from google.api_core.gapic_v1.client_info import ClientInfo
 import logging
 
+import json
+from json_repair import repair_json
+
+from rich.console import Console 
+from rich.table import Table
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 
@@ -62,8 +67,8 @@ def get_prompt( secret_id: str) -> str:
             logging.info(f"Successfully retrieved secret ID: {secret_id} in project {project_id}")
             return payload
         
-        except PermissionDenied:
-            logging.warning(f"Insufficient permissions to access secret {secret_id} in project {project_id}")
+        except PermissionDenied as e:
+            logging.warning(f"Insufficient permissions to access secret {secret_id} in project {project_id}: {e}")
             return None
         
         except NotFound:
@@ -88,6 +93,31 @@ def load_image_from_path(image_path: str) -> Image:
     """
     return Image.load_from_file(image_path)
 
+def validate_and_correct_json(json_text):
+    """Validates and attempts to correct JSON text.
+
+    Args:
+        json_text (str): The JSON text to validate.
+
+    Returns:
+        str: The original or corrected JSON text if valid, None otherwise.
+    """
+ 
+
+    try:
+        # Validate the JSON
+        json.loads(json_text)
+        return json_text  # JSON is already valid
+    except json.JSONDecodeError:
+        try:
+            # If invalid, attempt to repair
+            return repair_json(json_text) 
+        except ValueError:
+            click.echo(
+                "Error: Model output is not valid JSON and could not be repaired."
+            )
+            return None
+
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 
 # from devai.commands.jira import create_jira_issue
@@ -95,80 +125,104 @@ def load_image_from_path(image_path: str) -> Image:
 
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
-def code(context):
+@click.option('-o', '--output', type=click.Choice(['markdown', 'json', 'table']), default='markdown', help="The desired output format, markdown is the defualt.")
+def code(context, output):
     """
     This function performs a code review using the Generative Model API.
 
     Args:
         context (str): The code to be reviewed.
+        output (str): The desired output format (markdown, json, or table).
     """
-    #click.echo('code')
-    
-    source='''
+    source_code = '''
             ### Context (code) ###
             {}
 
             '''
-    qry = get_prompt('review_query')
+    # Output Format Substitution
+    output_format = {
+        'markdown': '''Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
 
-    if qry is None:
-        qry='''
+Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
+
+*   "Could we explore an alternative algorithm here to potentially improve performance?"
+*   "Would refactoring this logic into smaller functions enhance readability and maintainability?"
+
+Specificity: Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
+
+Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
+
+No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
+
+Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low). If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices." Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"''',
+
+        'json': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+
+*   **class_name** (optional): The name of the class where the issue is found.
+*   **method_name** (optional): The name of the method where the issue is found.
+*   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
+*   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
+*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+
+Provide an overview or overall impression entry for the code as the first entry.''',
+        'table': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+
+*   **class_name** (optional): The name of the class where the issue is found.
+*   **method_name** (optional): The name of the method where the issue is found.
+*   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
+*   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
+*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+
+Provide an overview or overall impression entry for the code as the first entry.'''
+    }[output] 
+
+    qry = get_prompt('review_query') or f'''
             ### Instruction ###
             You are a senior software engineer and architect with over 20 years of experience, specializing in the language of the provided code snippet and adhering to clean code principles. You are meticulous, detail-oriented, and possess a deep understanding of software design and best practices.
 
             Your task is to perform a comprehensive code review of the provided code snippet. Evaluate the code with a focus on the following key areas:
-
-            Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
-            Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
-            Maintainability: Assess the code's readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
-            Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
-            Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
+            
+            *   Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
+            *   Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
+            *   Maintainability: Assess the code's readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
+            *   Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
+            *   Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
 
             ### Output Format ###
-            Structure:  Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring. 
-            Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
-            "Could we explore an alternative algorithm here to potentially improve performance?"
-            "Would refactoring this logic into smaller functions enhance readability and maintainability?"
-            Specificity:  Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
-            Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
-            No Issues:  If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices.
-
-            Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low).
-            If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices."
-            Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"
-
+            {output_format}
+            
             ### Example Dialogue ###
             <query> First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
                     import "fmt"
                     
-                    func main() {
+                    func main() {{
                         name := "Alice"
                         greeting := fmt.Sprintf("Hello, %s!", name)
                         fmt.Println(greeting)
-                    }
+                    }}
                     
                     
                     <response> [
-                        {
+                        {{
                             "question": "Indentation",
                             "answer": "yes",
                             "description": "Code is consistently indented with spaces (as recommended by Effective Go)"
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Variable Naming",
                             "answer": "yes",
                             "description": "Variables ("name", "greeting") use camelCase as recommended"
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Line Length",
                             "answer": "yes",
                             "description": "Lines are within reasonable limits" 
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Package Comments", 
                             "answer": "n/a",
                             "description": "This code snippet is too small for a package-level comment"
-                        }
+                        }}
                     ]
                     
                     
@@ -185,62 +239,61 @@ def code(context):
                     // Global variable, potentially unnecessary 
                     var globalCounter int = 0 
                     
-                    func main() {
-                        items := []string{"apple", "banana", "orange"}
+                    func main() {{
+                        items := []string{{"apple", "banana", "orange"}}
                     
                         // Very inefficient loop with nested loop for a simple search
-                        for _, item := range items {
-                            for _, search := range items {
-                                if item == search {
+                        for _, item := range items {{
+                            for _, search := range items {{
+                                if item == search {{
                                     fmt.Println("Found:", item)
-                                }
-                            }
-                        }
+                                }}
+                            }}
+                        }}
                     
                         // Sleep without clear reason, potential performance bottleneck
                         time.Sleep(5 * time.Second) 
                     
                         calculateAndPrint(10)
-                    }
+                    }}
                     
                     // Potential divide-by-zero risk
-                    func calculateAndPrint(input int) {
+                    func calculateAndPrint(input int) {{
                         result := 100 / input 
                         fmt.Println(result)
-                    }"
+                    }}"
                     
                     <response> [
-                        {
+                        {{
                             "question": "Global Variables",
                             "answer": "no",
                             "description": "Potential issue: Unnecessary use of the global variable 'globalCounter'. Consider passing values as arguments for better encapsulation." 
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Algorithm Efficiency",
                             "answer": "no",
                             "description": "Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets."
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Performance Bottlenecks",
                             "answer": "no",
                             "description": "'time.Sleep' without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use."
-                        },
-                        {
+                        }},
+                        {{
                             "question": "Potential Bugs",
                             "answer": "no",
                             "description": "'calculateAndPrint' function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately."
-                        },
-                        { 
+                        }},
+                        {{ 
                             "question": "Code Readability",
                             "answer": "no",
                             "description": "Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code."
-                        } 
+                        }} 
                     ]
 
             '''
-
-    # Load files as text into source variable
-    source=source.format(format_files_as_string(context))
+    # Load files as text into the source variable
+    # source = source_code.format(format_files_as_string(context))
 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
@@ -248,7 +301,57 @@ def code(context):
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
-    click.echo(f"{response.text}")
+
+    # Process Output
+    if output in ["json", "table"]:
+        cleaned_json = response.text
+        if cleaned_json.startswith("`json\n") and cleaned_json.endswith("\n`"):
+            cleaned_json = cleaned_json[8:-3]  # Remove backticks if present
+
+        valid_json = validate_and_correct_json(cleaned_json)
+        if valid_json:
+            if output == 'json':
+                try:
+                    parsed_data = json.loads(valid_json)
+                    formatted_json = json.dumps(parsed_data, indent=4)  # Format with indentation
+                    click.echo(formatted_json)
+                except json.JSONDecodeError:
+                    click.echo("Error: Error processing JSON data: {e}")
+            elif output == "table":
+                try:
+                    data = json.loads(valid_json)
+
+                    console = Console()
+                    table = Table(show_header=True, header_style="bold green")
+                    table.add_column("Class", style="dim")
+                    table.add_column("Method", style="dim")
+                    table.add_column("Category")
+                    table.add_column("Description", width=120)
+                    table.add_column("Severity")
+
+                    severity_emojis = {
+                        "low": "🟡",  # Yellow circle for low severity
+                        "medium": "⚠️",  # Warning sign for medium severity
+                        "high": "🛑",  # Stop sign for high severity
+                    }
+
+                    for item in data:
+                        class_name = item.get("class_name", "General") 
+                        method_name = item.get("method_name", "N/A")
+                        issue_type = item["issue_type"]
+                        description = item["description"]
+                        severity = item.get("severity", "Unknown")  # Default to 'Unknown' if severity is missing
+
+                        # Add emoji based on severity
+                        severity_with_emoji = f"{severity_emojis.get(severity.lower(), '')} {severity}"  
+                        table.add_row(class_name, method_name, issue_type, description, severity_with_emoji)
+
+
+                    console.print(table)
+                except json.JSONDecodeError as e:
+                    click.echo(f"Error processing JSON data: {e}")
+    else:
+        click.echo(response.text) 
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -746,3 +849,4 @@ review.add_command(blockers)
 review.add_command(impact)
 review.add_command(imgdiff)
 review.add_command(image)
+
