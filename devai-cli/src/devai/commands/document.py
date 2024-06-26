@@ -158,18 +158,17 @@ def update_readme(context):
 
 
 @click.command(name='releasenotes')
-# @click.option('-v', '--version', type=str, help="The version number for the release notes.")
+@click.option('-t', '--tag', required=False, type=str, help="The version (or tag) number for the release notes.")
 # @click.option('-f', '--file', type=str, help="The existing release notes to be updated.")
 @click.option('-c', '--context', required=False, type=str, default="", help="The code, or context, that you would like to pass.")
-def releasenotes(context):
+def releasenotes(context, tag):
     """Create a release notes based on the context passed!
     
-    
-    
-    
+    This is useful when no existing release notes exist. If you already have release notes `update-releasenotes` may be a better option.
     """
     
     click.echo('Generating and printing release notes.')
+    version_info = f"The version number {tag} should be used." if tag else "" 
     
 
     source='''
@@ -177,17 +176,47 @@ def releasenotes(context):
             {}
 
             '''
-    qry = get_prompt('document_readme')
-
-    if qry is None:
-        qry='''
+    qry = get_prompt('document_releasenotes') or f'''
             ### Instruction ###
-           Create detailed release notes
+            Generate comprehensive release notes for the specified software project and version. The release notes should adhere to industry best practices, be suitable for both technical users and non-technical stakeholders, and accurately reflect the changes and improvements introduced in this release.
+
+            {version_info}
+
+            ### Output Format ### 
+            A well-structured release notes document (in Markdown format by default) that includes the following sections:
+
+            Project Name, Version Number, Introduction (Optional): Briefly summarize the key highlights of the release.
+            
+            Also include Changes: Organized by categories (New Features, Enhancements, Bug Fixes, Deprecations, Other Changes), Known Issues (Optional), Additional Information (Optional)
+            Ensure the release notes are clear, concise, and easy to understand for both technical and non-technical audiences.
+            Use appropriate formatting (e.g., headings, lists, code blocks) for readability.
+            Accurately reflect the changes and improvements made in the release.
+            Are professionally written and convey the value of the new version effectively.
+
+            ### Example Dialogue ###
+            Project Name: CodeGuard Pro
+            Version Number: 2.5.0
+            Changes:
+            * New Features:
+                * Integrated code linting with customizable rule sets
+                * Added support for real-time collaboration in code editing
+            * Enhancements:
+                * Improved code completion suggestions based on project context
+                * Faster code analysis and error detection
+            * Bug Fixes:
+                * Resolved issue with incorrect syntax highlighting in certain languages
+                * Fixed bug causing crashes when working with large files
+            * Deprecations:
+                * Support for Python 2.x has been removed
+            * Other Changes:
+                * Updated user interface for better navigation and visual appeal
+            Known Issues:
+            * Real-time collaboration may experience delays in slow network environments.
             '''
 
-    # Load files as text into source variable
+   
     source=source.format(format_files_as_string(context))
-
+    
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
