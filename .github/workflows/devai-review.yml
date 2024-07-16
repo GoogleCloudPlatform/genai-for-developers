@@ -5,7 +5,7 @@ run-name: Reviewing ${{ github.actor }}'s code changes  🚀
 on: [push]
 env:
   LOCATION: us-central1
-  PROJECT_ID: genai-cicd
+  PROJECT_ID: '${{ secrets.PROJECT_ID }}'
 jobs:
   DevAI-Reviews:
     runs-on: ubuntu-latest
@@ -29,8 +29,8 @@ jobs:
       - name: Authorize. with GCP 
         uses: 'google-github-actions/auth@v2'
         with:
-          credentials_json: '${{ secrets.GOOGLE_API_CREDENTIALS }}' 
-          project_id: genai-cicd
+          credentials_json: '${{ secrets.GOOGLE_API_CREDENTIALS }}'
+          project_id: '${{ secrets.PROJECT_ID }}'
       - name: Test Coverage Review
         run: echo '## Test Coverage Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review testcoverage -c ${{ github.workspace }}/sample-app/src)" >> $GITHUB_STEP_SUMMARY
