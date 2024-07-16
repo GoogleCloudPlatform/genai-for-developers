@@ -13,3 +13,6 @@ GitPython==3.1.43
 
 google-cloud-secret-manager==2.20.0
 google-crc32c==1.5.0
+
+rich==13.7.1
+json-repair==0.23.1
