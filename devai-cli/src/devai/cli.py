@@ -14,7 +14,7 @@
 
 import click
 
-from devai.commands import cmd,  prompt, review, release
+from devai.commands import cmd,  prompt, review, release, document
 from devai.commands.rag import rag
 
 
@@ -40,6 +40,7 @@ devai.add_command(cmd.sub)
 devai.add_command(prompt.prompt)
 devai.add_command(review.review)
 devai.add_command(release.release)
+devai.add_command(document.document)
 devai.add_command(rag.rag)
 
 # devai.add_command(jira.jira)
