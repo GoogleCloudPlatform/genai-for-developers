@@ -6,4 +6,4 @@ if shutil.which("git") is None:
     print("Git is required but not installed. Exiting.")
     sys.exit(1)
 
-from . import cmd, prompt, release, review
+from . import cmd, prompt, release, review, document
