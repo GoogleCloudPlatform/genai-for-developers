@@ -2,7 +2,7 @@
 # - Requires GCP service account stored in GOOGLE_API_CREDENTIALS secret
 name: GenAI For Developers
 run-name: Reviewing ${{ github.actor }}'s code changes  🚀
-on: [push]
+on: [push, workflow_dispatch]
 env:
   LOCATION: us-central1
   PROJECT_ID: '${{ secrets.PROJECT_ID }}'
