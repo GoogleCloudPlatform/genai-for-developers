@@ -1,0 +1,646 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.29">
+    
+    
+      
+        <title>Prompt Engineering - GenAI for Developers</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.76a95c52.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#prompt-engineering" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="GenAI for Developers" class="md-header__button md-logo" aria-label="GenAI for Developers" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GenAI for Developers
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Prompt Engineering
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="GenAI for Developers" class="md-nav__button md-logo" aria-label="GenAI for Developers" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    GenAI for Developers
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-engineering-is-crucial-for-several-reasons" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prompt engineering is crucial for several reasons:
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices-for-prompt-engineering" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices for Prompt Engineering
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-structure-for-devai" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prompt Structure for devai
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prompt Structure for devai">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instruction ###
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Context (code) ###
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output Format ###
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-prompts-for-application-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Prompts for Application Development
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example Prompts for Application Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-review-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Review Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-with-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Template with example
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="prompt-engineering">Prompt Engineering</h1>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Date</strong></td>
+<td>26<sup>th</sup> May 2024</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><strong>Context</strong></td>
+<td>Decide on the best structure to use for the prompts in <code>devai</code> to make them more robust and meet best practices to provide the most useful responses.</td>
+</tr>
+<tr>
+<td><strong>Decision</strong></td>
+<td>4 core sections (Instructions, Context, Output format and Example Dialogue [OPTIONAL])</td>
+</tr>
+<tr>
+<td><strong>Rationale</strong></td>
+<td>It seemed the simplest structure based on many examples and best practices guides.</td>
+</tr>
+<tr>
+<td><strong>Consequences</strong></td>
+<td>A consistent approach to creating prompts to be used for existing and new features in <code>devai</code> which should simplify creation and troubleshooting. The prompts will need to be reviewed as more is learnt about prompt engineering and the LLM's evolve.</td>
+</tr>
+<tr>
+<td><strong>Participants</strong></td>
+<td>robedwards@</td>
+</tr>
+<tr>
+<td><strong>References</strong></td>
+<td><a href="https://ai.google.dev/gemini-api/docs/prompting-strategies">https://ai.google.dev/gemini-api/docs/prompting-strategies</a>, <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/learn/introduction-prompt-design">https://cloud.google.com/vertex-ai/docs/generative-ai/learn/introduction-prompt-design</a>, <a href="https://ai.google.dev/gemini-api/docs/prompting-strategies">https://ai.google.dev/gemini-api/docs/prompting-strategies</a>, <a href="https://developers.google.com/machine-learning/resources/prompt-eng">https://developers.google.com/machine-learning/resources/prompt-eng</a>, <a href="https://cloud.google.com/blog/products/application-development/five-best-practices-for-prompt-engineering">https://cloud.google.com/blog/products/application-development/five-best-practices-for-prompt-engineering</a></td>
+</tr>
+<tr>
+<td><strong>Notes</strong></td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p>Prompt engineering is the method of creating and refining input text or instructions, known as prompts, to effectively communicate with and guide AI models, particularly large language models (LLMs), to generate desired responses. It involves understanding the model's strengths and weaknesses, providing clear and specific instructions, utilizing contextual information, and iterating through different prompt variations to achieve optimal results.</p>
+<h2 id="prompt-engineering-is-crucial-for-several-reasons">Prompt engineering is crucial for several reasons:</h2>
+<ul>
+<li>It improves the performance of AI models by providing clear instructions and context, leading to more accurate and relevant outputs.</li>
+<li>It helps reduce biases and harmful responses by carefully controlling the input and guiding the AI's focus.</li>
+<li>It increases control and predictability over the AI's behavior, ensuring consistent and desired outcomes.</li>
+<li>It enhances the user experience by making interactions with AI models more intuitive and satisfying.</li>
+</ul>
+<h2 id="best-practices-for-prompt-engineering">Best Practices for Prompt Engineering</h2>
+<ul>
+<li>Understand the Model: Know the model's strengths, weaknesses, and limitations to craft effective prompts and avoid errors.</li>
+<li>Be Specific: Tailor prompts to your desired outcome, providing clear instructions and avoiding ambiguity.</li>
+<li>Use Context: Include relevant information, examples, or personas in prompts to help the model understand your request better.</li>
+<li>Provide Examples: Give the model examples of desired input-output pairs to guide its responses.</li>
+<li>Experiment and Iterate: Try different prompt variations, keywords, and structures to discover what works best.</li>
+<li>Chain-of-Thought Prompting: Break down complex problems into smaller steps and prompt the model to provide reasoning for each step.</li>
+</ul>
+<h2 id="prompt-structure-for-devai">Prompt Structure for <code>devai</code></h2>
+<p>The prompt structure to be used for <code>devai</code> is  </p>
+<h3 id="instruction">Instruction ###</h3>
+<p>Clearly state the task, such as "Review the following code for potential errors and optimizations."</p>
+<h3 id="context-code">Context (code) ###</h3>
+<p>Code snippet or file to be reviewed passed.</p>
+<h3 id="output-format">Output Format ###</h3>
+<p>Specify the type of feedback expected, e.g., "List potential errors, suggest optimizations, and provide an overall assessment."</p>
+<h2 id="example-prompts-for-application-development">Example Prompts for Application Development</h2>
+<ul>
+<li>Text Summarization: "Summarize the main points of this article in three sentences."</li>
+<li>Code Generation: "Write a Python function to calculate the factorial of a number."</li>
+<li>Image Generation: "Generate an image of a cat sitting on a chair."</li>
+<li>Translation: "Translate the following English text to French: 'Hello, how are you?'"</li>
+<li>Question Answering: "What are the benefits of using renewable energy sources?"</li>
+</ul>
+<h3 id="code-review-example">Code Review Example</h3>
+<p>Here's an example prompt designed for code review, incorporating persona, task, context, and format:</p>
+<p>Persona: You are a senior software engineer with expertise in Python and a deep understanding of clean code principles. You are meticulous, detail-oriented, and have a knack for identifying potential issues and optimizations in code.</p>
+<p>Task: Thoroughly review the provided Python code snippet for the following:</p>
+<ul>
+<li>Correctness: Ensure the code functions as intended, without errors or unexpected behavior.</li>
+<li>Efficiency: Identify potential performance bottlenecks or areas where the code could be optimized for speed or resource usage.</li>
+<li>Readability: Assess the code's clarity and adherence to best practices, suggesting improvements to make it more maintainable.</li>
+<li>Security: Look for potential vulnerabilities or weaknesses that could be exploited.</li>
+</ul>
+<p>Context:</p>
+<p>Python
+<div class="highlight"><pre><span></span><code>def calculate_discount(price, discount_percentage):
+    if discount_percentage &lt; 0 or discount_percentage &gt; 100:
+        raise ValueError(&quot;Discount percentage must be between 0 and 100&quot;)
+    discount_amount = price * (discount_percentage / 100)
+    discounted_price = price - discount_amount
+    return discounted_price
+</code></pre></div></p>
+<p>Format:</p>
+<p>Provide your feedback in the following structured format:</p>
+<ul>
+<li>Overall Assessment: A brief summary of your overall impression of the code's quality.</li>
+<li>Potential Issues: A list of any errors, bugs, or potential problems you identified.</li>
+<li>Optimization Suggestions: Specific recommendations for improving the code's efficiency or performance.</li>
+<li>Readability Enhancements: Suggestions for improving the code's clarity, structure, or adherence to best practices.</li>
+<li>Security Concerns: Any potential security risks or vulnerabilities you found.</li>
+</ul>
+<h2 id="template-with-example">Template with example</h2>
+<div class="highlight"><pre><span></span><code>### Instruction ###
+You are a senior software engineer and architect with over 20 years of experience, specializing in the language of the provided code snippet and adhering to clean code principles. You are meticulous, detail-oriented, and possess a deep understanding of software design and best practices.
+
+Your task is to perform a comprehensive code review of the provided code snippet. Evaluate the code with a focus on the following key areas:
+
+Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
+Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
+Maintainability: Assess the code&#39;s readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
+Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
+Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
+
+
+### Example Dialogue ###
+&lt;query&gt; First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
+        import &quot;fmt&quot;
+
+        func main() {
+            name := &quot;Alice&quot;
+            greeting := fmt.Sprintf(&quot;Hello, %s!&quot;, name)
+            fmt.Println(greeting)
+        }
+
+
+        &lt;response&gt; [
+            {
+                &quot;question&quot;: &quot;Indentation&quot;,
+                &quot;answer&quot;: &quot;yes&quot;,
+                &quot;description&quot;: &quot;Code is consistently indented with spaces (as recommended by Effective Go)&quot;
+            },
+            {
+                &quot;question&quot;: &quot;Variable Naming&quot;,
+                &quot;answer&quot;: &quot;yes&quot;,
+                &quot;description&quot;: &quot;Variables (&quot;name&quot;, &quot;greeting&quot;) use camelCase as recommended&quot;
+            },
+            {
+                &quot;question&quot;: &quot;Line Length&quot;,
+                &quot;answer&quot;: &quot;yes&quot;,
+                &quot;description&quot;: &quot;Lines are within reasonable limits&quot; 
+            },
+            {
+                &quot;question&quot;: &quot;Package Comments&quot;, 
+                &quot;answer&quot;: &quot;n/a&quot;,
+                &quot;description&quot;: &quot;This code snippet is too small for a package-level comment&quot;
+            }
+        ]
+
+
+        &lt;query&gt; Identify common issues such as code smells, anti-patterns, potential bugs, performance bottlenecks, and security vulnerabilities. Offer actionable recommendations to address these issues and improve the overall quality of the code.
+
+        &quot;package main
+
+        import (
+            &quot;fmt&quot;
+            &quot;math/rand&quot;
+            &quot;time&quot;
+        )
+
+        // Global variable, potentially unnecessary 
+        var globalCounter int = 0 
+
+        func main() {
+            items := []string{&quot;apple&quot;, &quot;banana&quot;, &quot;orange&quot;}
+
+            // Very inefficient loop with nested loop for a simple search
+            for _, item := range items {
+                for _, search := range items {
+                    if item == search {
+                        fmt.Println(&quot;Found:&quot;, item)
+                    }
+                }
+            }
+
+            // Sleep without clear reason, potential performance bottleneck
+            time.Sleep(5 * time.Second) 
+
+            calculateAndPrint(10)
+        }
+
+        // Potential divide-by-zero risk
+        func calculateAndPrint(input int) {
+            result := 100 / input 
+            fmt.Println(result)
+        }&quot;
+
+        &lt;response&gt; [
+            {
+                &quot;question&quot;: &quot;Global Variables&quot;,
+                &quot;answer&quot;: &quot;no&quot;,
+                &quot;description&quot;: &quot;Potential issue: Unnecessary use of the global variable &#39;globalCounter&#39;. Consider passing values as arguments for better encapsulation.&quot; 
+            },
+            {
+                &quot;question&quot;: &quot;Algorithm Efficiency&quot;,
+                &quot;answer&quot;: &quot;no&quot;,
+                &quot;description&quot;: &quot;Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets.&quot;
+            },
+            {
+                &quot;question&quot;: &quot;Performance Bottlenecks&quot;,
+                &quot;answer&quot;: &quot;no&quot;,
+                &quot;description&quot;: &quot;&#39;time.Sleep&#39; without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use.&quot;
+            },
+            {
+                &quot;question&quot;: &quot;Potential Bugs&quot;,
+                &quot;answer&quot;: &quot;no&quot;,
+                &quot;description&quot;: &quot;&#39;calculateAndPrint&#39; function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately.&quot;
+            },
+            { 
+                &quot;question&quot;: &quot;Code Readability&quot;,
+                &quot;answer&quot;: &quot;no&quot;,
+                &quot;description&quot;: &quot;Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code.&quot;
+            } 
+        ]
+
+
+### Context (code) ###
+
+### Output Format ###
+Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+
+Class/Method (Optional): The name of the class or method where the issue is found (if applicable).
+Question: A concise description of the issue or aspect being evaluated (e.g., &quot;Potential Performance Bottleneck,&quot; &quot;Readability Concern,&quot; &quot;Security Vulnerability&quot;).
+Answer: Indicate whether the code is acceptable (&quot;yes&quot;), has issues or recommendations (&quot;no&quot;), or is not applicable (&quot;n/a&quot;).
+Description: Provide a detailed explanation of the issue, including specific recommendations for improvement, potential risks, or the rationale behind your assessment. Include code examples or snippets to illustrate your suggestions where appropriate.
+
+Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low).
+If no major issues are found, state: &quot;No major issues found. The code appears well-structured and adheres to good practices.&quot;
+Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: &quot;Could we explore an alternative algorithm here to potentially improve performance?&quot;
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
+</html>
