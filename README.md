@@ -9,12 +9,15 @@ In this repository you will find samples, demos and tutorials to help developers
 The contents of this repository should not be considered an official google product. The materials are provided for educational purposes only.
 
 ## Integrations
+# [DevAI VS Code Extension](./devai-vscode-extension/)
 
-[DevAI CLI](./devai-cli/)
+![DevAI VS Code Extension](./images/extension-diagram.png "DevAI VS Code Extension")
+
+# [DevAI CLI](./devai-cli/)
 
 ![Devai CLI integration](./images/code-review-github.png "Devai CLI integration")
 
-[DevAI API](./devai-api/)
+# [DevAI API](./devai-api/)
 
 ![Devai API integration](./images/devai-api.png "Devai API integration")
 
