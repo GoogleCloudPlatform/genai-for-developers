@@ -28,7 +28,6 @@ build-job:
   stage: build
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
-    - devai echo
     - echo $(pwd)
     - export PROJECT_ID=$(echo $PROJECT_ID)
     - export LOCATION=$(echo $LOCATION)
@@ -52,6 +51,8 @@ build-job:
     - echo $GOOGLE_CLOUD_CREDENTIALS > service-account-key.json
     - export GOOGLE_APPLICATION_CREDENTIALS="service-account-key.json"
 
+    - devai review testcoverage -c ./sample-app/src
+    - devai review blockers -c ./sample-app/pom.xml
     - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
     - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
     - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
