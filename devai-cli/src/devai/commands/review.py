@@ -32,6 +32,11 @@ from json_repair import repair_json
 from rich.console import Console 
 from rich.table import Table
 
+# Uncomment after configuring JIRA and GitLab env variables - see README.md for details
+
+# from devai.commands.jira import create_jira_issue
+# from devai.commands.gitlab import create_gitlab_issue_comment
+
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
 
 model_name="gemini-1.5-pro"
@@ -117,11 +122,6 @@ def validate_and_correct_json(json_text):
                 "Error: Model output is not valid JSON and could not be repaired."
             )
             return None
-
-# Uncomment after configuring JIRA and GitLab env variables - see README.md for details
-
-# from devai.commands.jira import create_jira_issue
-# from devai.commands.gitlab import create_gitlab_issue_comment
 
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
