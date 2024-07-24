@@ -23,11 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from langchain.embeddings import VertexAIEmbeddings
 from pydantic import BaseModel
 
-
 from .routes import routes
-
-EMBEDDING_MODEL_NAME = "textembedding-gecko@001"
-
 
 class AppConfig(BaseModel):
     host: IPv4Address | IPv6Address = IPv4Address("127.0.0.1")
