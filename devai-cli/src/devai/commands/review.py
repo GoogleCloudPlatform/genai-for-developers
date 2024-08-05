@@ -297,7 +297,7 @@ Provide an overview or overall impression entry for the code as the first entry.
 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
@@ -436,7 +436,7 @@ def performance(context):
 
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
@@ -540,7 +540,7 @@ def security(context):
     
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
@@ -629,7 +629,7 @@ def testcoverage(context):
     
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
@@ -685,7 +685,7 @@ def blockers(context):
     
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(source)
 
@@ -723,29 +723,30 @@ def impact(current, target):
     if qry is None:
         qry='''
         INSTRUCTIONS:
-        You need to analyze two versions of a codebase and provide impact analysis tht will help with migration from current version to target version.
-        I have two versions of a codebase: [CURRENT] and [TARGET].
+        You need to analyze two versions of a codebase and provide impact analysis that will help with migration from current version to target version.
+        You have two versions of a codebase: [CURRENT] and [TARGET].
+        Its possible that TARGET code does not exist, if thats the case, review CURRENT code only.
 
         Please perform a detailed impact analysis comparing these versions. Specifically, I need you to:
 
-        Identify the changes:
+        Step 1) Identify the changes:
         List all files modified, added, or deleted between the two versions.
         For each modified file, highlight the specific lines of code that were changed.
-        Categorize the changes:
+        
+        Step 2) Categorize the changes:
         Classify the changes into categories like bug fixes, new features, performance improvements, refactoring, etc.
         Provide a brief explanation for each category.
-        Analyze the impact:
+        
+        Step 3) Analyze the impact:
         For each change, explain its potential impact on the application's functionality, performance, security, and any other relevant aspects.
         Identify any potential risks or regressions introduced by the changes.
-        Suggest testing areas:
-        Based on the analysis, recommend specific areas of the application that require thorough testing to ensure the changes haven't introduced any unexpected behavior.
-        Provide code snippets:
+        
+        Step 4) Provide code snippets:
         Whenever possible, include relevant code snippets to illustrate the changes and their potential impact.
         Please present your analysis in a clear and concise manner, using Markdown formatting for readability.
 
-        Optional:
-
-        If you have access to the repository history, you can analyze the commit messages and pull requests associated with the changes for additional context.
+        Step 5) Suggest testing areas:
+        Based on the analysis, recommend specific areas of the application that require thorough testing to ensure the changes haven't introduced any unexpected behavior.
         If the codebase has unit tests, you can suggest which tests need to be updated or created based on your analysis.
 
         '''
@@ -756,7 +757,7 @@ def impact(current, target):
     
     code_chat_model = GenerativeModel(model_name)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
         response = code_chat.send_message(current_source)
         response = code_chat.send_message(target_source)
