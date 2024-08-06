@@ -130,7 +130,7 @@ cloudshell edit .github/workflows/devai-review.yml
 
 Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
 
-### Review and the Gemini API calls
+### Review command and Gemini API calls
 
 Inspect the key lines of the CLI that is used in the workflow to understand how it functions.
 
