@@ -1,5 +1,5 @@
 # GitHub - Code review automation with GenAI
-
+![Devai CLI integration](../../../images/code-review-github.png "Devai CLI integration")
 This tutorial utilizes Gemini to assist with code reviews within the CICD process. An example integration and workflow are included to demonstrate the capabilities and bootstrap your effort. Additional modifications and customizations can be made by providing your own prompts as well as extending the provided CLI tool.
 
 In this tutorial you will:
@@ -120,6 +120,16 @@ cd genai-for-developers
 
 ## Review GitHub workflow and Gemini API calls
 
+### Review GitHub workflow
+
+Open the GitHub workflow by opening the file below.
+
+```sh
+cloudshell edit .github/workflows/devai-review.yml 
+```
+
+Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
+
 ### Review and the Gemini API calls
 
 Inspect the key lines of the CLI that is used in the workflow to understand how it functions.
@@ -140,12 +150,4 @@ def code(context):
 
 Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers
 
-## Review GitHub workflow
 
-Open the GitHub workflow by opening the file below.
-
-```sh
-cloudshell edit .github/workflows/devai-review.yml 
-```
-
-Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
