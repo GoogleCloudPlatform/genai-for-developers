@@ -1,4 +1,4 @@
-# CICD Code Review with GitHub
+# GitHub - Code review automation with GenAI
 
 This tutorial utilizes Gemini to assist with code reviews within the CICD process. An example integration and workflow are included to demonstrate the capabilities and bootstrap your effort. Additional modifications and customizations can be made by providing your own prompts as well as extending the provided CLI tool.
 
@@ -26,8 +26,11 @@ In the opened terminal, enable required services to use Vertex AI APIs and Gemin
 gcloud services enable \
     aiplatform.googleapis.com \
     cloudaicompanion.googleapis.com \
-    cloudresourcemanager.googleapis.com
+    cloudresourcemanager.googleapis.com \
+    secretmanager.googleapis.com
 ```
+
+If prompted to authorize, click "Authorize" to continue.
 
 ### Create Service Account in GCP
 
@@ -45,10 +48,10 @@ gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "$DISPLA
 
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.admin" --condition None
 
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor" --condition None
+
 gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
 ```
-
-If prompted to authorize, click "Authorize" to continue.
 
 ## Configure GitHub to integrate with GCP
 
@@ -69,7 +72,7 @@ A GitHub workflow is provided in the repo, however you will need to enable GitHu
 - Switch to the "Actions" tab
 - Enable GitHub workflows
 
-### Make GCP secret available to your workflow
+### Add Repository Secrets
 
 In this step you will create a repository secret to hold the GCP API credentials and make them available to Actions within this repo.
 
@@ -85,48 +88,28 @@ cat ~/vertex-client-key.json
 - Add Repository secret called "GOOGLE_API_CREDENTIALS"
 - Paste the secret you copied earlier into the value field for the secret.
 - Click Add Secret
+- Follow the same steps to add `PROJECT_ID`=your-gcp-project and `LOCATION`=us-central1 secrets
 
-### Configure local git
+### Run GitHub Actions Workflow
 
-The steps in this section assume you have not previously configured git in your workspace, which is often the case for lab enviroments and first time CloudShell uses. If your local git client is already configured you can skip this section.
+Navigate to your GitHub repository in the browser and run the workflow.
+The workflow is configured to run on code push or manual execution.
 
-In your GCP terminal set the Git user name and email. Update the values before running the commands.
+### Review GitHub Actions Workflow output
 
-```sh
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
+You can review the execution and resulting summary in GitHub.
 
-```
+- In the browser, Open the GitHub "Actions" tab and review the workflow output.
+- When the job completes click on Summary and scroll down to see the AI generated output.
 
-Now configure your git client to access your repo by generating an SSH key and adding it to your GitHub account.
-
-Update your email before running the following command
-
-`ssh-keygen -t ed25519 -C "your-email-address"`
-
-Add the key to your auth agent with the following commands. Do not enter passphrase and hit enter multiple times to complete key generation.
-
-```sh
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub
-```
-
-Add generated public key to your GitHub account.
-
-- Open https://github.com/settings/keys 
-- Click "New SSH key".
-- Provide a name such as "qwiklabs-key"
-- Copy & paste the output from the last command
 
 ### Clone the repository locally
 
-With your local git client configured, you can clone the forked repo locally.
-
-Be sure to replace your user ID in the next command.
+Return to the Cloud Shell terminal and clone the repository.
+Change YOUR-GITHUB-USERID to your GitHub userid before running the commands.
 
 ```sh
-git clone git@github.com:YOUR-USERID/genai-for-developers.git
+git clone https://github.com/YOUR-GITHUB-USERID/genai-for-developers.git 
 ```
 
 Change into the directory before continuing with the rest of the tutorial.
@@ -166,22 +149,3 @@ cloudshell edit .github/workflows/devai-review.yml
 ```
 
 Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
-
-## Execute a CICD job and Review GenAI output
-
-In this step you will commit a change then review the GenAI output in the GitHub logs and summary
-
-### Make changes and push the commit
-
-The workflow file needs to be updated to reference your GCP project.
-
-- Update 2 instances in the file. Replace project id on lines 8 and 30 with your GCP project id. Example: qwiklabs-gcp-02-71a9948ae110
-
-- Stage, commit and push your changes to GitHub. The change will enable the workflow to run correctly and pushing to your repo will execute the workflow. 
-
-### Review AI Output in CICD
-
-With the commit pushed, the workflow will have started executing. You can review the execution and resulting summary in GitHub.
-
-- In the browser, Open the GitHub "Actions" tab and review the workflow output.
-- When the job completes click on Summary and scroll down to see the AI generated output.
