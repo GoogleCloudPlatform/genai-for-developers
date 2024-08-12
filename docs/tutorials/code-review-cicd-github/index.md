@@ -148,6 +148,9 @@ Review the prompt used in the `code` function. The function begins with
 def code(context):
 ```
 
-Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers
+Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers.
 
 
+## Integrations
+
+Take a look at other tutorials to enable integrations with [JIRA](../setup-jira.md), [GitLab](../setup-gitlab.md) and [LangSmith](../setup-langsmith.md).

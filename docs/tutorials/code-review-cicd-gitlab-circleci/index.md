@@ -156,6 +156,37 @@ def code(context):
 
 Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers.
 
+### Disable GitLab workflow execution
+Edit the `.gitlab-ci.yml` file in the GitLab UI and uncomment the lines to disable GitLab workflow execution on code push events. 
+You can still execute the workflow from UI on demand.
+
+```
+# workflow:
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "web"
+```
+
+## CircleCI integration
+### What is CircleCI?
+CircleCI is a cloud-based CI/CD platform that allows teams to automate their software development and deployment processes. It integrates with version control systems like GitHub, Bitbucket, and GitLab, allowing teams to validate code changes in real-time by running automated tests and builds. For continuous delivery, CircleCI can automate the deployment of software to various cloud environments like AWS, Google Cloud, and Azure.
+
+### Setup
+Open CircleCI[https://app.circleci.com/] website and create a new Project. Select “GitLab” / “Cloud” for your repo.
+Grant CircleCI access to your GitLab account.
+
+Under the Fastest option, select the main branch. CircleCI might detect an existing config file and skip this step.
+
+After the project is created, click on the “Project Settings” / “Environment Variables” section.
+
+Add the environment variables that you used so far.
+
+*   `PROJECT_ID` - your GCP project id
+*   `LOCATION` - us-central1
+*   `GOOGLE_CLOUD_CREDENTIALS`
+
+
+Start the workflow from the CircleCI UI and review the output.
+
 ## Integrations
 
 Take a look at other tutorials to enable integrations with [JIRA](../setup-jira.md), [GitLab](../setup-gitlab.md) and [LangSmith](../setup-langsmith.md).
