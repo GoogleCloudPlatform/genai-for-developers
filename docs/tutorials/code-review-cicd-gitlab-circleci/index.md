@@ -5,8 +5,8 @@ This tutorial utilizes Gemini to assist with code reviews within the CICD proces
 In this tutorial you will:
 
 - Configure GCP for access to Gemini APIs
-- Configure GitLab to integrate with GCP
-- Review GitLab pipeline and Gemini API calls
+- Configure CircleCI to integrate with GCP
+- Review CircleCI workflow and Gemini API calls
 - Execute a CICD job and Review GenAI output
 
 ## Get Started
