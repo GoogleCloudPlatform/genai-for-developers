@@ -1,4 +1,4 @@
-# GitLab - Code review automation with GenAI
+# CircleCI - Code review automation with GenAI
 
 This tutorial utilizes Gemini to assist with code reviews within the CICD process. An example integration and workflow are included to demonstrate the capabilities and bootstrap your effort. Additional modifications and customizations can be made by providing your own prompts as well as extending the provided CLI tool.
 
@@ -75,17 +75,34 @@ Click - “`Create Project`” to start the import process.
 If you see an error about invalid GitHub Repository URL, [create a new GitHub token](https://github.com/settings/tokens)(fine-grained) with Public repositories read-only access, and retry import again providing your GitHub userid and token.
 
 
-### Add GitLab CICD pipeline variables
+### Disable GitLab workflow execution
+Edit the `.gitlab-ci.yml` file in the GitLab UI and uncomment the lines to disable GitLab workflow execution on code push events. 
+You can still execute the workflow from UI on demand.
 
-Next you are going to enable the GitLab CICD pipeline to run code review when changes are pushed to the repository.
+```
+# workflow:
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "web"
+```
 
-Open the GitLab repository in the browser and navigate to the “`Settings / CICD"` section.
 
-Expand the `Variables` section and click “`Add variable`”. 
 
-Make sure to uncheck all the checkboxes when you add the new variables. 
+## Setup CircleCI
 
-Add 3 variables:
+Next you are going to enable the CircleCI CICD pipeline to run code review when changes are pushed to the repository.
+
+Open CircleCI[https://app.circleci.com/] website and create a new Project. 
+
+Select `“GitLab” / “Cloud”` for your repo.
+Grant CircleCI access to your GitLab account.
+
+Under the `Fastest` option, select the `main` branch. CircleCI might detect an existing config file and skip this step.
+
+### Configure Environment Variables
+
+After the project is created, click on the “`Project Settings” / “Environment Variables`” section.
+
+Add the environment variables that you used so far.
 
 *   `PROJECT_ID` - your GCP project id
 *   `LOCATION` - us-central1
@@ -96,15 +113,9 @@ For `GOOGLE_CLOUD_CREDENTIALS` variable value, use the service account key creat
 ```
 cat ~/vertex-client-key.json
 ```
+### Start the workflow
 
-### Run GitLab CICD pipeline
-
-Open “`Build / Pipelines`” in the GitLab UI and click “`Run Pipeline`”.
-
-### Review GitLab pipeline output
-
-Open “`Build / Jobs`” in the GitLab UI and review the pipeline output.
-
+Start the workflow from the CircleCI UI and review the output.
 
 
 ## Clone the repository locally
@@ -122,14 +133,14 @@ Change into the directory before continuing with the rest of the tutorial.
 cd genai-for-developers
 ```
 
-## Review GitLab pipeline config and Gemini API calls
+## Review CircleCI workflow config and Gemini API calls
 
-### Review GitLab pipeline config
+### Review CircleCI workflow config
 
-Change directory and open `.gitlab-ci.yml` file.
+Change directory and open `.circleci/config.yml` file.
 
 ```sh
-cloudshell edit .gitlab-ci.yml
+cloudshell edit .circleci/config.yml
 ```
 
 Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. 
@@ -155,37 +166,6 @@ def code(context):
 ```
 
 Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers.
-
-### Disable GitLab workflow execution
-Edit the `.gitlab-ci.yml` file in the GitLab UI and uncomment the lines to disable GitLab workflow execution on code push events. 
-You can still execute the workflow from UI on demand.
-
-```
-# workflow:
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "web"
-```
-
-## CircleCI integration
-### What is CircleCI?
-CircleCI is a cloud-based CI/CD platform that allows teams to automate their software development and deployment processes. It integrates with version control systems like GitHub, Bitbucket, and GitLab, allowing teams to validate code changes in real-time by running automated tests and builds. For continuous delivery, CircleCI can automate the deployment of software to various cloud environments like AWS, Google Cloud, and Azure.
-
-### Setup
-Open CircleCI[https://app.circleci.com/] website and create a new Project. Select “GitLab” / “Cloud” for your repo.
-Grant CircleCI access to your GitLab account.
-
-Under the Fastest option, select the main branch. CircleCI might detect an existing config file and skip this step.
-
-After the project is created, click on the “Project Settings” / “Environment Variables” section.
-
-Add the environment variables that you used so far.
-
-*   `PROJECT_ID` - your GCP project id
-*   `LOCATION` - us-central1
-*   `GOOGLE_CLOUD_CREDENTIALS`
-
-
-Start the workflow from the CircleCI UI and review the output.
 
 ## Integrations
 
