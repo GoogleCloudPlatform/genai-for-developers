@@ -1,12 +1,12 @@
-# GitHub - Code review automation with GenAI
-![Devai CLI integration](../../../images/code-review-github.png "Devai CLI integration")
+# GitLab - Code review automation with GenAI
+
 This tutorial utilizes Gemini to assist with code reviews within the CICD process. An example integration and workflow are included to demonstrate the capabilities and bootstrap your effort. Additional modifications and customizations can be made by providing your own prompts as well as extending the provided CLI tool.
 
 In this tutorial you will:
 
 - Configure GCP for access to Gemini APIs
-- Configure GitHub to integrate with GCP
-- Review GitHub workflow and Gemini API calls
+- Configure GitLab to integrate with GCP
+- Review GitLab pipeline and Gemini API calls
 - Execute a CICD job and Review GenAI output
 
 ## Get Started
@@ -53,63 +53,67 @@ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SER
 gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
 ```
 
-## Configure GitHub to integrate with GCP
 
-### Fork the Repo
+## Import GitHub Repo to GitLab Repo
 
-This tutorial uses a sample repository to demostrate the features. Start by forking the repo for your own use. 
+Go to https://gitlab.com/projects/new and select “`Import project`” / “`Repository by URL`” option:
 
-- [Fork GitHub repo](https://github.com/GoogleCloudPlatform/genai-for-developers/fork)
-- Select your github userid as an owner.
-- Uncheck option to copy only the "main" branch.
-- Click "Create fork".
+Git repository url:
 
-### Enable GitHub Actions
 
-A GitHub workflow is provided in the repo, however you will need to enable GitHub actions in your forked repo in order to run the process.
+```
+https://github.com/GoogleCloudPlatform/genai-for-developers.git
+```
 
-- Open the forked repo in the browser
-- Switch to the "Actions" tab
-- Enable GitHub workflows
 
-### Add Repository Secrets
+Under Project URL - select your gitlab userid
 
-In this step you will create a repository secret to hold the GCP API credentials and make them available to Actions within this repo.
+Set Visibility to `Public`.
 
-- In your GCP terminal run the following command to view the GCP secret created earlier.
+Click - “`Create Project`” to start the import process.
 
-```sh
+If you see an error about invalid GitHub Repository URL, [create a new GitHub token](https://github.com/settings/tokens)(fine-grained) with Public repositories read-only access, and retry import again providing your GitHub userid and token.
+
+
+### Add GitLab CICD pipeline variables
+
+Next you are going to enable the GitLab CICD pipeline to run code review when changes are pushed to the repository.
+
+Open the GitLab repository in the browser and navigate to the “`Settings / CICD"` section.
+
+Expand the `Variables` section and click “`Add variable`”. 
+
+Make sure to uncheck all the checkboxes when you add the new variables. 
+
+Add 3 variables:
+
+*   `PROJECT_ID` - your GCP project id
+*   `LOCATION` - us-central1
+*   `GOOGLE_CLOUD_CREDENTIALS`
+
+For `GOOGLE_CLOUD_CREDENTIALS` variable value, use the service account key created in section above. Run this command in the Google Cloud Shell and copy/paste the value.
+
+```
 cat ~/vertex-client-key.json
 ```
 
-- Copy the secret output to your clipboard. You'll paste it in the following steps
+### Run GitLab CICD pipeline
 
-- In GitHub, navigate to "Settings -> Secrets and variables -> Actions" in the GitHub repository.
-- Add Repository secret called "GOOGLE_API_CREDENTIALS"
-- Paste the secret you copied earlier into the value field for the secret.
-- Click Add Secret
-- Follow the same steps to add `PROJECT_ID`=your-gcp-project and `LOCATION`=us-central1 secrets
+Open “`Build / Pipelines`” in the GitLab UI and click “`Run Pipeline`”.
 
-### Run GitHub Actions Workflow
+### Review GitLab pipeline output
 
-Navigate to your GitHub repository in the browser and run the workflow.
-The workflow is configured to run on code push or manual execution.
-
-### Review GitHub Actions Workflow output
-
-You can review the execution and resulting summary in GitHub.
-
-- In the browser, Open the GitHub "Actions" tab and review the workflow output.
-- When the job completes click on Summary and scroll down to see the AI generated output.
+Open “`Build / Jobs`” in the GitLab UI and review the pipeline output.
 
 
-### Clone the repository locally
+
+## Clone the repository locally
 
 Return to the Cloud Shell terminal and clone the repository.
-Change YOUR-GITHUB-USERID to your GitHub userid before running the commands.
+Replace with your GitLab userid and repository url that was just created.
 
 ```sh
-git clone https://github.com/YOUR-GITHUB-USERID/genai-for-developers.git 
+git clone https://gitlab.com:YOUR_GITLAB_USERID/genai-for-developers.git
 ```
 
 Change into the directory before continuing with the rest of the tutorial.
@@ -118,17 +122,19 @@ Change into the directory before continuing with the rest of the tutorial.
 cd genai-for-developers
 ```
 
-## Review GitHub workflow and Gemini API calls
+## Review GitLab pipeline config and Gemini API calls
 
-### Review GitHub workflow
+### Review GitLab pipeline config
 
-Open the GitHub workflow by opening the file below.
+Change directory and open `.gitlab-ci.yml` file.
 
 ```sh
-cloudshell edit .github/workflows/devai-review.yml 
+cloudshell edit .gitlab-ci.yml
 ```
 
-Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
+Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. 
+
+For example the code review step includes `devai review code -c [source to review]`
 
 ### Review command and Gemini API calls
 
@@ -149,7 +155,6 @@ def code(context):
 ```
 
 Review the other functions and prompts used in this workflow such as testcoverage, performance, security, blockers.
-
 
 ## Integrations
 
