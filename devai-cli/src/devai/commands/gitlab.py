@@ -20,10 +20,9 @@ from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 from langchain_community.utilities.gitlab import GitLabAPIWrapper
 from google.cloud.aiplatform import telemetry
   
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1'
-model_name="gemini-1.5-pro"
+from .constants import USER_AGENT, MODEL_NAME
 
-llm = ChatVertexAI(model_name=model_name,
+llm = ChatVertexAI(model_name=MODEL_NAME,
                    convert_system_message_to_human=True,
                    project=os.environ["PROJECT_ID"],
                    location=os.environ["LOCATION"])

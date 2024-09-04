@@ -26,8 +26,7 @@ from google.api_core.gapic_v1.client_info import ClientInfo
 import logging
 
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
-model_name="gemini-1.5-pro"
+from .constants import USER_AGENT, MODEL_NAME
 
 def ensure_env_variable(var_name):
     """Ensure an environment variable is set."""
@@ -135,7 +134,7 @@ def readme(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel(model_name)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
         code_chat.send_message(qry)
@@ -362,7 +361,7 @@ def update_readme(context, file):
    
     source=source.format(current=current, context=format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(model_name)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
         code_chat.send_message(qry)
@@ -432,7 +431,7 @@ def releasenotes(context, tag):
    
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(model_name)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
         code_chat.send_message(qry)
@@ -546,7 +545,7 @@ def update_releasenotes(context, tag, file):
    
     source=source.format(current=current, context=format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(model_name)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat()
         code_chat.send_message(qry)
