@@ -33,11 +33,10 @@ from vertexai.generative_models import GenerativeModel
 
 from .jira import create_jira_issue
 
-USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
-model_name="gemini-1.5-pro"
+from .constants import USER_AGENT, MODEL_NAME
 
 with telemetry.tool_context_manager(USER_AGENT):
-    llm = ChatVertexAI(model_name=model_name,
+    llm = ChatVertexAI(model_name=MODEL_NAME,
         convert_system_message_to_human=True,
         temperature=0.2,
         max_output_tokens=8192)
@@ -57,7 +56,7 @@ agent = initialize_agent(
 )
 
 routes = APIRouter()
-code_chat_model = GenerativeModel(model_name)
+code_chat_model = GenerativeModel(MODEL_NAME)
 
 @routes.get("/")
 async def root():
@@ -68,7 +67,7 @@ async def root():
 async def test():
     """Test endpoint"""
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         response = code_chat.send_message("Tell me about Google Gemini 1.5 capabilities")
     print(f"Response from Model:\n{response.text}\n")
     return {"message": response.text}
@@ -87,24 +86,20 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     {prompt}
     """
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         response = code_chat.send_message(instructions)
         print(f"{response.text}\n")
 
-    # resp_text = response.candidates[0].content.parts[0].text
+    pr_prompt = f"""Create GitLab merge request using provided details below.
+    Create new files, commit them and push them to opened merge request.
+    When creating new files, remove the lines that start with ``` before saving the files.
 
-    # pr_prompt = f"""Create GitLab merge request using provided details below.
-    # Create new files, commit them and push them to opened merge request.
-    # When creating new files, remove the lines that start with ``` before saving the files.
+    DETAILS: 
+    {response.text}
+    """
 
-    # DETAILS: 
-    # {resp_text}
-    # """
-
-    # print(pr_prompt)
-    # agent.invoke(pr_prompt)
-
-    # create_jira_issue("Code Review Results", response.text)
+    print(pr_prompt)
+    agent.invoke(pr_prompt)
 
     return response.text
 
@@ -150,7 +145,7 @@ async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=T
     {prompt}
     """
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat()
+        code_chat = code_chat_model.start_chat(response_validation=False)
         response = code_chat.send_message(instructions)
         print(f"Response from Model:\n{response.text}\n")
 
