@@ -132,7 +132,7 @@ cd ~/genai-for-developers/devai-api
 Deploy application:
 
 ```sh
-gcloud beta run deploy devai-api \
+gcloud run deploy devai-api \
   --source=. \
   --region="$LOCATION" \
   --allow-unauthenticated \
@@ -151,6 +151,5 @@ gcloud beta run deploy devai-api \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
   --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
   --min-instances=1 \
-  --max-instances=3 \
-  --service-min-instances=1
+  --max-instances=3
 ```
