@@ -117,7 +117,7 @@ From the popup window, select your GCP project.
 
 ## Code explanation with Gemini Code Assist
 
-Open file "`devai-api/app/routes.py`" and then right click anywhere in the file and select "`Gemini > Explain` `this"` from the context menu.
+Open file "`devai-api/app/routes.py`" and then right click anywhere in the file and select "`Gemini Code Assist > Explain this"` from the context menu.
 
 
 Review Gemini's explanation for the selected file.
