@@ -1,4 +1,4 @@
-# GenAI Assistant for QA over docs and API calls
+# GenAI agent for QA over docs and API calls
 
 ## Overview
 
