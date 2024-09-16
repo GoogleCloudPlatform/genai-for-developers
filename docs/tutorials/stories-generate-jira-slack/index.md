@@ -1,19 +1,18 @@
-# GenAI agent for QA over docs and API calls
+# GenAI agent for generating JIRA user stories using Slack
 
 ## Overview
 
 In this lab, you will create a GenAI Agent, connect it to the Cloud Run application and integrate the agent into the Slack workspace.
 
-![Slack - JIRA - Gemini Integration](../../../images/devai-api-slack-lab.png "Slack - JIRA - Gemini Integration")
+![Slack - JIRA - Gemini Integration](../../../images/devai-api-slack.png "Slack - JIRA - Gemini Integration")
 
 ### What you will learn
 
 There are several main parts to the lab:
 
-* Deploy Cloud Run application to integrate with Gemini APIs
+* Deploy Cloud Run application to integrate with Gemini and JIRA APIs
 * Create and deploy Vertex AI Agent
 * Integrate Agent into Slack
-* Configure data store for Q&A over PDF documents
 
 
 ## Setup and Requirements
@@ -33,8 +32,6 @@ In the opened terminal, run following commands
 git clone https://github.com/GoogleCloudPlatform/genai-for-developers.git
 
 cd genai-for-developers
-
-git checkout slack-agent-jira-lab
 ```
 
 Click "Open Editor"
@@ -122,10 +119,11 @@ Open file "`devai-api/app/routes.py`" and then right click anywhere in the file 
 
 Review Gemini's explanation for the selected file.
 
+## Setup JIRA
 
+Follow this tutorial to enable integrations with [JIRA](../setup-jira.md).
 
 ## Deploy Devai-API to Cloud Run
-
 
 
 Check that you are in the right folder.
@@ -136,14 +134,17 @@ cd ~/genai-for-developers/devai-api
 
 For this lab, we follow best practices and use  [Secret Manager](https://cloud.google.com/run/docs/configuring/services/secrets) to store and reference the Access Token and LangChain API Key values in Cloud Run.
 
-Set environment variables.
+Set environment variables using the values from the JIRA setup tutorial above.
 
 ```
 export JIRA_API_TOKEN=your-jira-token
 export JIRA_USERNAME="YOUR-EMAIL"
 export JIRA_INSTANCE_URL="https://YOUR-JIRA-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY="YOUR-JIRA-PROJECT-KEY"
+```
 
+Set these environment variable without replacing the values.
+```
 export GITLAB_PERSONAL_ACCESS_TOKEN=your-gitlab-token
 export GITLAB_URL="https://gitlab.com"
 export GITLAB_BRANCH="devai"
@@ -212,20 +213,20 @@ region [us-central1] will be created.
 
 Do you want to continue (Y/n)?  y
 ```
+
 Ask Gemini to explain the command.
 
 ## Test API
-
 Test endpoint by running curl command.
 
 ```
 curl -X POST \
    -H "Content-Type: application/json" \
-   -d '{"prompt": "PROJECT-100"}' \
-   $(gcloud  run services list --filter="(devai-api)" --format="value(URL)")/generate
+   -d '{"prompt": "Create a functional login page using HTML for structure, CSS for styling, and JavaScript for client-side validation and interactivity."}' \
+   $(gcloud  run services list --filter="(devai-api)" --format="value(URL)")/create-jira-issue
 ```
 
-Review output.
+Review output in JIRA.
 
 ## Vertex AI Agent Builder
 
@@ -237,7 +238,7 @@ Type "Agent" for Display name and click "Agree & Create".
 Set Goal:
 
 ```
-Help user with questions about JIRA project
+Help user with JIRA user stories creation
 ```
 
 Set Instructions:
@@ -264,13 +265,13 @@ Select `OpenAPI` from the Type dropdown.
 Set Tool Name:
 
 ```
-jira-project-status
+jira-project-stories
 ```
 
 Set Description:
 
 ```
-Returns JIRA project status
+Creates JIRA user stories
 ```
 
 Set Schema (YAML) - replace YOUR CLOUD RUN URL.
@@ -353,7 +354,7 @@ Return to Agent configuration and update instructions to use the tool.
 Add instructions to use new tool:
 
 ```
-- Use ${TOOL: jira-project-status} to help the user with JIRA project status.
+- Use ${TOOL: jira-project-stories} to help the user create new JIRE user stories.
 ```
 
 Switch to Examples tab and add new example:
@@ -371,31 +372,36 @@ Using the `+` icon next ti chat prompt, you can select `Agent response` and `Use
 
 ```
 Agent response: How can I help you today?
-User input: I need to understand JIRA project status
-Agent reponse: Whats the JIRA PROJECT ID?
-User input: TEST-PROJECT-100
-Tool invocation: jira-project-status, action "generate"
-Agent reponse: Project status for TEST-PROJECT-100
+User input: I need to craete new JIRA user story
+Agent reponse: What are the requirements?
+User input: Create a functional login page using HTML for structure, CSS for styling, and JavaScript for client-side validation and interactivity.
+Tool invocation: jira-project-stories, action "create-jira-issue"
+Agent reponse: Link to your JIRA project
 User input: Thank you
 Agent response: Can I help you with anything else?
 User input: No, thank you
 ```
 
 Tool invocation configuration:
-Tool and action name:
+Tool name:
 ```
-jira-project-status
-generate
+jira-project-stories
 ```
+
+Action name:
+```
+create-jira-issue
+```
+
 Tool input:
 ```
 {
-    "prompt": "TEST-PROJECT-100"
+    "prompt": "Create a functional login page using HTML for structure, CSS for styling, and JavaScript for client-side validation and interactivity."
 }
 ```
 Tool output:
 ```
-"Project status for TEST-PROJECT-100"
+Link to your JIRA project
 ```
 
 Click Save and Cancel. Return to the Agent emulator and test the flow.
@@ -479,254 +485,24 @@ Save the changes.
 
 Open "Slack" and add an agent by typing "@Agent".
 
-Ask the agent for a JIRA project summary.
-
-
-## Q&A over PDF documents
-
-
-### Create Cloud Storage Bucket
-
-Open GCS in the Cloud Console:  [https://console.cloud.google.com/storage/browser](https://console.cloud.google.com/storage/browser) 
-
-Create a new bucket.
-
-For bucket name type: "`pdf-docs`" + last 5 digits of your GCP project.
-
-Location type: `multi-region, us`.
-
-Storage class: `Standard`
-
-Access control: `Uniform`
-
-Data protection: `uncheck soft delete policy`
-
-Click "`Create`".
-
-Confirm "Public access will be prevented".
-
-Download PDF report and upload it to the bucket.
-[https://services.google.com/fh/files/misc/exec_guide_gen_ai.pdf](https://services.google.com/fh/files/misc/exec_guide_gen_ai.pdf) 
-
-Bucket with uploaded file view:
-
-
-
-### Data store configuration
-
-Return to Agent Console and open "`Agent`", scroll down and click "`+ Data store`".
-
-
-Use following values:
-
-Tool name: `pdf-docs`
-
-Type: `Data store`
-
-Description: `pdf-docs`
-
-Click "`Save`" 
-
-
-Click the "`Create a data store`" at the bottom on the page.
-
-Click "`AGREE`" when asked about "Do you agree to have your search & conversation data stores in the us region?"
-
-Type "`Google`" in the "Provide Company" field.
-
-On the next screen, click "`CREATE DATA STORE`".
-
-Select "`Cloud Storage`" as data source.
-
-Prepare data for ingesting
-
-[https://cloud.google.com/generative-ai-app-builder/docs/prepare-data](https://cloud.google.com/generative-ai-app-builder/docs/prepare-data) 
-```
-HTML and TXT files must be 2.5 MB or smaller. 
-
-PDF, PPTX, and DOCX files must be 100 MB or smaller. 
-
-You can import up to 100,000 files at a time.
-```
-Select: `unstructured documents`
-
-And select your GCS bucket/folder.
-
-
-Click continue.
-
-
-For data store name type: "`pdf-docs`"
-
-Select "`Digital parser`" from the dropdown.
-
-Enable advanced chunking.
-
-Enable ancestor headings in chunks.
-
-Click "`Create`".
-
-
-Select data store and click "`Create`"
-
-
-
-Click on the data store and review Documents, Activity and Processing Config.
-
-
-It will take ~5-10 minutes to complete the import.
-
-
-
-#### Parsing and Chunking options
-
-You can control content parsing in the following ways:
-
-* **Digital parser.** The digital parser is on by default for all file types unless a different parser type is specified. The digital parser processes ingested documents if no other default parser is specified for the data store or if the specified parser doesn't support the file type of an ingested document.
-* **OCR parsing for PDFs**. Public preview. If you plan to upload scanned PDFs or PDFs with text inside images, you can turn on the OCR parser to improve PDF indexing. See  [About OCR parsing for PDFs](https://cloud.google.com/generative-ai-app-builder/docs/parse-chunk-documents#parsing-pdfs).
-* **Layout parser.** Public preview. Turn on the layout parser for HTML, PDF, or DOCX files if you plan to use Vertex AI Search for RAG. See  [Chunk documents for RAG](https://cloud.google.com/generative-ai-app-builder/docs/parse-chunk-documents#parse-chunk-rag) for information about this parser and how to turn it on.
-
-[Learn more about parsing and chunking documents. ](https://cloud.google.com/generative-ai-app-builder/docs/parse-chunk-documents)
-
-### Tool configuration
-
-Return to the tab with Tools configuration. 
-
-Refresh the browser and select "`pdf-docs`" from the Unstructured dropdown.
-
-
-#### Configure grounding.
-
-Type "`Google`" for company name.
-
-Payload settings - check "`Include snippets in the response payload`"
-
-
-
-Click "`Save`".
-
-
-### Agent's instructions configuration
-
-Return to Agent configuration.
-
-Add new instruction:
-
-```
-- Provide detailed answer to users questions about the exec guide to gen ai using information in the ${TOOL:pdf-docs}
-```
-
-
-Save configuration.
-
-### Create an example for PDF-Docs tool
-
-Switch to the Examples tab. Create a new example.
-
-Using actions "`+`".
-
-Add "User input":
-
-```
-What are the main capabilities?
-```
-
-Add "Tool use".
-
-* Tool & Action: "`pdf-docs`"
-
-Input (requestBody)
-
-```
-{
-  "query": "Main capabilities",
-  "filter": "",
-  "userMetadata": {},
-  "fallback": ""
-}
-```
-
-Tool Output:
-
-```
-{
-  "answer": "Detailed answer about main capabilities",
-  "snippets": [
-    {
-      "uri": "https://storage.cloud.google.com/pdf-docs-49ca4/exec_guide_gen_ai.pdf",
-      "text": "Detailed answer about main capabilities",
-      "title": "exec_guide_gen_ai"
-    }
-  ]
-}
-```
-
-Add "Agent response"
-
-```
-Detailed answer about main capabilities. 
-
-https://storage.cloud.google.com/pdf-docs-49ca4/exec_guide_gen_ai.pdf
-```
-
-
-Test the configuration by sending a question to the Agent in the emulator.
-
-Question: 
-
-```
-What are the 10 steps in the exec guide?
-```
-
-
-Select "`Agent`" and click "`Save example`".
-
-
-
-Provide a name "`user-question-flow`" and save.
-
-Format agent response and include link to the pdf doc from the tool output section.
-
-```
-The 10 steps in the exec guide are:
-1. Identify..
-2. Select..
-3. Define..
-4. Ensure..
-.
-.
-https://storage.cloud.google.com/pdf-docs-49ca4/exec_guide_gen_ai.pdf
-```
-
-Save the example.
-
-Return to the emulator and click "`Replay conversation`". Check the updated response format.
+Ask the agent create several JIRA user stories.
 
 
 ## Prebuilt Agents
 
-
-
 Explore prebuilt Agents from the menu on the left.
-
-
 
 Select one of the agents and deploy it. Explore Agent's setup, instructions and tools.
 
-
-
 ## Congratulations!
-
-
 
 Congratulations, you finished the lab!
 
 ### What we've covered:
 
 * How to deploy Cloud Run application to integrate with Gemini APIs
-* How to create and deploy Vertex AI Agent
+* How to create and deploy Vertex AI Agent that can help with JIRA user stories creation
 * How to add Slack integration for the Agent
-* How to configure data store for Q&A over PDF documents
 
 ### What's next:
 
