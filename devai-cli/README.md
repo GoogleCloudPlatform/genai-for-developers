@@ -94,8 +94,12 @@ devai review imgdiff \
   -t /ui/main-page-before-upgrade.png  
 
 devai review image \
-  -f /tmp/diagram.png \
+  -f "/tmp/diagram.png" \
   -p "Review and summarize this diagram"
+
+devai review video \
+  -f "/tmp/video.mp4" \
+  -p "Review and summarize this video"  
 
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name" 
