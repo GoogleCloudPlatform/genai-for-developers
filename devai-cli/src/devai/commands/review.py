@@ -18,6 +18,7 @@ from devai.util.file_processor import format_files_as_string
 from vertexai.generative_models import (
     GenerativeModel,
     Image,
+    Part
 )
 from google.cloud.aiplatform import telemetry
 import os
@@ -833,6 +834,43 @@ def image(file, prompt):
     for response in responses:
         print(response.text, end="")
 
+@click.command(name='video')
+@click.option('-f', '--file', required=True, type=str, default="")
+@click.option('-p', '--prompt', required=True, type=str, default="")
+def video(file, prompt):
+    """
+    This function performs a video analysis using the Generative Model API.
+
+    Args:
+        file (str): path to video.
+        prompt (str): question about video.
+    """
+
+    qry = get_prompt('review_query')
+
+    if qry is None:
+        qry=f'''
+        INSTRUCTIONS:
+        {prompt}
+        '''
+
+    with open(file, "rb") as f:
+        video_data = f.read()
+
+    video = Part.from_data(
+        data=video_data,
+        mime_type="video/mp4",
+    )
+
+    contents = [qry, video]
+
+    code_chat_model = GenerativeModel(MODEL_NAME)
+    with telemetry.tool_context_manager(USER_AGENT):
+        responses = code_chat_model.generate_content(contents, stream=True)
+
+    for response in responses:
+        print(response.text, end="")
+
 @click.group()
 def review():
     """
@@ -848,4 +886,4 @@ review.add_command(blockers)
 review.add_command(impact)
 review.add_command(imgdiff)
 review.add_command(image)
-
+review.add_command(video)
