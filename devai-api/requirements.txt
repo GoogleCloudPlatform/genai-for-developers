@@ -3,7 +3,7 @@ google-cloud-aiplatform==1.48.0
 google-auth==2.27.0
 itsdangerous==2.1.2
 jinja2==3.1.4
-langchain==0.1.8
+langchain==0.2.10
 langchain_google_vertexai==0.0.5
 markdown==3.5.2
 types-Markdown==3.5.0.20240129
@@ -22,6 +22,6 @@ click==8.1.7
 google-cloud-aiplatform==1.48.0
 jira==3.6.0
 python-gitlab==4.4.0
-langchain==0.1.8
+langchain==0.2.10
 langchain_google_vertexai==0.0.5
 atlassian-python-api==3.41.10
