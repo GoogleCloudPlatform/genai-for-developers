@@ -779,11 +779,11 @@ def imgdiff(current, target):
     """
 
     before_state='''
-    BEFORE UPGRADE STATE: 
+    IMAGE 1: 
 
     '''
     after_state='''
-    AFTER UPGRADE STATE:
+    IMAGE 2:
 
     '''
     qry = get_prompt('review_query')
@@ -791,8 +791,9 @@ def imgdiff(current, target):
     if qry is None:
         qry='''
         INSTRUCTIONS:
-        Analyze images of the Web page and write the report about what UI elements are missing between the two images.
-        Explain how you reached this decision.
+        Meticulously examine the two provided images. Generate a comprehensive report detailing the specific 
+        elements absent from each image in comparison to the other.  Clearly articulate the reasoning and 
+        methodology employed to arrive at your conclusions.
         '''
     
     contents = [qry, after_state, load_image_from_path(current),
