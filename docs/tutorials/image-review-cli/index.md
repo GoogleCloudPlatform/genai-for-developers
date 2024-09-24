@@ -1,4 +1,4 @@
-## DEVAI CLI - Image analysis
+## DEVAI CLI - Image review
 
 This example demonstrates ways to integrate LLM models into a custom command line utility for use by developers both locally and part of CICD pipeline to automate image review.
 
@@ -33,7 +33,7 @@ This diagram outlines a code review automation workflow utilizing Gemini, GitHub
 * **React Agent & LLM Traces:**  These likely represent components within the system responsible for interacting with Gemini and collecting data about its decision-making process.
 
 **In summary:** This workflow automates the code review process, leveraging the power of Gemini's GenAI capabilities to identify potential issues and streamline developer workflows. By integrating with GitHub and JIRA, it ensures seamless incorporation of the AI-powered insights into existing development processes.
- 
+
 ---
 
 ### Input Image:
