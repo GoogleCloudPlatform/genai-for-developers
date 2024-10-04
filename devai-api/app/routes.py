@@ -22,7 +22,7 @@ from fastapi import APIRouter, Body, FastAPI, HTTPException, Request
 
 from google.auth.transport import requests  # type:ignore
 from google.oauth2 import id_token  # type:ignore
-from langchain.embeddings.base import Embeddings
+
 
 from langchain.agents import AgentType, initialize_agent
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -110,13 +110,13 @@ async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=T
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    instructions = f"""You are senior staff software engineer at Google and will be given REQUIREMENT below.
-    Write a very detailed technical prompt for JIRA user story based on input requirements. 
+    instructions = f"""You are a senior staff software engineer at Google and will be given REQUIREMENTS below.
+    Write a very detailed technical description for JIRA user story based on input requirements. 
     
     EXAMPLE:
     create a url shortener in python using FASTAPI framework. Output must include python source code, unit tests, documentation.
     
-    GEMINI OUTPUT:
+    OUTPUT:
     Create a URL Shortener Microservice using FastAPI
     As a developer, I want to create a URL shortener microservice using FastAPI to shorten long URLs and retrieve the original URLs from short codes.
     Acceptance Criteria:
