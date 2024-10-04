@@ -40,6 +40,7 @@ export JIRA_API_TOKEN=your-token-value
 export JIRA_USERNAME="email that you used to register with JIRA"
 export JIRA_INSTANCE_URL="https://YOUR-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY="JIRA project key"
+export JIRA_CLOUD=true
 ```
 
 ### Enable JIRA command in the code

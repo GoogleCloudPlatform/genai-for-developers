@@ -373,9 +373,10 @@ Set environment variables required for JIRA integration.
 
 ```sh
 export JIRA_API_TOKEN=your-jira-api-token
-export JIRA_USERNAME = "email that you used to register with JIRA"
-export JIRA_INSTANCE_URL = "https://YOUR-PROJECT.atlassian.net"
-export JIRA_PROJECT_KEY = "JIRA project key"
+export JIRA_USERNAME="email that you used to register with JIRA"
+export JIRA_INSTANCE_URL="https://YOUR-PROJECT.atlassian.net"
+export JIRA_PROJECT_KEY="JIRA project key"
+export JIRA_CLOUD=true
 ```
 
 #### Enable functionality
