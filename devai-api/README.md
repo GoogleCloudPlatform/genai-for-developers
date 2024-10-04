@@ -32,6 +32,7 @@ For integration with JIRA:
 - JIRA_USERNAME: The JIRA username.
 - JIRA_INSTANCE_URL: The JIRA instance URL.
 - JIRA_PROJECT_KEY: The JIRA project key.
+- JIRA_CLOUD: Required for LangChain JiraAPIWrapper
 
 For integration with GitLab:
 
@@ -113,6 +114,7 @@ export JIRA_USERNAME="YOUR-EMAIL"
 export JIRA_INSTANCE_URL="https://YOUR-JIRA-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY="YOUR-JIRA-PROJECT-KEY"
 export JIRA_CLOUD=true
+
 export GITLAB_URL="https://gitlab.com"
 export GITLAB_BRANCH="devai"
 export GITLAB_BASE_BRANCH="main"

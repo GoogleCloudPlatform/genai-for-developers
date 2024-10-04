@@ -29,6 +29,7 @@ pipelines:
             - export JIRA_USERNAME=$(echo $JIRA_USERNAME)
             - export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
             - export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+            - export JIRA_CLOUD=true
 
             - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
             - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
