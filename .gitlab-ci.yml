@@ -40,6 +40,7 @@ build-job:
     - export JIRA_USERNAME=$(echo $JIRA_USERNAME)
     - export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
     - export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
+    - export JIRA_CLOUD=true
 
     - export GITLAB_PERSONAL_ACCESS_TOKEN=$(echo $GITLAB_PERSONAL_ACCESS_TOKEN)
     - export GITLAB_URL=$(echo $GITLAB_URL)

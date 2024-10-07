@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import asynccontextmanager
 from ipaddress import IPv4Address, IPv6Address
-from typing import Optional
 
 import yaml
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from langchain.embeddings import VertexAIEmbeddings
 from pydantic import BaseModel
 
 from .routes import routes

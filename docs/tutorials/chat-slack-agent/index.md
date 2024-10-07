@@ -143,6 +143,7 @@ export JIRA_API_TOKEN=your-jira-token
 export JIRA_USERNAME="YOUR-EMAIL"
 export JIRA_INSTANCE_URL="https://YOUR-JIRA-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY="YOUR-JIRA-PROJECT-KEY"
+export JIRA_CLOUD=true
 
 export GITLAB_PERSONAL_ACCESS_TOKEN=your-gitlab-token
 export GITLAB_URL="https://gitlab.com"
@@ -196,6 +197,7 @@ gcloud run deploy devai-api \
   --set-env-vars JIRA_USERNAME="$JIRA_USERNAME" \
   --set-env-vars JIRA_INSTANCE_URL="$JIRA_INSTANCE_URL" \
   --set-env-vars JIRA_PROJECT_KEY="$JIRA_PROJECT_KEY" \
+  --set-env-vars JIRA_CLOUD="$JIRA_CLOUD" \
   --set-env-vars LANGCHAIN_TRACING_V2="$LANGCHAIN_TRACING_V2" \
   --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \

@@ -25,6 +25,7 @@ jobs:
               export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
               export JIRA_INSTANCE_URL=$(echo $JIRA_INSTANCE_URL)
               export JIRA_API_TOKEN=$(echo $JIRA_API_TOKEN)
+              export JIRA_CLOUD=true
 
               export GITLAB_URL=$(echo $GITLAB_URL)
               export GITLAB_REPOSITORY=$(echo $GITLAB_REPOSITORY)

@@ -141,6 +141,7 @@ export JIRA_API_TOKEN=your-jira-token
 export JIRA_USERNAME="YOUR-EMAIL"
 export JIRA_INSTANCE_URL="https://YOUR-JIRA-PROJECT.atlassian.net"
 export JIRA_PROJECT_KEY="YOUR-JIRA-PROJECT-KEY"
+export JIRA_CLOUD=true
 ```
 
 Set these environment variable without replacing the values.

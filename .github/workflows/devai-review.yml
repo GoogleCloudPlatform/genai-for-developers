@@ -6,6 +6,7 @@ on: [push, workflow_dispatch]
 env:
   LOCATION: us-central1
   PROJECT_ID: '${{ secrets.PROJECT_ID }}'
+  JIRA_CLOUD: true
 jobs:
   DevAI-Reviews:
     runs-on: ubuntu-latest
