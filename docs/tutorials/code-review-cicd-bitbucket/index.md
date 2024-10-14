@@ -138,9 +138,9 @@ cloudshell edit bitbucket-pipelines.yml
 ```
 ### Review command and Gemini API calls
 
-Inspect the key lines of the CLI that is used in the workflow to understand how it functions.
+Review the source code for the devai cli.
 
-In cloudshell your can open the specific file with the following command.
+In cloudshell you can open the specific file with the following command.
 
 ```sh
 cloudshell edit devai-cli/src/devai/commands/review.py 
