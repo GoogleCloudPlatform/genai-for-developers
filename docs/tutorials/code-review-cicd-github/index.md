@@ -92,7 +92,7 @@ cat ~/vertex-client-key.json
 
 ### Run GitHub Actions Workflow
 
-Navigate to your GitHub repository in the browser and run the workflow.
+Navigate to your GitHub repository in the browser and run the workflow - `GenAI For Developers`.
 The workflow is configured to run on code push or manual execution.
 
 ### Review GitHub Actions Workflow output
@@ -128,13 +128,13 @@ Open the GitHub workflow by opening the file below.
 cloudshell edit .github/workflows/devai-review.yml 
 ```
 
-Review the 5 tasks at the bottom of the file that use the `devai` python script you reviewed in the previous step. For example the code review step includes `devai review code -c [source to review]`
+Review the tasks at the bottom of the file that use the `devai` cli. 
+
+For example the code review step includes `devai review code -c [source to review]`
 
 ### Review command and Gemini API calls
 
-Inspect the key lines of the CLI that is used in the workflow to understand how it functions.
-
-In cloudshell your can open the specific file with the following command.
+In cloudshell you can open the specific file with the following command.
 
 ```sh
 cloudshell edit devai-cli/src/devai/commands/review.py 
