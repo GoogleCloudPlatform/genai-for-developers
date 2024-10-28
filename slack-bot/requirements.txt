@@ -1,4 +1,0 @@
-slack_bolt
-Flask>=1.1
-gunicorn>=20
-google-cloud-aiplatform==1.35.0
