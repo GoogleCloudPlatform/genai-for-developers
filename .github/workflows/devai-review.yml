@@ -2,11 +2,14 @@
 # - Requires GCP service account stored in GOOGLE_API_CREDENTIALS secret
 name: GenAI For Developers
 run-name: Reviewing ${{ github.actor }}'s code changes  🚀
-on: [push, workflow_dispatch]
+on: [workflow_dispatch]
 env:
   LOCATION: us-central1
   PROJECT_ID: '${{ secrets.PROJECT_ID }}'
   JIRA_CLOUD: true
+  GITHUB_APP_ID: '${{ secrets.GH_APP_ID }}'
+  GITHUB_REPOSITORY: '${{ secrets.GH_REPOSITORY }}'
+  GITHUB_APP_PRIVATE_KEY: '${{ secrets.GH_APP_PRIVATE_KEY }}'
 jobs:
   DevAI-Reviews:
     runs-on: ubuntu-latest
@@ -32,6 +35,11 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_API_CREDENTIALS }}'
           project_id: '${{ secrets.PROJECT_ID }}'
+      # - name: Docs update with PR
+      #   run: echo '## Docs Update Results 🚀' >> $GITHUB_STEP_SUMMARY
+      # - run: echo "$(devai document readme -c ${{ github.workspace }}/sample-app/src -f 'sample-app/README.md' -b 'feature/docs-update')" >> $GITHUB_STEP_SUMMARY
+      #   shell: bash
+
       - name: Test Coverage Review
         run: echo '## Test Coverage Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review testcoverage -c ${{ github.workspace }}/sample-app/src)" >> $GITHUB_STEP_SUMMARY
