@@ -7,6 +7,9 @@ env:
   LOCATION: us-central1
   PROJECT_ID: '${{ secrets.PROJECT_ID }}'
   JIRA_CLOUD: true
+ # Following environment variables need to be configured if GitHub integration/commands
+ # to automatically open pull requests are enabled 
+ # see docs/tutorials/setup-github.md for more details
   GITHUB_APP_ID: '${{ secrets.GH_APP_ID }}'
   GITHUB_REPOSITORY: '${{ secrets.GH_REPOSITORY }}'
   GITHUB_APP_PRIVATE_KEY: '${{ secrets.GH_APP_PRIVATE_KEY }}'
