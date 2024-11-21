@@ -44,7 +44,7 @@ Open `review.py` file:
 ~/genai-for-developers/devai-cli/src/devai/commands/review.py
 ```
 
-Find and uncomment line numbers below
+Find and uncomment lines below
 
 Line to import GitLab command
 ```
@@ -65,7 +65,7 @@ export LOCATION=us-central1
 devai review code -c ~/genai-for-developers/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
 ```
 
-Review console output and check for new comments on the issue in the GitLab repository that used for this integration.
+Review console output and check for new comments on the issue in the GitLab repository that was used for this integration.
 
 
 
