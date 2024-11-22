@@ -1,7 +1,8 @@
 import os
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.utilities.github import GitHubAPIWrapper
-from .constants import MODEL_NAME
+from google.cloud.aiplatform import telemetry
+from .constants import MODEL_NAME, USER_AGENT
 
 model = ChatVertexAI(
     model_name=MODEL_NAME,
@@ -39,8 +40,9 @@ def generate_pr_summary(existing_source_code: str, new_source_code: str) -> str:
     """
 
     try:
-        pr_response = model.invoke(pr_summary_template.format(existing_source_code, new_source_code))
-        return pr_response.content
+        with telemetry.tool_context_manager(USER_AGENT):
+            pr_response = model.invoke(pr_summary_template.format(existing_source_code, new_source_code))
+            return pr_response.content
     except Exception as e:
         print(f"Error generating pull request summary: {e}")
         return
