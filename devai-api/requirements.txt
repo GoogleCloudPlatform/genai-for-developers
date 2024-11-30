@@ -16,6 +16,6 @@ PyGithub==2.2.0
 jira==3.8.0
 pydantic==2.6.1
 atlassian-python-api==3.41.10
-langchain_community==0.2.10
+langchain_community==0.2.19
 
 click==8.1.7
