@@ -8,7 +8,7 @@ langchain_google_vertexai==1.0.5
 markdown==3.5.2
 types-Markdown==3.5.0.20240129
 uvicorn[standard]==0.27.0.post1
-python-multipart==0.0.7
+python-multipart==0.0.18
 langsmith==0.1.129
 google-generativeai==0.4.0
 python-gitlab==4.4.0
