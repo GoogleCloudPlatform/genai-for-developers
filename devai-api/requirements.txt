@@ -12,10 +12,12 @@ python-multipart==0.0.7
 langsmith==0.1.129
 google-generativeai==0.4.0
 python-gitlab==4.4.0
-PyGithub==2.2.0
+
 jira==3.8.0
 pydantic==2.6.1
 atlassian-python-api==3.41.10
 langchain_community==0.2.10
 
 click==8.1.7
+PyGithub==2.5.0
+GitPython==3.1.43
