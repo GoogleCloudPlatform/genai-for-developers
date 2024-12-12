@@ -1,3 +1,17 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import subprocess
 import requests
@@ -6,7 +20,6 @@ from git import Repo
 from github import Auth
 
 from langchain_community.utilities.github import GitHubAPIWrapper
-from langchain_google_vertexai import ChatVertexAI
 from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 
@@ -17,7 +30,7 @@ from .file_processor import format_files_as_string
 github = GitHubAPIWrapper(
     github_app_id=os.getenv("GITHUB_APP_ID"),
     github_app_private_key=os.getenv("GITHUB_APP_PRIVATE_KEY"),
-    github_repository=f"{os.getenv('GITHUB_ACCOUNT')}/{os.getenv('REPO_NAME')}",
+    github_repository=f"{os.getenv('GITHUB_ACCOUNT')}/{os.getenv('GITHUB_REPO_NAME')}",
 )
 
 model = GenerativeModel(MODEL_NAME)
@@ -33,14 +46,33 @@ NEW <<<<
 
 
 def get_source_code(repo_name: str):
+    """Clones the specified GitHub repository and returns its source code as a string.
+
+    Args:
+        repo_name (str): The name of the repository to clone.
+
+    Returns:
+        str: The source code of the cloned repository.
+    """
     github_account = os.environ["GITHUB_ACCOUNT"]
-    repo_name = os.environ["REPO_NAME"]
+    repo_name = os.environ["GITHUB_REPO_NAME"]
 
     clone_repo(github_account, repo_name)
     return format_files_as_string(f"{repo_name}")
 
 
 def generate_pr_summary(existing_source_code: str, new_source_code: str) -> str:
+    """Generates a summary for a GitHub pull request based on the changes between 
+    the existing and new source code.
+
+    Args:
+        existing_source_code (str): The original source code.
+        new_source_code (str): The modified source code.
+
+    Returns:
+        str: A string containing the pull request title and description, 
+             separated by a newline character. Returns None if an error occurs.
+    """
     pr_summary_template = """
     Summarize the changes between old and new source code and return summary for GitHub pull request. 
     Response format: PR Name\nnPR description
@@ -66,10 +98,15 @@ def generate_pr_summary(existing_source_code: str, new_source_code: str) -> str:
 
 
 def create_github_pr(branch: str, files: dict[str, str]):
-    """Opens new GitHub Pull Request with updated files
+    """Creates a GitHub pull request with the specified branch and file updates.
+
     Args:
-    branch (str): branch name.
-    files (dict[str, str]): file path and content pairs
+        branch (str): The name of the branch to create the pull request from.
+        files (dict[str, str]): A dictionary where keys are filepaths and 
+                                values are the new file content.
+
+    Returns:
+        The response from the GitHub API.  Returns None if an error occurs.
     """
 
     try:
@@ -108,8 +145,17 @@ def create_github_pr(branch: str, files: dict[str, str]):
         print(f"Error creating pull request: {e}")
         return
 
+
 def clone_repo(github_account: str, repo_name: str):
-    
+    """Clones the specified GitHub repository using the provided credentials.
+
+    Args:
+        github_account (str): The GitHub account/organization name.
+        repo_name (str): The name of the repository.
+
+    Returns:
+        Repo: The cloned repository object. Returns None if cloning fails.
+    """
     try:
         github_app_id = os.environ["GITHUB_APP_ID"]
         github_installation_id = os.environ["GITHUB_APP_INSTALLATION_ID"]
@@ -151,17 +197,30 @@ def clone_repo(github_account: str, repo_name: str):
 
 
 def delete_folder(repo_name: str):
+    """Deletes the specified folder and its contents.
+
+    Args:
+        repo_name (str): The name of the folder to delete.
+    """
     try:
         subprocess.run(["rm", "-rf", repo_name], check=True)
     except Exception as e:
         print(f"Error deleting folder: {e}")
-    
+
 
 def create_pull_request(prompt: str):
+    """Creates a pull request on GitHub with updates to the README.md file.
+
+    Args:
+        prompt (str): The prompt describing the desired changes.
+
+    Returns:
+        The response from the GitHub API, or None if an error occurs.
+    """
 
     response = ""
     try:
-        repo_name = os.environ["REPO_NAME"]
+        repo_name = os.environ["GITHUB_REPO_NAME"]
 
         delete_folder(repo_name)
 
@@ -187,6 +246,15 @@ def create_pull_request(prompt: str):
     return response
 
 def get_summary(instructions, source_code):
+    """Uses a language model to generate a README summary based on provided instructions and source code.
+
+    Args:
+        instructions (str): Instructions for generating the summary.
+        source_code (str): The project's source code.
+
+    Returns:
+        str: The generated README summary.
+    """
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = model.start_chat(response_validation=False)
         code_chat.send_message(instructions)
