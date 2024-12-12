@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-from typing import Any, Mapping, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import PlainTextResponse, RedirectResponse, JSONResponse
-from fastapi import APIRouter, Body, FastAPI, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi import APIRouter, Body, HTTPException, Request
 
-
-from google.auth.transport import requests  # type:ignore
-from google.oauth2 import id_token  # type:ignore
 
 
 from langchain.agents import AgentType, initialize_agent
@@ -32,6 +27,7 @@ from google.cloud.aiplatform import telemetry
 from vertexai.generative_models import GenerativeModel
 
 from .jira import create_jira_issue
+from .github_utils import create_pull_request
 
 from .constants import USER_AGENT, MODEL_NAME
 
@@ -68,9 +64,21 @@ async def test():
     """Test endpoint"""
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat(response_validation=False)
-        response = code_chat.send_message("Tell me about Google Gemini 1.5 capabilities")
+        response = code_chat.send_message("Describe Developer Productivity with GenAI")
     print(f"Response from Model:\n{response.text}\n")
     return {"message": response.text}
+
+
+@routes.post("/create-github-pr", response_class=PlainTextResponse)
+async def generate_handler(request: Request, prompt: str = Body(embed=True)):
+    """Handler for GitHub Pull Requests Generation"""
+    # Retrieve user prompt
+    if not prompt:
+        raise HTTPException(status_code=400, detail="Error: Prompt is required")
+
+    pr_details = create_pull_request(prompt)
+
+    return pr_details
 
 @routes.post("/generate", response_class=PlainTextResponse)
 async def generate_handler(request: Request, prompt: str = Body(embed=True)):
