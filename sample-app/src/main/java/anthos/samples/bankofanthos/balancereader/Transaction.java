@@ -61,7 +61,7 @@ public final class Transaction {
     @JsonProperty("timestamp")
     private Date timestamp;
 
-    private static final double CENTS_PER_DOLLAR = 100.0;
+    private static final double CENTS_PER_DOLLAR = 100.00;
 
     public long getTransactionId() {
         return transactionId;
