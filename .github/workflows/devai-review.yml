@@ -43,28 +43,27 @@ jobs:
       # - run: echo "$(devai document readme -c ${{ github.workspace }}/sample-app/src -f 'sample-app/README.md' -b 'feature/docs-update')" >> $GITHUB_STEP_SUMMARY
       #   shell: bash
 
-      - name: Test Coverage Review
-        run: echo '## Test Coverage Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      - run: echo "$(devai review testcoverage -c ${{ github.workspace }}/sample-app/src)" >> $GITHUB_STEP_SUMMARY
-        shell: bash
+      # - name: Test Coverage Review
+      #   run: echo '## Test Coverage Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      # - run: echo "$(devai review testcoverage -c ${{ github.workspace }}/sample-app/src)" >> $GITHUB_STEP_SUMMARY
+      #   shell: bash
 
       - name: Code Review
         run: echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
-      - name: Performance Review
-        run: echo '## Performance Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      - run: echo "$(devai review performance -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
-        shell: bash
+      # - name: Performance Review
+      #   run: echo '## Performance Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      # - run: echo "$(devai review performance -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
+      #   shell: bash
 
-      - name: Security Review
-        run: echo '## Security Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      - run: echo "$(devai review security -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
-        shell: bash
+      # - name: Security Review
+      #   run: echo '## Security Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      # - run: echo "$(devai review security -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
+      #   shell: bash
 
-      - name: Blockers Review
-        run: echo '## Blockers Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      - run: echo "$(devai review blockers -c ${{ github.workspace }}/sample-app/pom.xml)" >> $GITHUB_STEP_SUMMARY
-        shell: bash
-              
+      # - name: Blockers Review
+      #   run: echo '## Blockers Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      # - run: echo "$(devai review blockers -c ${{ github.workspace }}/sample-app/pom.xml)" >> $GITHUB_STEP_SUMMARY
+      #   shell: bash
