@@ -101,6 +101,7 @@ public final class LedgerReader {
                         | DataAccessResourceFailureException e) {
                         remoteLatest = latestTransactionId;
                         LOGGER.warn("Could not reach ledger database");
+						System.out.println(">>>Testing");
                     }
                     // if there are new transactions, poll the database
                     if (remoteLatest > latestTransactionId) {
