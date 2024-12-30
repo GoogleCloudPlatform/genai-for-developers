@@ -70,6 +70,7 @@ public final class BalanceReaderController {
         // Initialize JWT verifier.
         this.verifier = verifier;
         LOGGER.debug("Initialized JWT verifier");
+        System.out.println("Initializing");
         // Initialize cache
         this.cache = cache;
         GuavaCacheMetrics.monitor(meterRegistry, this.cache, "Guava");
