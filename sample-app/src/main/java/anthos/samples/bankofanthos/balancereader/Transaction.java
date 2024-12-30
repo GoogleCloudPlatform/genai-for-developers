@@ -76,6 +76,7 @@ public final class Transaction {
     }
 
     public String getToAccountNum() {
+        System.out.println(">>>>>>Testing");
         return toAccountNum;
     }
 
