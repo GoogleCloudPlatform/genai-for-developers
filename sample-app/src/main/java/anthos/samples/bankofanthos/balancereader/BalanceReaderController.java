@@ -167,6 +167,7 @@ public final class BalanceReaderController {
             return new ResponseEntity<Long>(balance, HttpStatus.OK);
         } catch (JWTVerificationException e) {
             LOGGER.error("Failed to retrieve account balance: not authorized");
+			System.out.println("Testing the PR");
             return new ResponseEntity<>("not authorized",
                 HttpStatus.UNAUTHORIZED);
         } catch (ExecutionException | UncheckedExecutionException e) {
