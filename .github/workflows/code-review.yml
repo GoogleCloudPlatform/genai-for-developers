@@ -23,9 +23,23 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
+
+      - name: Get Changed Files
+        id: changed_files
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const files = await github.paginate(
+              github.rest.pulls.listFiles, 
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+              }
+            );
+            const changedFiles = files.map(file => file.filename).join(' ');
+            core.setOutput('files', changedFiles);
+
       - name: Set up Python 
         uses: actions/setup-python@v5
         with:
@@ -47,14 +61,13 @@ jobs:
       # - run: echo "$(devai document readme -c ${{ github.workspace }}/sample-app/src -f 'sample-app/README.md' -b 'feature/docs-update')" >> $GITHUB_STEP_SUMMARY
       #   shell: bash
 
-      # - name: Test Coverage Review
-      #   run: echo '## Test Coverage Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      # - run: echo "$(devai review testcoverage -c ${{ github.workspace }}/sample-app/src)" >> $GITHUB_STEP_SUMMARY
-      #   shell: bash
-
       - name: Code Review
-        run: echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
-      - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
+        run: |
+          echo '## Code Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+          for file in ${{ steps.changed_files.outputs.files }}; do
+            echo "Analyzing $file..." >> $GITHUB_STEP_SUMMARY
+            devai review code -c "$file" >> $GITHUB_STEP_SUMMARY
+          done
         shell: bash
 
       # - name: Performance Review
