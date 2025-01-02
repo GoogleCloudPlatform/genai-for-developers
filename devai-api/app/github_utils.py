@@ -26,13 +26,6 @@ from vertexai.generative_models import GenerativeModel
 from .constants import USER_AGENT, MODEL_NAME
 from .file_processor import format_files_as_string
 
-
-github = GitHubAPIWrapper(
-    github_app_id=os.getenv("GITHUB_APP_ID"),
-    github_app_private_key=os.getenv("GITHUB_APP_PRIVATE_KEY"),
-    github_repository=f"{os.getenv('GITHUB_ACCOUNT')}/{os.getenv('GITHUB_REPO_NAME')}",
-)
-
 model = GenerativeModel(MODEL_NAME)
 
 file_update_request = """{}
@@ -109,6 +102,12 @@ def create_github_pr(branch: str, files: dict[str, str]):
         The response from the GitHub API.  Returns None if an error occurs.
     """
 
+    github = GitHubAPIWrapper(
+        github_app_id=os.getenv("GITHUB_APP_ID"),
+        github_app_private_key=os.getenv("GITHUB_APP_PRIVATE_KEY"),
+        github_repository=f"{os.getenv('GITHUB_ACCOUNT')}/{os.getenv('GITHUB_REPO_NAME')}",
+    )
+
     try:
         resp = github.create_branch(branch)
         print(resp)
@@ -140,7 +139,12 @@ def create_github_pr(branch: str, files: dict[str, str]):
         pr_summary = generate_pr_summary(existing_source_code, new_source_code)
         resp = github.create_pull_request(pr_summary)
         print(resp)
-        return resp
+
+        github_account = os.environ["GITHUB_ACCOUNT"]
+        repo_name = os.environ["GITHUB_REPO_NAME"]
+        
+        pr_link = f"https://github.com/{github_account}/{repo_name}/pulls"
+        return pr_link
     except Exception as e:
         print(f"Error creating pull request: {e}")
         return
@@ -208,6 +212,18 @@ def delete_folder(repo_name: str):
         print(f"Error deleting folder: {e}")
 
 
+def validate_github_setup():
+    if not os.getenv("GITHUB_APP_ID"):
+        raise ValueError("GITHUB_APP_ID environment variable is not set")
+    if not os.getenv("GITHUB_APP_PRIVATE_KEY"):
+        raise ValueError("GITHUB_APP_PRIVATE_KEY environment variable is not set")
+    if not os.getenv("GITHUB_ACCOUNT"):
+        raise ValueError("GITHUB_ACCOUNT environment variable is not set")
+    if not os.getenv("GITHUB_REPO_NAME"):
+        raise ValueError("GITHUB_REPO_NAME environment variable is not set")
+    if not os.getenv("GITHUB_APP_INSTALLATION_ID"):
+        raise ValueError("GITHUB_APP_INSTALLATION_ID environment variable is not set")    
+
 def create_pull_request(prompt: str):
     """Creates a pull request on GitHub with updates to the README.md file.
 
@@ -217,6 +233,13 @@ def create_pull_request(prompt: str):
     Returns:
         The response from the GitHub API, or None if an error occurs.
     """
+
+    try:
+        validate_github_setup()
+    except Exception as e:
+        resp = "Error validating GitHub setup"
+        print(f"{resp}: {e}")
+        return resp
 
     response = ""
     try:
