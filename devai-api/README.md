@@ -6,9 +6,11 @@ This application defines the routes for the DevAI API.
 
 The API provides two main endpoints:
 
-`/generate`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate code and documentation based on the prompt.
+`/generate`: This endpoint takes a user prompt as input and uses the Gemini model to generate code and documentation based on the prompt.
 
-`/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
+`/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
+
+`/create-github-pr`: This endpoint takes a user prompt as input and uses the Gemini model to generate documentation based and opens GitHub pull request with updated README.md file.
 
 The API includes a `/test` endpoint for testing purposes.
 
@@ -41,7 +43,16 @@ For integration with GitLab:
 - GITLAB_BRANCH: The GitLab branch.
 - GITLAB_BASE_BRANCH: The GitLab base branch.
 
-For integration with LAngSmith:
+For integration with GitHub:
+
+- GITHUB_APP_ID: The GitHub App id.
+- GITHUB_ACCOUNT: The GitHub account(org or userid).
+- GITHUB_REPO_NAME: The GitHub repository name.
+- GITHUB_APP_INSTALLATION_ID: The GitHub App installation id.
+
+GitHub App setup [details](../docs/tutorials/setup-github.md).
+
+For integration with LangSmith:
 
 - LANGCHAIN_TRACING_V2: The LangChain tracing flag.
 - LANGCHAIN_ENDPOINT: The LangChain endpoint.
@@ -51,6 +62,7 @@ The code uses the following secrets:
 - LANGCHAIN_API_KEY: The LangChain API key.
 - GITLAB_PERSONAL_ACCESS_TOKEN: The GitLab personal access token.
 - JIRA_API_TOKEN: The JIRA API token.
+- GITHUB_APP_PRIVATE_KEY: GitHub App private key.
 
 ## JIRA User story implementation
 
@@ -97,6 +109,13 @@ echo -n $GITLAB_PERSONAL_ACCESS_TOKEN | \
  --data-file=-
 ```
 
+Set `GITHUB_APP_PRIVATE_KEY` and create a secret:
+
+```sh
+gcloud secrets create GITHUB_APP_PRIVATE_KEY \
+  --data-file="/tmp/path-to-your-github-app.private-key.pem"
+```
+
 Set `LANGCHAIN_API_KEY` and create a secret:
 
 ```sh
@@ -122,6 +141,11 @@ export GITLAB_REPOSITORY="GITLAB-USERID/GITLAB-REPO"
 
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+
+export GITHUB_APP_ID=APP_ID
+export GITHUB_ACCOUNT="YOUR-USERID"
+export GITHUB_REPO_NAME="REPO-NAME"
+export GITHUB_APP_INSTALLATION_ID=INSTALLATION_ID
 ```
 
 Deploy service to Cloud Run:
@@ -150,9 +174,14 @@ gcloud run deploy devai-api \
   --set-env-vars JIRA_PROJECT_KEY="$JIRA_PROJECT_KEY" \
   --set-env-vars LANGCHAIN_TRACING_V2="$LANGCHAIN_TRACING_V2" \
   --set-env-vars JIRA_CLOUD="$JIRA_CLOUD" \
+  --set-env-vars GITHUB_APP_ID=$GITHUB_APP_ID \
+  --set-env-vars GITHUB_ACCOUNT="$GITHUB_ACCOUNT" \
+  --set-env-vars GITHUB_REPO_NAME="$GITHUB_REPO_NAME" \
+  --set-env-vars GITHUB_APP_INSTALLATION_ID="$GITHUB_APP_INSTALLATION_ID" \
   --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
   --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
+  --update-secrets="GITHUB_APP_PRIVATE_KEY=GITHUB_APP_PRIVATE_KEY:latest" \
   --min-instances=1 \
   --max-instances=3
 ```
