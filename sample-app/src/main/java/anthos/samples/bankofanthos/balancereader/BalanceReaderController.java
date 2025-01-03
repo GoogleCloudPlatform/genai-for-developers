@@ -17,7 +17,6 @@ public ResponseEntity<?> getBalance(
         }
         // Load from cache
         Long balance = cache.get(accountId);
-		int newBal = balance;
 
         // Intentional test: Adding a redundant or problematic logic
         if (balance < 0) {

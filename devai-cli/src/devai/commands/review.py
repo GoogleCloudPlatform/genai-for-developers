@@ -139,29 +139,7 @@ def code(context, output):
 
             '''
     # Output Format Substitution
-    output_format = {
-        'markdown': '''
-       Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
-
-Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
-
-*   "Could we explore an alternative algorithm here to potentially improve performance?"
-*   "Would refactoring this logic into smaller functions enhance readability and maintainability?"
-
-Specificity: Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
-
-Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
-
-No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
-
-### Output Format ###
-- **Method Name**: The name of the method where the issue is found.
-- **Issue Type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
-- **Description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
-- **Severity**: Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
-- **Recommendation**: Specific suggestions for improvement.
-''',
-
+output_format = {
     'json': '''Provide your feedback in a structured JSON array with each element containing the following fields:
 
 *   **method_name**: The name of the method where the issue is found.
@@ -170,8 +148,30 @@ No Issues: If your review uncovers no significant areas for improvement, state "
 *   **severity**: Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
 *   **recommendation**: Specific suggestions for improvement.
 
-Provide an overview or overall impression entry for the code as the first entry.'''
-    }[output] 
+### Summary ###
+- **Summary**: Provide an overall impression of the code review findings.
+- **Decision**: Indicate "Approved" if there are no critical or high-severity issues, or "Rejected" if there are high-severity issues.
+
+Example JSON Output:
+```json
+[
+    {
+        "method_name": "getBalance",
+        "issue_type": "Type Mismatch",
+        "description": "Long value assigned to int, possible overflow.",
+        "severity": "high",
+        "recommendation": "Use `.intValue()` with range checks."
+    },
+    {
+        "summary": "The code has several high-severity issues related to type mismatches and inefficient error handling.",
+        "decision": "Rejected"
+    }
+]
+```
+
+Provide a detailed analysis of any issues identified, followed by an overall summary and decision.
+'''
+}[output] 
 
     qry = get_prompt('review_query') or f'''
             ### Instruction ###
