@@ -140,7 +140,8 @@ def code(context, output):
             '''
     # Output Format Substitution
     output_format = {
-        'markdown': '''Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
+        'markdown': '''
+       Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
 
 Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
 
@@ -153,24 +154,21 @@ Prioritization: If possible, indicate the severity or potential impact of each i
 
 No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
 
-Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low). If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices." Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"''',
+### Output Format ###
+- **Method Name**: The name of the method where the issue is found.
+- **Issue Type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
+- **Description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
+- **Severity**: Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+- **Recommendation**: Specific suggestions for improvement.
+''',
 
-        'json': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+    'json': '''Provide your feedback in a structured JSON array with each element containing the following fields:
 
-*   **class_name** (optional): The name of the class where the issue is found.
-*   **method_name** (optional): The name of the method where the issue is found.
+*   **method_name**: The name of the method where the issue is found.
 *   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
 *   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
-*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
-
-Provide an overview or overall impression entry for the code as the first entry.''',
-        'table': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
-
-*   **class_name** (optional): The name of the class where the issue is found.
-*   **method_name** (optional): The name of the method where the issue is found.
-*   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
-*   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
-*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+*   **severity**: Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+*   **recommendation**: Specific suggestions for improvement.
 
 Provide an overview or overall impression entry for the code as the first entry.'''
     }[output] 
@@ -218,7 +216,7 @@ You are a senior Java developer and architect specializing in HCL Commerce V9.1 
 8. **Deprecated APIs**:
    - Identify any usage of deprecated Java or HCL Commerce APIs.
    - Recommend modern alternatives.
-   
+
             ### Output Format ###
             {output_format}
             
