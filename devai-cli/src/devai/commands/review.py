@@ -139,41 +139,39 @@ def code(context, output):
 
             '''
     # Output Format Substitution
-    output_format = {
-        'markdown': '''Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
+output_format = {
+    'json': '''Provide your feedback in a structured JSON array with each element containing the following fields:
 
-Tone: Frame your findings as constructive suggestions or open-ended questions. This encourages collaboration and avoids a purely critical tone. Examples:
-
-*   "Could we explore an alternative algorithm here to potentially improve performance?"
-*   "Would refactoring this logic into smaller functions enhance readability and maintainability?"
-
-Specificity: Provide detailed explanations for each issue. This helps the original developer understand the reasoning and implement effective solutions.
-
-Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
-
-No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
-
-Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low). If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices." Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"''',
-
-        'json': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
-
-*   **class_name** (optional): The name of the class where the issue is found.
-*   **method_name** (optional): The name of the method where the issue is found.
+*   **method_name**: The name of the method where the issue is found.
 *   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
 *   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
-*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+*   **severity**: Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+*   **recommendation**: Specific suggestions for improvement.
 
-Provide an overview or overall impression entry for the code as the first entry.''',
-        'table': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
+### Summary ###
+- **Summary**: Provide an overall impression of the code review findings.
+- **Decision**: Indicate "Approved" if there are no critical or high-severity issues, or "Rejected" if there are high-severity issues.
 
-*   **class_name** (optional): The name of the class where the issue is found.
-*   **method_name** (optional): The name of the method where the issue is found.
-*   **issue_type**: A brief description of the issue type (e.g., "Performance Bottleneck," "Security Vulnerability").
-*   **description**: A detailed explanation of the issue, including its potential impact and suggested solutions.
-*   **severity**: (optional) Indicate the severity or potential impact of the issue (e.g., "critical", "high", "medium", "low").
+Example JSON Output:
+```json
+[
+    {
+        "method_name": "getBalance",
+        "issue_type": "Type Mismatch",
+        "description": "Long value assigned to int, possible overflow.",
+        "severity": "high",
+        "recommendation": "Use `.intValue()` with range checks."
+    },
+    {
+        "summary": "The code has several high-severity issues related to type mismatches and inefficient error handling.",
+        "decision": "Rejected"
+    }
+]
+```
 
-Provide an overview or overall impression entry for the code as the first entry.'''
-    }[output] 
+Provide a detailed analysis of any issues identified, followed by an overall summary and decision.
+'''
+}[output] 
 
     qry = get_prompt('review_query') or f'''
             ### Instruction ###
@@ -181,11 +179,43 @@ Provide an overview or overall impression entry for the code as the first entry.
 
             Your task is to perform a comprehensive code review of the provided code snippet. Evaluate the code with a focus on the following key areas:
             
-            *   Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
-            *   Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
-            *   Maintainability: Assess the code's readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
-            *   Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
-            *   Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
+### Instruction ###
+You are a senior Java developer and architect specializing in HCL Commerce V9.1 development and best practices. Your task is to perform a comprehensive code review of the provided Java code snippet, with a focus on identifying issues specific to HCL Commerce and Java development, such as incorrect API usage, inefficiencies, and common bugs.
+
+### Key Areas of Review ###
+1. **HCL Commerce Best Practices**:
+   - Ensure adherence to HCL Commerce coding guidelines.
+   - Validate the use of HCL Commerce-specific APIs and frameworks (e.g., REST services, DataBeans).
+   - Identify any anti-patterns or misuse of HCL Commerce features.
+
+2. **Correctness**:
+   - Check for syntax errors, type mismatches, and invalid type casting.
+   - Ensure that all variables and methods are correctly defined and used.
+
+3. **Efficiency**:
+   - Identify inefficient SQL queries, redundant operations, and suboptimal data structures.
+   - Look for potential memory leaks or resource management issues (e.g., unclosed database connections).
+
+4. **Concurrency and Thread Safety**:
+   - Ensure that shared resources are properly synchronized.
+   - Identify potential deadlocks, race conditions, or misuse of thread pools.
+
+5. **Error Handling**:
+   - Ensure robust error handling with meaningful error messages.
+   - Check for proper exception logging and handling (e.g., catching `SQLException` but not logging it).
+
+6. **Security**:
+   - Check for SQL injection vulnerabilities.
+   - Ensure secure handling of sensitive data (e.g., customer PII, payment information).
+   - Validate proper input sanitization and authentication mechanisms.
+
+7. **Maintainability**:
+   - Assess code readability, modularity, and compliance with Java coding standards.
+   - Suggest improvements for better modularization and reusability.
+
+8. **Deprecated APIs**:
+   - Identify any usage of deprecated Java or HCL Commerce APIs.
+   - Recommend modern alternatives.
 
             ### Output Format ###
             {output_format}
