@@ -176,120 +176,56 @@ Provide an overview or overall impression entry for the code as the first entry.
     }[output] 
 
     qry = get_prompt('review_query') or f'''
-            ### Instruction ###
-            You are a senior software engineer and architect with over 20 years of experience, specializing in the language of the provided code snippet and adhering to clean code principles. You are meticulous, detail-oriented, and possess a deep understanding of software design and best practices.
+### Instruction ###
+You are a senior Java developer and architect specializing in HCL Commerce V9.1 development and best practices. Your task is to perform a comprehensive code review of the provided Java code snippet, with a focus on identifying issues specific to HCL Commerce and Java development, such as incorrect API usage, inefficiencies, and common bugs.
 
-            Your task is to perform a comprehensive code review of the provided code snippet. Evaluate the code with a focus on the following key areas:
-            
-            *   Correctness: Ensure the code functions as intended, is free of errors, and handles edge cases gracefully.
-            *   Efficiency: Identify performance bottlenecks, redundant operations, or areas where algorithms and data structures could be optimized for improved speed and resource utilization.
-            *   Maintainability: Assess the code's readability, modularity, and adherence to coding style guidelines and conventions. Look for inconsistent formatting, naming issues, complex logic, tight coupling, or lack of proper code organization. Suggest improvements to enhance clarity and maintainability.
-            *   Security: Scrutinize the code for potential vulnerabilities, such as improper input validation, susceptibility to injection attacks, or weaknesses in data handling.
-            *   Best Practices: Verify adherence to established coding standards, design patterns, and industry-recommended practices that promote long-term code health.
+### Key Areas of Review ###
+1. **HCL Commerce Best Practices**:
+   - Ensure adherence to HCL Commerce coding guidelines.
+   - Validate the use of HCL Commerce-specific APIs and frameworks (e.g., REST services, DataBeans).
+   - Identify any anti-patterns or misuse of HCL Commerce features.
 
-            ### Output Format ###
-            {output_format}
-            
-            ### Example Dialogue ###
-            <query> First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
-                    import "fmt"
-                    
-                    func main() {{
-                        name := "Alice"
-                        greeting := fmt.Sprintf("Hello, %s!", name)
-                        fmt.Println(greeting)
-                    }}
-                    
-                    
-                    <response> [
-                        {{
-                            "question": "Indentation",
-                            "answer": "yes",
-                            "description": "Code is consistently indented with spaces (as recommended by Effective Go)"
-                        }},
-                        {{
-                            "question": "Variable Naming",
-                            "answer": "yes",
-                            "description": "Variables ("name", "greeting") use camelCase as recommended"
-                        }},
-                        {{
-                            "question": "Line Length",
-                            "answer": "yes",
-                            "description": "Lines are within reasonable limits" 
-                        }},
-                        {{
-                            "question": "Package Comments", 
-                            "answer": "n/a",
-                            "description": "This code snippet is too small for a package-level comment"
-                        }}
-                    ]
-                    
-                    
-                    <query> Identify common issues such as code smells, anti-patterns, potential bugs, performance bottlenecks, and security vulnerabilities. Offer actionable recommendations to address these issues and improve the overall quality of the code.
-                    
-                    "package main
-                    
-                    import (
-                        "fmt"
-                        "math/rand"
-                        "time"
-                    )
-                    
-                    // Global variable, potentially unnecessary 
-                    var globalCounter int = 0 
-                    
-                    func main() {{
-                        items := []string{{"apple", "banana", "orange"}}
-                    
-                        // Very inefficient loop with nested loop for a simple search
-                        for _, item := range items {{
-                            for _, search := range items {{
-                                if item == search {{
-                                    fmt.Println("Found:", item)
-                                }}
-                            }}
-                        }}
-                    
-                        // Sleep without clear reason, potential performance bottleneck
-                        time.Sleep(5 * time.Second) 
-                    
-                        calculateAndPrint(10)
-                    }}
-                    
-                    // Potential divide-by-zero risk
-                    func calculateAndPrint(input int) {{
-                        result := 100 / input 
-                        fmt.Println(result)
-                    }}"
-                    
-                    <response> [
-                        {{
-                            "question": "Global Variables",
-                            "answer": "no",
-                            "description": "Potential issue: Unnecessary use of the global variable 'globalCounter'. Consider passing values as arguments for better encapsulation." 
-                        }},
-                        {{
-                            "question": "Algorithm Efficiency",
-                            "answer": "no",
-                            "description": "Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets."
-                        }},
-                        {{
-                            "question": "Performance Bottlenecks",
-                            "answer": "no",
-                            "description": "'time.Sleep' without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use."
-                        }},
-                        {{
-                            "question": "Potential Bugs",
-                            "answer": "no",
-                            "description": "'calculateAndPrint' function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately."
-                        }},
-                        {{ 
-                            "question": "Code Readability",
-                            "answer": "no",
-                            "description": "Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code."
-                        }} 
-                    ]
+2. **Correctness**:
+   - Check for syntax errors, type mismatches, and invalid type casting.
+   - Ensure that all variables and methods are correctly defined and used.
 
+3. **Efficiency**:
+   - Identify inefficient SQL queries, redundant operations, and suboptimal data structures.
+   - Look for potential memory leaks or resource management issues (e.g., unclosed database connections).
+
+4. **Concurrency and Thread Safety**:
+   - Ensure that shared resources are properly synchronized.
+   - Identify potential deadlocks, race conditions, or misuse of thread pools.
+
+5. **Error Handling**:
+   - Ensure robust error handling with meaningful error messages.
+   - Check for proper exception logging and handling (e.g., catching `SQLException` but not logging it).
+
+6. **Security**:
+   - Check for SQL injection vulnerabilities.
+   - Ensure secure handling of sensitive data (e.g., customer PII, payment information).
+   - Validate proper input sanitization and authentication mechanisms.
+
+7. **Maintainability**:
+   - Assess code readability, modularity, and compliance with Java coding standards.
+   - Suggest improvements for better modularization and reusability.
+
+8. **Deprecated APIs**:
+   - Identify any usage of deprecated Java or HCL Commerce APIs.
+   - Recommend modern alternatives.
+
+### Output Format ###
+{output_format}
+
+### Example Findings ###
+#### Issue: Type Mismatch
+**Problem**: A `Long` is assigned to an `int` without proper type casting.
+**Suggestion**:
+```java
+if (balance > Integer.MAX_VALUE || balance < Integer.MIN_VALUE) {
+    throw new ArithmeticException("Balance exceeds int range.");
+}
+int newBal = balance.intValue();
             '''
     # Load files as text into the source variable
     source = source.format(format_files_as_string(context))
