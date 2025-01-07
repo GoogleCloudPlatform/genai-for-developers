@@ -85,8 +85,9 @@ public final class BalanceReaderController {
             final String toRouting = transaction.getToRoutingNum();
             final Integer amount = transaction.getAmount();
 
-            if (fromRouting.equals(localRoutingNum)
-                && this.cache.asMap().containsKey(fromId)) {
+
+           if (fromRouting == localRoutingNum
+				&& this.cache.asMap().containsKey(fromId))  {
                 Long prevBalance = cache.asMap().get(fromId);
                 this.cache.put(fromId, prevBalance - amount);
             }
