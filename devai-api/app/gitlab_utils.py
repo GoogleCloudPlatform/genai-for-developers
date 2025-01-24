@@ -29,7 +29,42 @@ from .github_utils import delete_folder
 from .constants import USER_AGENT, MODEL_NAME
 from .file_processor import format_files_as_string
 
-def create_branch():
+
+LLM_INSTRUCTION_TEMPLATE = """You are principal software engineer and given requirements below for implementation.
+        You must follow rules when generating implementation:
+        - you must use existing codebase from the context below
+        - in your response, generate complete source code files and not diffs
+        - in your response, include full filepath with name before file content, excluding repository name
+        - must return response using sample format
+        
+        REQUIREMENTS:
+        {prompt}
+
+        SAMPLE RESPONSE FORMAT:
+        menu-service/src/main/java/org/google/demo/Menu.java
+        OLD <<<<
+        existing code from the context below for the file
+        >>>> OLD
+        NEW <<<<
+        new generated code by LLM
+        >>>> NEW
+
+        CONTEXT:
+        {codebase}
+        """
+
+PR_PROMPT_TEMPLATE = """Create GitLab merge request using provided details below.
+        Update existing files or Create new files, commit them and push them to opened merge request.
+        
+        DETAILS: 
+        {response_text}
+        """
+
+class MergeRequestError(Exception):
+    """Custom exception for merge request creation."""
+    pass
+
+def _create_branch():
     """Creates new branch for merge request"""
 
     gitlab_url = os.environ["GITLAB_URL"]
@@ -46,7 +81,7 @@ def create_branch():
 
     return new_branch_name
 
-def clone_repo(repo_name: str):
+def _clone_repo(repo_name: str):
     """Clones GitLab repository"""
 
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
@@ -59,11 +94,9 @@ def clone_repo(repo_name: str):
 
     return repo
 
-
-def init_agent():
+def _init_agent(new_gitlab_branch: str):
     """Initializes agent with GitLab toolkit"""
 
-    new_gitlab_branch = create_branch()
     gitlab = GitLabAPIWrapper(gitlab_branch=new_gitlab_branch)
     toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
 
@@ -86,63 +119,46 @@ def init_agent():
 
     return agent
 
-def create_merge_request(prompt: str):
+def _generate_llm_instructions(prompt: str, codebase: str) -> str:
+    """Generates instructions for the LLM"""
+    return LLM_INSTRUCTION_TEMPLATE.format(prompt=prompt, codebase=codebase)
+
+def _get_llm_response(instructions: str, repo_name: str) -> str:
+    """Sends instructions to the LLM and returns the response"""
+    code_chat_model = GenerativeModel(MODEL_NAME)
+
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat(response_validation=False)
+        response = code_chat.send_message(instructions)
+    
+    # Remove repo name from the response
+    return response.text.replace(f"{repo_name}/", "")
+
+def _create_gitlab_merge_request(response_text: str, agent) -> None:
+    """Creates a GitLab merge request"""
+    pr_prompt = PR_PROMPT_TEMPLATE.format(response_text=response_text)
+    agent.invoke(pr_prompt)
+
+def create_merge_request(prompt: str) -> str:
     """Creates new GitLab merge request"""
- 
+
+    owner, repo_name = get_repo_details()
     try:
-        owner, repo_name = get_repo_details()
-        delete_folder(repo_name)
-
-        clone_repo(repo_name)
-
+        delete_folder(repo_name)    
+        _clone_repo(repo_name)
         codebase = load_codebase(repo_name, prompt)
+        instructions = _generate_llm_instructions(prompt, codebase)
+        implementation_details = _get_llm_response(instructions, repo_name)
+        print(implementation_details)
 
-        instructions = f"""You are principal software engineer and given requirements below for implementation.
-        You must follow rules when generating implementation:
-        - you must use existing codebase from the context below
-        - in your response, generate complete source code files and not diffs
-        - in your response, include full filepath with name before file content, excluding repository name
-        - must return response using sample format
+        new_gitlab_branch = _create_branch()
+        agent = _init_agent(new_gitlab_branch)
         
-        REQUIREMENTS:
-        {prompt}
-
-        SAMPLE RESPONSE FORMAT:
-        menu-service/src/main/java/org/google/demo/Menu.java
-        OLD <<<<
-        existing code from the context below for the file
-        >>>> OLD
-        NEW <<<<
-        new generated code by LLM
-        >>>> NEW
-
-        CONTEXT:
-        {codebase}
-
-        """
-        code_chat_model = GenerativeModel(MODEL_NAME)
-
-        with telemetry.tool_context_manager(USER_AGENT):
-            code_chat = code_chat_model.start_chat(response_validation=False)
-            response = code_chat.send_message(instructions)
-
-        print(response.text)
-        response = response.text.replace(f"{repo_name}/", "")
-
-        pr_prompt = f"""Create GitLab merge request using provided details below.
-        Update existing files or Create new files, commit them and push them to opened merge request.
+        _create_gitlab_merge_request(implementation_details, agent)
         
-        DETAILS: 
-        {response}
-        """
-
-        agent = init_agent()
-        agent.invoke(pr_prompt)
-
-        return response
+        return implementation_details
     except Exception as e:
-        print(f"Failed to create merge request: {e}")
-        return "Failed to create merge request"
+         raise MergeRequestError(f"Failed to create merge request: {e}") from e
     finally:
         delete_folder(repo_name)
 
@@ -150,7 +166,6 @@ def get_repo_details():
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
     repo = gitlab_repo_name.split("/")
     return (repo[0], repo[1])
-
 
 def load_codebase(repo_name, prompt: str) -> str:
     # Defaults to menu-service
