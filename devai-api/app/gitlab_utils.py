@@ -64,9 +64,12 @@ class MergeRequestError(Exception):
     """Custom exception for merge request creation."""
     pass
 
-def _create_branch():
-    """Creates new branch for merge request"""
+def _create_branch() -> str:
+    """Creates a new branch in GitLab for a merge request.
 
+    Returns:
+        str: The name of the newly created branch.
+    """
     gitlab_url = os.environ["GITLAB_URL"]
     gitlab_base_branch = os.environ["GITLAB_BASE_BRANCH"]
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
@@ -81,9 +84,15 @@ def _create_branch():
 
     return new_branch_name
 
-def _clone_repo(repo_name: str):
-    """Clones GitLab repository"""
+def _clone_repo(repo_name: str) -> Repo:
+    """Clones a GitLab repository to the local file system.
 
+    Args:
+        repo_name (str): The name of the repository to clone.
+
+    Returns:
+        Repo: The cloned repository object.
+    """
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
     gitlab_access_token = os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]
 
@@ -95,8 +104,14 @@ def _clone_repo(repo_name: str):
     return repo
 
 def _init_agent(new_gitlab_branch: str):
-    """Initializes agent with GitLab toolkit"""
+    """Initializes an agent with the GitLab toolkit.
 
+    Args:
+        new_gitlab_branch (str): The name of the branch to use for the agent.
+
+    Returns:
+        Agent: The initialized agent.
+    """
     gitlab = GitLabAPIWrapper(gitlab_branch=new_gitlab_branch)
     toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
 
@@ -120,11 +135,27 @@ def _init_agent(new_gitlab_branch: str):
     return agent
 
 def _generate_llm_instructions(prompt: str, codebase: str) -> str:
-    """Generates instructions for the LLM"""
+    """Generates instructions for the Language Model (LLM).
+
+    Args:
+        prompt (str): The user prompt.
+        codebase (str): The codebase context.
+
+    Returns:
+        str: The formatted instructions for the LLM.
+    """
     return LLM_INSTRUCTION_TEMPLATE.format(prompt=prompt, codebase=codebase)
 
 def _get_llm_response(instructions: str, repo_name: str) -> str:
-    """Sends instructions to the LLM and returns the response"""
+    """Sends instructions to the LLM and retrieves its response.
+
+    Args:
+        instructions (str): The instructions for the LLM.
+        repo_name (str): The name of the repository.
+
+    Returns:
+        str: The response from the LLM.
+    """
     code_chat_model = GenerativeModel(MODEL_NAME)
 
     with telemetry.tool_context_manager(USER_AGENT):
@@ -135,21 +166,35 @@ def _get_llm_response(instructions: str, repo_name: str) -> str:
     return response.text.replace(f"{repo_name}/", "")
 
 def _create_gitlab_merge_request(response_text: str, agent) -> None:
-    """Creates a GitLab merge request"""
+    """Creates a GitLab merge request using the provided response text and agent.
+
+    Args:
+        response_text (str): The response text to use for the merge request.
+        agent: The agent to use for creating the merge request.
+    """
     pr_prompt = PR_PROMPT_TEMPLATE.format(response_text=response_text)
     agent.invoke(pr_prompt)
 
 def create_merge_request(prompt: str) -> str:
-    """Creates new GitLab merge request"""
+    """Creates a new GitLab merge request.
 
+    Args:
+        prompt (str): The prompt describing the changes to be made.
+
+    Returns:
+        str: The implementation details returned by the LLM.
+
+    Raises:
+        MergeRequestError: If an error occurs during the merge request creation.
+    """
     owner, repo_name = get_repo_details()
     try:
         delete_folder(repo_name)    
         _clone_repo(repo_name)
         codebase = load_codebase(repo_name, prompt)
+
         instructions = _generate_llm_instructions(prompt, codebase)
         implementation_details = _get_llm_response(instructions, repo_name)
-        print(implementation_details)
 
         new_gitlab_branch = _create_branch()
         agent = _init_agent(new_gitlab_branch)
@@ -162,12 +207,26 @@ def create_merge_request(prompt: str) -> str:
     finally:
         delete_folder(repo_name)
 
-def get_repo_details():
+def get_repo_details() -> tuple[str, str]:
+    """Extracts the repository owner and name from the GITLAB_REPOSITORY environment variable.
+
+    Returns:
+        tuple[str, str]: A tuple containing the repository owner and name.
+    """
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
     repo = gitlab_repo_name.split("/")
     return (repo[0], repo[1])
 
-def load_codebase(repo_name, prompt: str) -> str:
+def load_codebase(repo_name: str, prompt: str) -> str:
+    """Loads the codebase from the specified repository.
+
+    Args:
+        repo_name (str): The name of the repository.
+        prompt (str): The user prompt.
+
+    Returns:
+        str: The formatted codebase as a string.
+    """
     # Defaults to menu-service
     service = "menu-service/src"
 
