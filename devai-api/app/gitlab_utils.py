@@ -15,6 +15,7 @@
 import datetime
 import gitlab
 import os
+from git import Repo
 
 from langchain.agents import AgentType, initialize_agent
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -22,8 +23,11 @@ from langchain_community.utilities.gitlab import GitLabAPIWrapper
 
 from google.cloud.aiplatform import telemetry
 from langchain_google_vertexai import ChatVertexAI
+from vertexai.generative_models import GenerativeModel
 
+from .github_utils import delete_folder
 from .constants import USER_AGENT, MODEL_NAME
+from .file_processor import format_files_as_string
 
 def create_branch():
     """Creates new branch for merge request"""
@@ -41,6 +45,20 @@ def create_branch():
     print("Created new branch:", new_branch_name)
 
     return new_branch_name
+
+def clone_repo(repo_name: str):
+    """Clones GitLab repository"""
+
+    gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
+    gitlab_access_token = os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]
+
+    repo = Repo.clone_from(
+        f"https://oauth2:{gitlab_access_token}@gitlab.com/{gitlab_repo_name}.git",
+        repo_name,
+    )
+
+    return repo
+
 
 def init_agent():
     """Initializes agent with GitLab toolkit"""
@@ -61,23 +79,93 @@ def init_agent():
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
         verbose=True,
         handle_parsing_errors=True,
-        max_iterations=5,
+        max_iterations=10,
         return_intermediate_steps=True,
         early_stopping_method="generate",
     )
 
     return agent
 
-def create_merge_request(details: str):
+def create_merge_request(prompt: str):
     """Creates new GitLab merge request"""
+ 
+    try:
+        owner, repo_name = get_repo_details()
+        delete_folder(repo_name)
 
-    pr_prompt = f"""Create GitLab merge request using provided details below.
-    Create new files, commit them and push them to opened merge request.
-    When creating new files, remove the lines that start with ``` before saving the files.
+        clone_repo(repo_name)
 
-    DETAILS: 
-    {details}
-    """
+        codebase = load_codebase(repo_name, prompt)
 
-    agent = init_agent()
-    agent.invoke(pr_prompt)
+        instructions = f"""You are principal software engineer and given requirements below for implementation.
+        You must follow rules when generating implementation:
+        - you must use existing codebase from the context below
+        - in your response, generate complete source code files and not diffs
+        - in your response, include full filepath with name before file content
+        - must return response using sample format
+        
+        REQUIREMENTS:
+        {prompt}
+
+        SAMPLE RESPONSE FORMAT:
+        menu-service/src/main/java/org/google/demo/Menu.java
+        OLD <<<<
+        existing code from the context below for the file
+        >>>> OLD
+        NEW <<<<
+        new generated code by LLM
+        >>>> NEW
+
+        CONTEXT:
+        {codebase}
+
+        """
+        code_chat_model = GenerativeModel(MODEL_NAME)
+
+        with telemetry.tool_context_manager(USER_AGENT):
+            code_chat = code_chat_model.start_chat(response_validation=False)
+            response = code_chat.send_message(instructions)
+
+        print(response.text)
+
+        pr_prompt = f"""Create GitLab merge request using provided details below.
+        Update existing files or Create new files, commit them and push them to opened merge request.
+        
+        DETAILS: 
+        {response.text}
+        """
+
+        agent = init_agent()
+        agent.invoke(pr_prompt)
+
+        return response.text
+    except Exception as e:
+        print(f"Failed to create merge request: {e}")
+        return "Failed to create merge request"
+    finally:
+        delete_folder(repo_name)
+
+def get_repo_details():
+    gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
+    repo = gitlab_repo_name.split("/")
+    return (repo[0], repo[1])
+
+
+def load_codebase(repo_name, prompt: str) -> str:
+    # Defaults to menu-service
+    service = "menu-service/src"
+
+    if "menu service" in prompt.lower():
+        service = "menu-service/src"
+    if "customer service" in prompt.lower():
+        service = "customer-service/src"
+    if "customer ui" in prompt.lower():
+        service = "customer-ui/src"
+    if "inventory service" in prompt.lower():
+        service = "inventory-service/spanner"
+    if "order-service" in prompt.lower():
+        service = "order-service"
+
+    code_path = f"{repo_name}/{service}"
+
+    return format_files_as_string(code_path)
