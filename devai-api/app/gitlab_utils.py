@@ -187,7 +187,7 @@ def create_merge_request(prompt: str) -> str:
     Raises:
         MergeRequestError: If an error occurs during the merge request creation.
     """
-    owner, repo_name = get_repo_details()
+    _, repo_name = get_repo_details()
     try:
         delete_folder(repo_name)    
         _clone_repo(repo_name)
