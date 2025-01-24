@@ -23,13 +23,10 @@ from vertexai.generative_models import GenerativeModel
 
 from .jira import create_jira_issue
 from .github_utils import create_pull_request
-from .gitlab_utils import create_merge_request
+from .gitlab_utils import create_merge_request, load_codebase
 
 from .constants import USER_AGENT, MODEL_NAME
-
-
-
-
+from .file_processor import format_files_as_string
 
 routes = APIRouter()
 code_chat_model = GenerativeModel(MODEL_NAME)
@@ -67,19 +64,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    instructions = f"""You are principal software engineer at Google and given requirements below for implementation.
-    Please provide implementation details and document the implementation.
-    
-    REQUIREMENTS:
-    {prompt}
-    """
-    with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        response = code_chat.send_message(instructions)
-
-    create_merge_request(response.text)
-
-    return response.text
+    return create_merge_request(prompt)
 
 @routes.post("/create-jira-issue", response_class=JSONResponse)
 async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
