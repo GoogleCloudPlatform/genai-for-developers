@@ -101,7 +101,7 @@ def create_merge_request(prompt: str):
         You must follow rules when generating implementation:
         - you must use existing codebase from the context below
         - in your response, generate complete source code files and not diffs
-        - in your response, include full filepath with name before file content
+        - in your response, include full filepath with name before file content, excluding repository name
         - must return response using sample format
         
         REQUIREMENTS:
@@ -127,18 +127,19 @@ def create_merge_request(prompt: str):
             response = code_chat.send_message(instructions)
 
         print(response.text)
+        response = response.text.replace(f"{repo_name}/", "")
 
         pr_prompt = f"""Create GitLab merge request using provided details below.
         Update existing files or Create new files, commit them and push them to opened merge request.
         
         DETAILS: 
-        {response.text}
+        {response}
         """
 
         agent = init_agent()
         agent.invoke(pr_prompt)
 
-        return response.text
+        return response
     except Exception as e:
         print(f"Failed to create merge request: {e}")
         return "Failed to create merge request"
