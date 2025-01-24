@@ -23,10 +23,9 @@ from vertexai.generative_models import GenerativeModel
 
 from .jira import create_jira_issue
 from .github_utils import create_pull_request
-from .gitlab_utils import create_merge_request, load_codebase
+from .gitlab_utils import create_merge_request
 
 from .constants import USER_AGENT, MODEL_NAME
-from .file_processor import format_files_as_string
 
 routes = APIRouter()
 code_chat_model = GenerativeModel(MODEL_NAME)
@@ -59,7 +58,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 
 @routes.post("/generate", response_class=PlainTextResponse)
 async def generate_handler(request: Request, prompt: str = Body(embed=True)):
-    """Handler for Generate Content Requests"""
+    """Handler for GitLab Merge Requests Generation"""
     # Retrieve user prompt
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
