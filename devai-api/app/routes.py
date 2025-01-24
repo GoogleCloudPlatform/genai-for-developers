@@ -23,7 +23,7 @@ from vertexai.generative_models import GenerativeModel
 
 from .jira import create_jira_issue
 from .github_utils import create_pull_request
-from .gitlab_utils import create_merge_request
+from .gitlab_utils import create_merge_request, MergeRequestError
 
 from .constants import USER_AGENT, MODEL_NAME
 
@@ -63,7 +63,11 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    return create_merge_request(prompt)
+    try:
+        return create_merge_request(prompt)
+    except MergeRequestError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create merge request: {e}") from e
+    
 
 @routes.post("/create-jira-issue", response_class=JSONResponse)
 async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
