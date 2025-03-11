@@ -231,7 +231,7 @@ def load_codebase(repo_name: str, prompt: str) -> str:
     service = "menu-service/src"
 
     if "menu service" in prompt.lower():
-        service = "menu-service/src"
+        service = "menu-service"
     if "customer service" in prompt.lower():
         service = "customer-service/src"
     if "customer ui" in prompt.lower():
