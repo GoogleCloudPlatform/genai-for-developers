@@ -872,6 +872,52 @@ def video(file, prompt):
     for response in responses:
         print(response.text, end="")
 
+@click.command(name='compliance')
+@click.option('-c', '--context', required=False, type=str, default="")
+@click.option('-cfg', '--config', required=False, type=str, default=".gemini")
+def compliance(context, config):
+    """
+    This function performs a compliance review using the Generative Model API.
+
+    Args:
+        context (str): The code to be reviewed.
+        output (str): The desired output format (markdown, json, or table).
+    """
+    source = '''
+            ### Context (code) ###
+            {}
+
+            '''
+    standards = '''
+            ### Best Practices ###
+            {}
+
+            '''
+    qry = get_prompt('review_query') or f'''
+            ### Instruction ###
+            You are an expert kubernetes engineer and architect with over 20 years of experience, specializing in the language of the provided code snippet and adhering to clean code principles.
+            You are meticulous, detail-oriented, and possess a deep understanding of software design and best practices.
+
+            ### Output Format ###
+            Very brief explanation of findings with focus on sample configuration that addresses the issue.
+
+            Your task is to perform a comprehensive compliance review of the provided code snippet.
+            Evaluate the code with a focus on the following key areas:
+            
+            '''
+    # Load files as text into the source variable
+    source = source.format(format_files_as_string(context))
+    best_practices = standards.format(format_files_as_string(config))
+
+    code_chat_model = GenerativeModel(MODEL_NAME)
+    with telemetry.tool_context_manager(USER_AGENT):
+        code_chat = code_chat_model.start_chat(response_validation=False)
+        code_chat.send_message(qry)
+        code_chat.send_message(best_practices)
+        response = code_chat.send_message(source)
+
+    click.echo(response.text) 
+
 @click.group()
 def review():
     """
@@ -888,3 +934,4 @@ review.add_command(impact)
 review.add_command(imgdiff)
 review.add_command(image)
 review.add_command(video)
+review.add_command(compliance)
