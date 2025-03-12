@@ -53,6 +53,11 @@ jobs:
       - run: echo "$(devai review code -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
+      - name: Compliance Review
+        run: echo '## Compliance Review Results 🚀' >> $GITHUB_STEP_SUMMARY
+      - run: echo "$(devai review compliance -c ${{ github.workspace }}/sample-app/k8s --config ${{ github.workspace }}/devai-cli/gemini/styleguide.md)" >> $GITHUB_STEP_SUMMARY
+        shell: bash
+
       - name: Performance Review
         run: echo '## Performance Review Results 🚀' >> $GITHUB_STEP_SUMMARY
       - run: echo "$(devai review performance -c ${{ github.workspace }}/sample-app/src/main/java/anthos/samples/bankofanthos/balancereader)" >> $GITHUB_STEP_SUMMARY

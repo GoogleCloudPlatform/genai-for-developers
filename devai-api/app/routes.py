@@ -24,7 +24,7 @@ from vertexai.generative_models import GenerativeModel
 from .jira import create_jira_issue
 from .github_utils import create_pull_request
 from .gitlab_utils import create_merge_request, MergeRequestError
-
+from .api_utils import validate_api_key
 from .constants import USER_AGENT, MODEL_NAME
 
 routes = APIRouter()
@@ -36,7 +36,10 @@ async def root():
     return {"message": "DevAI API"}
 
 @routes.get("/test")
-async def test():
+async def test(request: Request):
+    # Validate API key
+    if not validate_api_key(request.headers.get('x-devai-api-key')):
+        raise HTTPException(status_code=401, detail="Error: Unauthorized")
     """Test endpoint"""
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat(response_validation=False)
@@ -48,6 +51,9 @@ async def test():
 @routes.post("/create-github-pr", response_class=PlainTextResponse)
 async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for GitHub Pull Requests Generation"""
+    # Validate API key
+    if not validate_api_key(request.headers.get('x-devai-api-key')):
+        raise HTTPException(status_code=401, detail="Error: Unauthorized")
     # Retrieve user prompt
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
@@ -56,9 +62,28 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 
     return pr_details
 
+@routes.post("/create-gitlab-mr", response_class=PlainTextResponse)
+async def generate_handler(request: Request, prompt: str = Body(embed=True)):
+    """Handler for GitLab Merge Requests Generation"""
+    # Validate API key
+    if not validate_api_key(request.headers.get('x-devai-api-key')):
+        raise HTTPException(status_code=401, detail="Error: Unauthorized")
+    # Retrieve user prompt
+    if not prompt:
+        raise HTTPException(status_code=400, detail="Error: Prompt is required")
+
+    try:
+        return create_merge_request(prompt)
+    except MergeRequestError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create merge request: {e}") from e
+    
+
 @routes.post("/generate", response_class=PlainTextResponse)
 async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for GitLab Merge Requests Generation"""
+    # Validate API key
+    if not validate_api_key(request.headers.get('x-devai-api-key')):
+        raise HTTPException(status_code=401, detail="Error: Unauthorized")
     # Retrieve user prompt
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
