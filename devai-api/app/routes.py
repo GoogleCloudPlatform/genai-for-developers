@@ -34,7 +34,7 @@ from vertexai.generative_models import GenerativeModel
 from .jira import create_jira_issue
 
 USER_AGENT = 'cloud-solutions/genai-for-developers-v1.0'
-model_name="gemini-1.5-pro"
+model_name="gemini-2.0-flash-001"
 
 with telemetry.tool_context_manager(USER_AGENT):
     llm = ChatVertexAI(model_name=model_name,
