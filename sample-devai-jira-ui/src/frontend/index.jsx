@@ -41,7 +41,7 @@ const App = () => {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: `{"body": "[GitLab Merge Request|https://gitlab.com/gitrey/qwiklabs-test/-/merge_requests]"}`
+      body: `{"body": "[GitLab Merge Request|https://gitlab.com/YOUR-GIT-USERID/YOUR-GIT-REPO/-/merge_requests]"}`
     });
 
 
@@ -57,7 +57,7 @@ const App = () => {
   return (
     <>
       <Text>{description}</Text>
-      <Link href='https://gitlab.com/gitrey/qwiklabs-test/-/merge_requests' openNewTab={true}>GitLab Merge Request</Link>
+      <Link href='https://gitlab.com/YOUR-GIT-USERID/YOUR-GIT-REPO/-/merge_requests' openNewTab={true}>GitLab Merge Request</Link>
     </>
   );
 };
