@@ -37,7 +37,7 @@ export GITLAB_BASE_BRANCH="main"
 
 Open the GitLab website and create a new GitLab issue in your project with the title `CICD AI Insights`.
 
-### Enable GitLab command in the code
+### Enable GitLab command in the code for DEVAI CLI command
 
 Open `review.py` file:
 ```

@@ -37,7 +37,7 @@ export GITHUB_APP_PRIVATE_KEY="/project/app-name-app.YYYY-MM-DD.private-key.pem"
 export GITHUB_REPOSITORY="gitrey/genai-for-developers"
 ```
 
-### Enable GitHub integration in the code
+### Enable GitHub integration in the code for DEVAI CLI command
 
 Open `document.py` file:
 ```

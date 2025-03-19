@@ -227,8 +227,8 @@ def load_codebase(repo_name: str, prompt: str) -> str:
     Returns:
         str: The formatted codebase as a string.
     """
-    # Defaults to menu-service
-    service = "menu-service/src"
+    # Defaults to repo root
+    service = ""
 
     if "menu service" in prompt.lower():
         service = "menu-service"
