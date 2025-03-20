@@ -141,11 +141,31 @@ def code(context, output):
         context (str): The code to be reviewed.
         output (str): The desired output format (markdown, json, or table).
     """
-    source = f'''
-            ### Context (code) ###
-            {context}
+    # Ensure context is a valid path
+    if not context:
+        click.echo("Error: Please provide a valid path to the code to review")
+        return
 
+    if not os.path.exists(context):
+        click.echo(f"Error: The path '{context}' does not exist")
+        return
+
+    source = '''
+            ### Context (code) ###
+            {}
             '''
+
+    # Load files as text into the source variable
+    try:
+        formatted_files = format_files_as_string(context)
+        if not formatted_files:
+            click.echo(f"Error: No readable files found in '{context}'")
+            return
+        source = source.format(formatted_files)
+    except Exception as e:
+        click.echo(f"Error processing files: {str(e)}")
+        return
+
     # Output Format Substitution
     output_format = {
         'markdown': '''Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
@@ -159,9 +179,7 @@ Specificity: Provide detailed explanations for each issue. This helps the origin
 
 Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
 
-No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
-
-Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low). If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices." Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"''',
+No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."''',
 
         'json': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
 
@@ -198,9 +216,6 @@ Provide an overview or overall impression entry for the code as the first entry.
             ### Output Format ###
             {output_format}
             '''
-
-    # Load files as text into the source variable
-    source = source.format(format_files_as_string(context))
 
     # Initialize Gemini
     model = GenerativeModel(MODEL_NAME)
