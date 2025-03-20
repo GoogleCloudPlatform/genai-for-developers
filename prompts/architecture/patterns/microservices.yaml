@@ -1,0 +1,176 @@
+metadata:
+  name: "Microservices Architecture Review"
+  version: "1.0.0"
+  category: "architecture"
+  subcategory: "patterns"
+  author: "DevAI Team"
+  last_updated: "2024-03-20"
+  tags: ["microservices", "architecture", "distributed-systems", "patterns", "scalability"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert software architect specializing in microservices architecture, with extensive experience in distributed systems, service design, and cloud-native applications.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided microservices architecture, focusing on design patterns, scalability, resilience, and best practices.
+
+    ### Focus Areas ###
+    1. Service Design
+       - Service boundaries
+       - Domain-driven design
+       - Single responsibility
+       - Interface design
+       - API versioning
+
+    2. Communication Patterns
+       - Service-to-service communication
+       - Message queues
+       - Event-driven architecture
+       - API gateways
+       - Service discovery
+
+    3. Data Management
+       - Database per service
+       - Event sourcing
+       - CQRS
+       - Data consistency
+       - Data replication
+
+    4. Resilience & Reliability
+       - Circuit breakers
+       - Retry mechanisms
+       - Fallback strategies
+       - Health checks
+       - Monitoring
+
+    5. Deployment & Operations
+       - Containerization
+       - Orchestration
+       - Configuration management
+       - Logging
+       - Tracing
+
+    ### Output Format ###
+    {
+      "architecture_review": {
+        "summary": {
+          "maturity_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "ARCH-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "pattern_reference": "<design_pattern>",
+            "location": {
+              "service": "<service_name>",
+              "component": "<affected_component>",
+              "file": "<filename>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<architecture_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<pattern_documentation>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        class OrderService {
+          async createOrder(orderData) {
+            // Direct database call to inventory service
+            const inventory = await inventoryDb.checkStock(orderData.items);
+            if (!inventory.available) {
+              throw new Error('Out of stock');
+            }
+            
+            // Create order
+            const order = await db.orders.insert(orderData);
+            return order;
+          }
+        }
+    - output: |
+        {
+          "architecture_review": {
+            "summary": {
+              "maturity_score": 60,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "ARCH-001",
+                "category": "Service Coupling",
+                "severity": "critical",
+                "pattern_reference": "Service Independence Pattern",
+                "location": {
+                  "service": "OrderService",
+                  "component": "createOrder",
+                  "file": "orderService.js"
+                },
+                "description": "Direct database access to inventory service violates service boundaries",
+                "impact": "Tight coupling between services, reduced scalability, maintenance issues",
+                "remediation": {
+                  "recommendation": "Implement proper service communication through API calls",
+                  "code_example": """
+                    class OrderService {
+                      constructor(inventoryClient) {
+                        this.inventoryClient = inventoryClient;
+                      }
+                      
+                      async createOrder(orderData) {
+                        // Use service client instead of direct DB access
+                        const inventory = await this.inventoryClient.checkStock(orderData.items);
+                        if (!inventory.available) {
+                          throw new Error('Out of stock');
+                        }
+                        
+                        const order = await db.orders.insert(orderData);
+                        return order;
+                      }
+                    }
+                  """,
+                  "references": [
+                    "https://microservices.io/patterns/service-per-database.html",
+                    "https://martinfowler.com/articles/microservices.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "architecture_review.summary"
+    - "architecture_review.findings"
+    - "architecture_review.recommendations"
+  quality_checks:
+    - "Must reference specific design patterns for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include architecture documentation references" 
