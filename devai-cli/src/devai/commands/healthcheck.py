@@ -1,5 +1,6 @@
 import click
 from vertexai.generative_models import GenerativeModel
+from devai.util.constants import GEMINI_PRO_MODEL
 
 @click.command()
 def healthcheck():
@@ -8,14 +9,14 @@ def healthcheck():
     
     try:
         # Initialize Gemini
-        model = GenerativeModel("gemini-pro")
+        model = GenerativeModel(GEMINI_PRO_MODEL)
         
         # Simple test prompt
         response = model.generate_content("Say 'Hello World!'")
         
         click.echo(f"Success! Response: {response.text}")
         click.echo("\nEnvironment Info:")
-        click.echo("- Model: gemini-pro")
+        click.echo(f"- Model: {GEMINI_PRO_MODEL}")
         
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)

@@ -17,9 +17,11 @@ import os
 import yaml
 from devai.commands.msg import standard, streaming
 from devai.util.file_processor import get_text_files_contents
+from vertexai.language_models import CodeChatModel, ChatModel
 from vertexai.generative_models import GenerativeModel
+from devai.util.constants import GEMINI_PRO_MODEL
 
-MODEL_NAME = "gemini-pro"
+MODEL_NAME = GEMINI_PRO_MODEL
 
 def load_prompt_template(template_path):
     """Load a prompt template from a YAML file.

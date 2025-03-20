@@ -26,8 +26,9 @@ from devai.util.file_processor import (
     list_commits_for_tags
 )
 from vertexai.generative_models import GenerativeModel
+from devai.util.constants import GEMINI_PRO_MODEL
 
-MODEL_NAME = "gemini-pro"
+MODEL_NAME = GEMINI_PRO_MODEL
 
 parameters = {
     "max_output_tokens": 2048,
