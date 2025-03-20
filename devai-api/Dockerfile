@@ -16,6 +16,8 @@
 # https://hub.docker.com/_/python
 FROM python:3.11-slim
 
+RUN apt-get update && apt-get install -y git
+
 # Allow statements and log messages to immediately appear in the logs
 ENV PYTHONUNBUFFERED True
 
