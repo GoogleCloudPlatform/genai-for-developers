@@ -6,7 +6,7 @@ from devai.commands.release import (
     get_model, summary_for_tag, report, notes
 )
 import subprocess
-from devai.util.constants import GEMINI_PRO_MODEL
+from devai.commands.constants import MODEL_NAME
 
 @pytest.fixture
 def mock_generative_model():
@@ -86,8 +86,7 @@ def test_get_model():
     """Test model initialization"""
     with patch('devai.commands.release.GenerativeModel') as mock:
         model = get_model()
-        mock.assert_called_once_with(GEMINI_PRO_MODEL)
-        mock.assert_called_once_with("gemini-pro")
+        mock.assert_called_once_with(MODEL_NAME)
         assert model == mock.return_value
 
 def test_summary_for_tag_success(mock_generative_model, mock_file_processor):

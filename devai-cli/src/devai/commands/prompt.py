@@ -15,13 +15,13 @@
 import click
 import os
 import yaml
+from rich.console import Console
+from rich.markdown import Markdown
 from devai.commands.msg import standard, streaming
 from devai.util.file_processor import get_text_files_contents
 from vertexai.language_models import CodeChatModel, ChatModel
 from vertexai.generative_models import GenerativeModel
-from devai.util.constants import GEMINI_PRO_MODEL
-
-MODEL_NAME = GEMINI_PRO_MODEL
+from devai.commands.constants import MODEL_NAME
 
 def load_prompt_template(template_path):
     """Load a prompt template from a YAML file.
@@ -72,7 +72,8 @@ def template(template_path, context, output):
     Example:
         devai prompt template -t prompts/security/web-security.yaml -c ./src/
     """
-    click.echo(f"Using template: {template_path}")
+    console = Console()
+    console.print(f"Using template: {template_path}", style="bold blue")
     
     # Load the template
     template = load_prompt_template(template_path)
@@ -101,15 +102,24 @@ def template(template_path, context, output):
         }
     )
     
-    # Output the response
-    click.echo(response.text)
+    # Format and print the response based on output format
+    if output == 'markdown':
+        md = Markdown(response.text)
+        console.print(md)
+    elif output == 'json':
+        from rich.syntax import Syntax
+        syntax = Syntax(response.text, "json", theme="monokai", line_numbers=True)
+        console.print(syntax)
+    else:
+        console.print(response.text)
 
 @click.command(name='with_context')
 @click.option('-q', '--qry', required=False, type=str, default="Provide a summary of this source code")
 @click.option('-c', '--context', required=False, type=str, default="")
 def with_context(qry, context):
     """Send a prompt with code context to Gemini."""
-    click.echo("Prompt with context")
+    console = Console()
+    console.print("Prompt with context", style="bold blue")
     
     # Get context from files if directory is provided
     if os.path.isdir(context):
@@ -146,7 +156,10 @@ Please provide:
             "temperature": 0.2
         }
     )
-    click.echo(response.text)
+    
+    # Format and print the response as markdown
+    md = Markdown(response.text)
+    console.print(md)
 
 @click.group()
 def prompt():

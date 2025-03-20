@@ -46,6 +46,8 @@ gcloud services enable \
     secretmanager.googleapis.com
 ```
 
+Note: After enabling the APIs, wait a few minutes for the changes to propagate before running commands. If you see a "SERVICE_DISABLED" error, visit the provided activation URL in the error message to enable the required API.
+
 ### Init Python virtualenv
 
 To start, setup your virtualenv, install requirements and run the sample command
@@ -64,6 +66,17 @@ To create an installable CLI from the source, use setuptools to create the DEVAI
 pip install --editable ./src
 ```
 
+### Required Environment Variables
+
+Before running any commands, make sure to set the following environment variables:
+
+```sh
+export PROJECT_ID=YOUR-GCP-PROJECT
+export LOCATION=us-central1
+```
+
+These variables are required for all commands to function properly. The PROJECT_ID should match the one you set up in the GCP Project config section above.
+
 ### Sample commands
 
 Once installed you can use the CLI with its short name `devai`. Here are all the available commands:
@@ -75,7 +88,7 @@ devai healthcheck                                    # Test Vertex AI connectivi
 # Prompt Commands
 devai prompt with_context -c ./src/                 # Review code with default prompt
 devai prompt with_context -q "Custom query" -c ./src/  # Review code with custom query
-devai prompt template -t prompts/security/web-security.yaml -c ./src/  # Security review using template
+devai prompt template -t ../prompts/security/web-security.yaml -c ./src/  # Security review using template
 devai prompt with-msg-streaming                     # Stream responses in real-time
 devai prompt with-msg                               # Standard prompt without context
 
@@ -99,10 +112,130 @@ devai document update-releasenotes -f ../sample-app/releasenotes.md -c ../sample
 devai release notes_user_tag -t "v5.0.0"
 devai release notes_user -s "main" -e "feature-branch-name"
 
-# RAG Commands
-devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
-devai rag query -q "What does devai do"
+# RAG Commands (Coming Soon)
+# Note: These commands are not currently available in the CLI
+# devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
+# devai rag query -q "What does devai do"
+
+### Jira Integration
+
+The CLI provides integration with Jira for issue management and automation. Before using Jira commands, ensure you have set up the required environment variables and have access to a Jira project.
+
+#### Prerequisites
+
+1. A Jira Cloud account with admin access
+2. A Jira project created in your account
+3. An Atlassian API token
+
+#### Environment Variables
+
+Set the following environment variables for Jira integration:
+
+```sh
+# Required for all Jira commands
+export JIRA_USERNAME="your-email@example.com"
+export JIRA_API_TOKEN="your-atlassian-api-token"
+export JIRA_INSTANCE_URL="https://your-domain.atlassian.net"
+export JIRA_PROJECT_KEY="YOUR-PROJECT-KEY"
+export JIRA_CLOUD=true
+
+# Required for all DevAI commands
+export PROJECT_ID=YOUR-GCP-PROJECT
+export LOCATION=us-central1
 ```
+
+To obtain an Atlassian API token:
+1. Go to https://id.atlassian.com/manage/api-tokens
+2. Click "Create API token"
+3. Enter a label (e.g., "devai-cli")
+4. Click "Create"
+5. Copy the token and save it securely
+
+#### Available Commands
+
+```sh
+# List all issues in a project
+devai jira list -c "PROJECT-KEY"
+
+# Create a new issue
+devai jira create -c "Issue description"
+
+# Fix an existing issue
+devai jira fix -c "ISSUE-KEY"
+```
+
+#### Command Details
+
+##### List Issues (`devai jira list`)
+Lists all issues in the specified project.
+- `-c, --context`: Project key (e.g., "STUF")
+- Output format: List of issues with keys and summaries
+
+##### Create Issue (`devai jira create`)
+Creates a new issue in the specified project.
+- `-c, --context`: Issue description
+- Creates a task-type issue with timestamp in summary
+- Returns the new issue key
+
+##### Fix Issue (`devai jira fix`)
+Attempts to fix an issue by implementing required changes.
+- `-c, --context`: Issue key (e.g., "STUF-1")
+- Analyzes issue description
+- Provides implementation plan
+- Updates issue status when complete
+
+#### Rate Limiting
+
+The Jira API has rate limits that vary based on your plan:
+- Free: 500 requests per minute
+- Standard: 1000 requests per minute
+- Premium: 2000 requests per minute
+
+If you encounter rate limiting errors:
+1. Wait a few minutes before retrying
+2. Reduce the frequency of commands
+3. Consider implementing exponential backoff in automated scripts
+
+#### Troubleshooting
+
+Common issues and solutions:
+
+1. **Authentication Errors**
+   - Verify JIRA_USERNAME and JIRA_API_TOKEN are correct
+   - Ensure API token has necessary permissions
+   - Check if token is expired
+
+2. **Project Access Issues**
+   - Confirm JIRA_PROJECT_KEY is correct
+   - Verify you have access to the project
+   - Check project permissions
+
+3. **API Connection Issues**
+   - Validate JIRA_INSTANCE_URL format
+   - Check network connectivity
+   - Verify JIRA_CLOUD is set to "true"
+
+4. **Rate Limiting**
+   - Wait before retrying
+   - Reduce command frequency
+   - Check your plan's limits
+
+#### Best Practices
+
+1. **Issue Creation**
+   - Provide clear, detailed descriptions
+   - Use consistent formatting
+   - Include relevant context
+
+2. **Issue Management**
+   - Regularly update issue status
+   - Use appropriate issue types
+   - Follow project conventions
+
+3. **API Usage**
+   - Monitor rate limits
+   - Implement error handling
+   - Cache responses when possible
 
 ### Using Templates
 
@@ -112,25 +245,41 @@ The CLI now supports structured code analysis using predefined templates. Templa
 - Expected output format
 - Validation requirements
 
-Available templates:
-- `prompts/security/web-security.yaml` - Web application security review
-- `prompts/internationalization/i18n.yaml` - Internationalization review
-- `prompts/database/schema.yaml` - Database schema review
-- `prompts/ai-ml/model-review.yaml` - AI/ML model review
-- `prompts/mobile/app-review.yaml` - Mobile app review
+Available templates in the `prompts` directory:
+- `security/web-security.yaml` - Web application security review
+- `accessibility/web-accessibility.yaml` - Web accessibility review
+- `performance/web-performance.yaml` - Web performance review
+- `database/schema.yaml` - Database schema review
+- `ai-ml/model-review.yaml` - AI/ML model review
+- `mobile/app-review.yaml` - Mobile app review
+- `documentation/api-documentation.yaml` - API documentation review
+- `testing/test-coverage.yaml` - Test coverage review
+- `maintenance/code-maintenance.yaml` - Code maintenance review
+- `devops/ci-cd/pipeline.yaml` - CI/CD pipeline review
+- `internationalization/i18n.yaml` - Internationalization review
+- `compliance/compliance.yaml` - Compliance review
+- `architecture/architecture.yaml` - Architecture review
+- `code-review/code-review.yaml` - General code review
 
 Example template usage:
 ```sh
 # Security review
-devai prompt template -t prompts/security/web-security.yaml -c ./src/
+devai prompt template -t ../prompts/security/web-security.yaml -c ./src/
 
 # Database schema review
-devai prompt template -t prompts/database/schema.yaml -c ./src/
+devai prompt template -t ../prompts/database/schema.yaml -c ./src/
 
 # Output in different formats
-devai prompt template -t prompts/security/web-security.yaml -c ./src/ -o json
-devai prompt template -t prompts/security/web-security.yaml -c ./src/ -o markdown
+devai prompt template -t ../prompts/security/web-security.yaml -c ./src/ -o json
+devai prompt template -t ../prompts/security/web-security.yaml -c ./src/ -o markdown
 ```
+
+Each template provides structured output in JSON format, including:
+- Summary of findings
+- Detailed issues with severity levels
+- Location of issues in the code
+- Remediation recommendations with code examples
+- References to relevant documentation
 
 ### Cleanup
 
@@ -395,3 +544,14 @@ devai echo
 
 ### LangSmith LLM tracing configuration
 [Setup](../docs/tutorials/setup-langsmith.md) information.
+
+# Integration Commands
+# Note: These commands require additional setup and environment variables
+# JIRA Integration (Coming Soon)
+# devai jira create -s "Bug in login flow" -d "Users unable to log in" -t "bug"
+
+# GitLab Integration (Coming Soon)
+# devai gitlab create -s "Feature request" -d "Add dark mode" -t "enhancement"
+
+# GitHub Integration (Coming Soon)
+# devai github create -s "Documentation update" -d "Update API docs" -t "documentation"

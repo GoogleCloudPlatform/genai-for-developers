@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from click.testing import CliRunner
 from devai.commands.healthcheck import healthcheck
-from devai.util.constants import GEMINI_PRO_MODEL
+from devai.commands.constants import MODEL_NAME
 
 @pytest.fixture
 def mock_generative_model():
@@ -28,7 +28,7 @@ def test_healthcheck_success(cli_runner, mock_generative_model):
     assert "Testing Vertex AI connectivity..." in result.output
     assert "Success! Response: Hello World!" in result.output
     assert "Environment Info:" in result.output
-    assert f"- Model: {GEMINI_PRO_MODEL}" in result.output
+    assert f"- Model: {MODEL_NAME}" in result.output
     mock_generative_model.return_value.generate_content.assert_called_once_with("Say 'Hello World!'")
 
 def test_healthcheck_failure(cli_runner, mock_generative_model):

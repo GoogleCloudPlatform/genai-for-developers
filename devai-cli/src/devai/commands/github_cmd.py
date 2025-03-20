@@ -109,3 +109,19 @@ def create_github_pr(branch: str, files: dict[str, str]):
     except Exception as e:
         print(f"Error creating pull request: {e}")
         return
+
+@click.group()
+def github():
+    """GitHub integration commands"""
+    pass
+
+@github.command()
+@click.option('--branch', required=True, help='Branch name for the pull request')
+@click.option('--files', required=True, help='Dictionary of file paths and their contents')
+def create_pr(branch, files):
+    """Create a GitHub pull request"""
+    try:
+        files_dict = eval(files)  # Convert string representation of dict to actual dict
+        create_github_pr(branch, files_dict)
+    except Exception as e:
+        print(f"Error creating pull request: {e}")

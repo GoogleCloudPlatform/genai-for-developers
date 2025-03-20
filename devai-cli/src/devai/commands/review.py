@@ -38,7 +38,7 @@ from rich.table import Table
 # from devai.commands.jira import create_jira_issue
 # from devai.commands.gitlab import create_gitlab_issue_comment
 
-from .constants import USER_AGENT, MODEL_NAME, GEMINI_PRO_MODEL
+from .constants import USER_AGENT, MODEL_NAME
 
 
 def ensure_env_variable(var_name):
@@ -303,7 +303,7 @@ Provide an overview or overall impression entry for the code as the first entry.
     source = source.format(format_files_as_string(context))
 
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         prompt = f"""
 {qry}
@@ -428,7 +428,7 @@ def performance(context):
     source=source.format(format_files_as_string(context))
 
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         prompt = f"""
 {qry}
@@ -543,7 +543,7 @@ def security(context):
     source=source.format(format_files_as_string(context))
     
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         prompt = f"""
 {qry}
@@ -643,7 +643,7 @@ def testcoverage(context):
     source=source.format(format_files_as_string(context))
     
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         prompt = f"""
 {qry}
@@ -709,7 +709,7 @@ def blockers(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(GEMINI_PRO_MODEL)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
@@ -782,7 +782,7 @@ def impact(current, target):
     target_source=target_source.format(format_files_as_string(target))
     
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         prompt = f"""
 {qry}
@@ -839,7 +839,7 @@ def imgdiff(current, target):
     contents = [qry, after_state, load_image_from_path(current),
                 before_state, load_image_from_path(target)]
 
-    code_chat_model = GenerativeModel(GEMINI_PRO_MODEL)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         responses = code_chat_model.generate_content(contents, stream=True)
 
@@ -868,7 +868,7 @@ def image(file, prompt):
     
     contents = [qry, load_image_from_path(file)]
 
-    code_chat_model = GenerativeModel(GEMINI_PRO_MODEL)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         responses = code_chat_model.generate_content(contents, stream=True)
 
@@ -905,7 +905,7 @@ def video(file, prompt):
 
     contents = [qry, video]
 
-    code_chat_model = GenerativeModel(GEMINI_PRO_MODEL)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         responses = code_chat_model.generate_content(contents, stream=True)
 
@@ -949,7 +949,7 @@ def compliance(context, config):
     source = source.format(format_files_as_string(context))
     best_practices = standards.format(format_files_as_string(config))
 
-    code_chat_model = GenerativeModel(GEMINI_PRO_MODEL)
+    code_chat_model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
         code_chat = code_chat_model.start_chat(response_validation=False)
         code_chat.send_message(qry)
