@@ -133,9 +133,9 @@ def code(context, output):
         context (str): The code to be reviewed.
         output (str): The desired output format (markdown, json, or table).
     """
-    source = '''
+    source = f'''
             ### Context (code) ###
-            {}
+            {context}
 
             '''
     # Output Format Substitution
@@ -294,12 +294,22 @@ Provide an overview or overall impression entry for the code as the first entry.
     # Load files as text into the source variable
     source = source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini and generate response
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
 
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     # Process Output
     if output in ["json", "table"]:
@@ -314,43 +324,19 @@ Provide an overview or overall impression entry for the code as the first entry.
                     parsed_data = json.loads(valid_json)
                     formatted_json = json.dumps(parsed_data, indent=4)  # Format with indentation
                     click.echo(formatted_json)
-                except json.JSONDecodeError:
-                    click.echo("Error: Error processing JSON data: {e}")
-            elif output == "table":
-                try:
-                    data = json.loads(valid_json)
-
-                    console = Console()
-                    table = Table(show_header=True, header_style="bold green")
-                    table.add_column("Class", style="dim")
-                    table.add_column("Method", style="dim")
-                    table.add_column("Category")
-                    table.add_column("Description", width=120)
-                    table.add_column("Severity")
-
-                    severity_emojis = {
-                        "low": "🟡",  # Yellow circle for low severity
-                        "medium": "⚠️",  # Warning sign for medium severity
-                        "high": "🛑",  # Stop sign for high severity
-                    }
-
-                    for item in data:
-                        class_name = item.get("class_name", "General") 
-                        method_name = item.get("method_name", "N/A")
-                        issue_type = item["issue_type"]
-                        description = item["description"]
-                        severity = item.get("severity", "Unknown")  # Default to 'Unknown' if severity is missing
-
-                        # Add emoji based on severity
-                        severity_with_emoji = f"{severity_emojis.get(severity.lower(), '')} {severity}"  
-                        table.add_row(class_name, method_name, issue_type, description, severity_with_emoji)
-
-
-                    console.print(table)
                 except json.JSONDecodeError as e:
-                    click.echo(f"Error processing JSON data: {e}")
+                    click.echo(f"Error: Error processing JSON data: {e}")
+            else:
+                try:
+                    parsed_data = json.loads(valid_json)
+                    table = create_table(parsed_data)
+                    click.echo(table)
+                except json.JSONDecodeError as e:
+                    click.echo(f"Error: Error processing JSON data: {e}")
+        else:
+            click.echo("Error: Invalid JSON format")
     else:
-        click.echo(response.text) 
+        click.echo(response.text)
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -433,11 +419,22 @@ def performance(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini and generate response
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -537,11 +534,22 @@ def security(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini and generate response
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -626,11 +634,22 @@ def testcoverage(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini and generate response
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -754,12 +773,25 @@ def impact(current, target):
     current_source=current_source.format(format_files_as_string(current))
     target_source=target_source.format(format_files_as_string(target))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini and generate response
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(current_source)
-        response = code_chat.send_message(target_source)
+        prompt = f"""
+{qry}
+
+Current Context:
+{current_source}
+
+Target Context:
+{target_source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 

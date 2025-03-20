@@ -88,10 +88,9 @@ def readme(context, file, branch):
     """
     click.echo('Generating and printing the README....')
     
-
-    source='''
+    source = f'''
             ### Context (code) ###
-            {}
+            {format_files_as_string(context)}
 
             '''
     qry = get_prompt('document_readme')
@@ -135,9 +134,6 @@ def readme(context, file, branch):
             License: Apache 2.0 License
             Contact Information: Email us at support@cymbal.coffee or open an issue on our GitHub repository.
             '''
-
-    # Load files as text into source variable
-    source=source.format(format_files_as_string(context))
 
     try:
         code_chat_model = GenerativeModel(MODEL_NAME)

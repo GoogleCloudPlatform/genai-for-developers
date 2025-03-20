@@ -48,7 +48,7 @@ def get_text_files_contents(path, ignore=None):
             if filename not in ignore:
                 full_path = os.path.join(dirpath, filename)
                 if is_ascii_text(full_path):
-                    with open(full_path, 'r', encoding='ascii') as f:
+                    with open(full_path, 'r', encoding='utf-8') as f:
                         result[full_path] = f.read()
     return result
 

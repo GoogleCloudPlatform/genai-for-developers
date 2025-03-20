@@ -66,53 +66,70 @@ pip install --editable ./src
 
 ### Sample commands
 
-Once installed you can use the CLI with its short name `devai` as follows
+Once installed you can use the CLI with its short name `devai`. Here are all the available commands:
 
 ```sh
+# Health Check
+devai healthcheck                                    # Test Vertex AI connectivity using Gemini
+
+# Prompt Commands
+devai prompt with_context -c ./src/                 # Review code with default prompt
+devai prompt with_context -q "Custom query" -c ./src/  # Review code with custom query
+devai prompt template -t prompts/security/web-security.yaml -c ./src/  # Security review using template
+devai prompt with-msg-streaming                     # Stream responses in real-time
+devai prompt with-msg                               # Standard prompt without context
+
+# Review Commands
 devai review code -c ../sample-app/src/main/java
 devai review performance -c ../sample-app/src/main/java
 devai review security -c ../sample-app/src/main/java
-
-devai review code -c ../sample-app/src/main/java/anthos/samples/bankofanthos/balancereader/BalanceReaderController.java
-
 devai review testcoverage -c ../sample-app/src
+devai review blockers -c ../sample-app/pom.xml
+devai review imgdiff -c /ui/after.png -t /ui/before.png
+devai review image -f "/tmp/diagram.png" -p "Review this diagram"
+devai review video -f "/tmp/video.mp4" -p "Review this video"
 
+# Documentation Commands
 devai document readme -c ../sample-app/src/main/
-# Sample command to update README.md file and open GitHub PR
-devai document readme -c ../sample-app/src/main/ -f "sample-app/README.md" -b "feature/docs-update"
-
 devai document update-readme -f ../sample-app/README.md -c ../sample-app/src/main/java/
 devai document releasenotes -c ../sample-app/src/main/java
 devai document update-releasenotes -f ../sample-app/releasenotes.md -c ../sample-app/src/main/java/ -t "v1.2.3"
 
-devai review blockers -c ../sample-app/pom.xml
-devai review blockers -c ../sample-app/setup.md
-
-devai review impact \
-  --current ~/github/repo/service-v1.0.0/modules/login \
-  --target ~/github/repo/service-v2.0.0/modules/login
-
-devai review imgdiff \
-  -c /ui/main-page-after-upgrade.png \
-  -t /ui/main-page-before-upgrade.png  
-
-devai review image \
-  -f "/tmp/diagram.png" \
-  -p "Review and summarize this diagram"
-
-devai review video \
-  -f "/tmp/video.mp4" \
-  -p "Review and summarize this video"  
-
+# Release Commands
 devai release notes_user_tag -t "v5.0.0"
-devai release notes_user -s "main" -e "feature-branch-name" 
+devai release notes_user -s "main" -e "feature-branch-name"
 
+# RAG Commands
 devai rag load -r "https://github.com/GoogleCloudPlatform/genai-for-developers"
 devai rag query -q "What does devai do"
+```
 
-devai prompt with_context  
-devai prompt with_msg
-devai prompt with_msg_streaming
+### Using Templates
+
+The CLI now supports structured code analysis using predefined templates. Templates are YAML files that define:
+- System context (reviewer expertise)
+- Specific instructions
+- Expected output format
+- Validation requirements
+
+Available templates:
+- `prompts/security/web-security.yaml` - Web application security review
+- `prompts/internationalization/i18n.yaml` - Internationalization review
+- `prompts/database/schema.yaml` - Database schema review
+- `prompts/ai-ml/model-review.yaml` - AI/ML model review
+- `prompts/mobile/app-review.yaml` - Mobile app review
+
+Example template usage:
+```sh
+# Security review
+devai prompt template -t prompts/security/web-security.yaml -c ./src/
+
+# Database schema review
+devai prompt template -t prompts/database/schema.yaml -c ./src/
+
+# Output in different formats
+devai prompt template -t prompts/security/web-security.yaml -c ./src/ -o json
+devai prompt template -t prompts/security/web-security.yaml -c ./src/ -o markdown
 ```
 
 ### Cleanup
