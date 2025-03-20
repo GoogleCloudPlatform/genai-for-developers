@@ -99,7 +99,10 @@ devai review security -c ~/genai-for-developers/sample-app/src/main/java
 devai review testcoverage -c ~/genai-for-developers/sample-app/src
 ```
 
-
+#### Company standards review command
+```
+devai review compliance --context ./sample-app/k8s --config ./devai-cli/gemini/styleguide.md
+```
 
 #### Blockers review commands
 ```
