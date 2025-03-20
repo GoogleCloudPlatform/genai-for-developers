@@ -72,15 +72,6 @@ spec:
             name: environment-config
         - configMapRef:
             name: ledger-db-config
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-            ephemeral-storage: 0.5Gi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-            ephemeral-storage: 0.5Gi
         readinessProbe:
           httpGet:
             path: /ready

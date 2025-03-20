@@ -61,7 +61,6 @@ export LOCATION=us-central1
 export PROJECT_ID=$(gcloud config get-value project)
 export SERVICE_ACCOUNT_NAME='vertex-client'
 export DISPLAY_NAME='Vertex Client'
-export KEY_FILE_NAME='vertex-client-key'
 
 gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --project $PROJECT_ID --display-name "$DISPLAY_NAME"
 
@@ -78,9 +77,6 @@ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SER
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
 
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
-
-
-gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
 ```
 
  If prompted to authorize, click "Authorize" to continue.
@@ -181,6 +177,19 @@ echo -n $LANGCHAIN_API_KEY | \
  --data-file=-
 ```
 
+[Create new API key](https://console.cloud.google.com/apis/credentials) to authenticate API calls.
+
+Set `DEVAI_API_KEY` and create a secret:
+
+```sh
+read -s DEVAI_API_KEY
+export DEVAI_API_KEY
+
+echo -n $DEVAI_API_KEY | \
+ gcloud secrets create DEVAI_API_KEY \
+ --data-file=-
+```
+
 Deploy application to Cloud Run.
 
 ```
@@ -202,6 +211,7 @@ gcloud run deploy devai-api \
   --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
   --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
+  --update-secrets="DEVAI_API_KEY=DEVAI_API_KEY:latest" \
   --min-instances=1 \
   --max-instances=3
 ```
@@ -221,10 +231,7 @@ Ask Gemini to explain the command.
 Test endpoint by running curl command.
 
 ```
-curl -X POST \
-   -H "Content-Type: application/json" \
-   -d '{"prompt": "Create a functional login page using HTML for structure, CSS for styling, and JavaScript for client-side validation and interactivity."}' \
-   $(gcloud  run services list --filter="(devai-api)" --format="value(URL)")/create-jira-issue
+curl -H "X-devai-api-key: $DEVAI_API_KEY" $(gcloud  run services list --filter="(devai-api)" --format="value(URL)")/test   
 ```
 
 Review output in JIRA.
@@ -304,37 +311,7 @@ paths:
          content:
            application/json:
              schema:
-               type: string
- /generate:
-   post:
-     summary: Request impl
-     operationId: generate
-     requestBody:
-       description: Request impl
-       required: true
-       content:
-         application/json:
-           schema:
-             $ref: '#/components/schemas/Prompt'
-     responses:
-       '200':
-         description: Generated
-         content:
-           application/json:
-             schema:
-               type: string
-
- /test:
-   get:
-     summary: Request impl
-     operationId: test
-     responses:
-       '200':
-         description: Generated
-         content:
-           application/json:
-             schema:
-               type: string                    
+               $ref: '#/components/schemas/ProjectStatus'
 components:
  schemas:
    Prompt:
@@ -344,7 +321,28 @@ components:
      properties:
        prompt:
          type: string
+   ProjectStatus:
+     type: object
+     required:
+       - message
+     properties:
+       message:
+         type: string
+
 ```
+
+Under `Authentication` section.
+
+Set `Authentication type` to `API key`
+
+Set `API Key Location` to `Request header`
+
+Set `Header name` to `x-devai-api-key`
+
+Set `API Key` to `Raw value`
+
+Set `API key secret` to value of $DEVAI_API_KEY
+
 
 Save the Tool configuration.
 
