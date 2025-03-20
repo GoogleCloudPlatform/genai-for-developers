@@ -27,8 +27,6 @@ before_script:
 build-job:
   stage: build
   script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
-    - echo $(pwd)
     - export PROJECT_ID=$(echo $PROJECT_ID)
     - export LOCATION=$(echo $LOCATION)
 
@@ -57,3 +55,4 @@ build-job:
     - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
     - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
     - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+    - devai review compliance --context ./sample-app/k8s --config ./devai-cli/gemini/styleguide.md
