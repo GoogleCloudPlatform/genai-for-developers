@@ -43,7 +43,7 @@ export JIRA_PROJECT_KEY="JIRA project key"
 export JIRA_CLOUD=true
 ```
 
-### Enable JIRA command in the code
+### Enable JIRA command in the code for DEVAI CLI command
 
 Open review.py file:
 

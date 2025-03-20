@@ -2,13 +2,8 @@ import Resolver from '@forge/resolver';
 
 const resolver = new Resolver();
 
-resolver.define('getText', (req) => {
-  console.log(req);
-  return 'DevAI reponse...';
-});
-
 resolver.define('getApiKey', (req) => {
-  return process.env.LLM_API_KEY;
+  return process.env.DEVAI_API_KEY;
 });
 
 resolver.define('getDevAIApiUrl', (req) => {
