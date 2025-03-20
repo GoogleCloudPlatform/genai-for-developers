@@ -1,3 +1,15 @@
 pytest>=7.0
 pytest-cov>=4.0
-pytest-mock>=3.10 
+pytest-mock>=3.10
+click>=8.1.7
+google-cloud-aiplatform>=1.48.0
+jira>=3.8.0
+python-gitlab>=4.4.0
+langchain>=0.2.10
+langchain-community>=0.2.10
+langchain_google_vertexai>=1.0.5
+atlassian-python-api>=3.41.10
+google-cloud-secret-manager>=2.20.0
+rich>=13.7.1
+json-repair>=0.23.1
+PyGithub>=2.5.0 

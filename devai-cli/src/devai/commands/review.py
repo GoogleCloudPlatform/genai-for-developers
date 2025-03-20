@@ -197,108 +197,8 @@ Provide an overview or overall impression entry for the code as the first entry.
 
             ### Output Format ###
             {output_format}
-            
-            ### Example Dialogue ###
-            <query> First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
-                    import "fmt"
-                    
-                    func main() {{
-                        name := "Alice"
-                        greeting := fmt.Sprintf("Hello, %s!", name)
-                        fmt.Println(greeting)
-                    }}
-                    
-                    
-                    <response> [
-                        {{
-                            "question": "Indentation",
-                            "answer": "yes",
-                            "description": "Code is consistently indented with spaces (as recommended by Effective Go)"
-                        }},
-                        {{
-                            "question": "Variable Naming",
-                            "answer": "yes",
-                            "description": "Variables ("name", "greeting") use camelCase as recommended"
-                        }},
-                        {{
-                            "question": "Line Length",
-                            "answer": "yes",
-                            "description": "Lines are within reasonable limits" 
-                        }},
-                        {{
-                            "question": "Package Comments", 
-                            "answer": "n/a",
-                            "description": "This code snippet is too small for a package-level comment"
-                        }}
-                    ]
-                    
-                    
-                    <query> Identify common issues such as code smells, anti-patterns, potential bugs, performance bottlenecks, and security vulnerabilities. Offer actionable recommendations to address these issues and improve the overall quality of the code.
-                    
-                    "package main
-                    
-                    import (
-                        "fmt"
-                        "math/rand"
-                        "time"
-                    )
-                    
-                    // Global variable, potentially unnecessary 
-                    var globalCounter int = 0 
-                    
-                    func main() {{
-                        items := []string{{"apple", "banana", "orange"}}
-                    
-                        // Very inefficient loop with nested loop for a simple search
-                        for _, item := range items {{
-                            for _, search := range items {{
-                                if item == search {{
-                                    fmt.Println("Found:", item)
-                                }}
-                            }}
-                        }}
-                    
-                        // Sleep without clear reason, potential performance bottleneck
-                        time.Sleep(5 * time.Second) 
-                    
-                        calculateAndPrint(10)
-                    }}
-                    
-                    // Potential divide-by-zero risk
-                    func calculateAndPrint(input int) {{
-                        result := 100 / input 
-                        fmt.Println(result)
-                    }}"
-                    
-                    <response> [
-                        {{
-                            "question": "Global Variables",
-                            "answer": "no",
-                            "description": "Potential issue: Unnecessary use of the global variable 'globalCounter'. Consider passing values as arguments for better encapsulation." 
-                        }},
-                        {{
-                            "question": "Algorithm Efficiency",
-                            "answer": "no",
-                            "description": "Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets."
-                        }},
-                        {{
-                            "question": "Performance Bottlenecks",
-                            "answer": "no",
-                            "description": "'time.Sleep' without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use."
-                        }},
-                        {{
-                            "question": "Potential Bugs",
-                            "answer": "no",
-                            "description": "'calculateAndPrint' function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately."
-                        }},
-                        {{ 
-                            "question": "Code Readability",
-                            "answer": "no",
-                            "description": "Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code."
-                        }} 
-                    ]
-
             '''
+
     # Load files as text into the source variable
     source = source.format(format_files_as_string(context))
 
@@ -338,13 +238,20 @@ Context:
                 try:
                     parsed_data = json.loads(valid_json)
                     table = create_table(parsed_data)
-                    click.echo(table)
+                    console = Console()
+                    console.print(table)
                 except json.JSONDecodeError as e:
                     click.echo(f"Error: Error processing JSON data: {e}")
         else:
             click.echo("Error: Invalid JSON format")
     else:
-        click.echo(response.text)
+        # For markdown output, ensure proper formatting
+        formatted_text = response.text
+        if formatted_text.startswith("```markdown\n"):
+            formatted_text = formatted_text[11:]  # Remove markdown code block start
+        if formatted_text.endswith("\n```"):
+            formatted_text = formatted_text[:-4]  # Remove markdown code block end
+        click.echo(formatted_text.strip())
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
