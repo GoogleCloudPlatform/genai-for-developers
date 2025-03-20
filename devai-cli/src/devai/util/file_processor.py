@@ -25,7 +25,7 @@ def is_ascii_text(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             f.read()
         return True
-    except UnicodeDecodeError:
+    except (UnicodeDecodeError, FileNotFoundError):
         return False
 
 def get_text_files_contents(path, ignore=None):
@@ -104,7 +104,7 @@ def list_changes(start_sha, end_sha, refer_commit_parent=False):
         start_sha = f"{start_sha}^"
 
     command = ["git", "diff", start_sha, end_sha]
-    output = subprocess.check_output(command, text=True)
+    output = subprocess.check_output(command)
     return output
 
 def list_commit_messages(start_sha, end_sha, refer_commit_parent=False):
@@ -113,7 +113,7 @@ def list_commit_messages(start_sha, end_sha, refer_commit_parent=False):
     if refer_commit_parent:
         command = ["git", "log", "--pretty=format:%s", "--name-only", f"{start_sha}^..{end_sha}"]
 
-    output = subprocess.check_output(command, text=True)
+    output = subprocess.check_output(command)
     return output
 
 def list_commits_for_branches(branch_a, branch_b):
@@ -134,6 +134,6 @@ def run_git_command(command):
 
     list = []
     for record in records:
-        list.append(record)
+        list.append(record.strip())
 
     return list

@@ -26,37 +26,59 @@ from google.cloud.aiplatform import telemetry
 
 from .constants import USER_AGENT, MODEL_NAME
 
-with telemetry.tool_context_manager(USER_AGENT):
-    llm = ChatVertexAI(model_name=MODEL_NAME,
-                    convert_system_message_to_human=True,
-                    project=os.environ["PROJECT_ID"],
-                    location=os.environ["LOCATION"])
+def check_required_env_vars():
+    """Check for required environment variables"""
+    required_vars = [
+        "PROJECT_ID",
+        "LOCATION",
+        "JIRA_USERNAME",
+        "JIRA_API_TOKEN",
+        "JIRA_INSTANCE_URL",
+        "JIRA_PROJECT_KEY"
+    ]
+    missing_vars = [var for var in required_vars if var not in os.environ]
+    if missing_vars:
+        raise click.ClickException(f"Missing required environment variables: {', '.join(missing_vars)}")
 
-jira = JiraAPIWrapper()
-toolkit = JiraToolkit.from_jira_api_wrapper(jira)
-agent = initialize_agent(
-    toolkit.get_tools(), 
-    llm, 
-    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-    verbose=True,
-    handle_parsing_errors=True,
-    max_iterations=5,
-    return_intermediate_steps=True,
-    early_stopping_method="generate",
-)
+def get_llm():
+    """Get Vertex AI ChatVertexAI instance"""
+    check_required_env_vars()
+    with telemetry.tool_context_manager(USER_AGENT):
+        return ChatVertexAI(
+            model_name=MODEL_NAME,
+            convert_system_message_to_human=True,
+            project=os.environ["PROJECT_ID"],
+            location=os.environ["LOCATION"]
+        )
 
+def get_jira_components():
+    """Get Jira components (API wrapper, toolkit, and agent)"""
+    check_required_env_vars()
+    jira = JiraAPIWrapper()
+    toolkit = JiraToolkit.from_jira_api_wrapper(jira)
+    agent = initialize_agent(
+        toolkit.get_tools(), 
+        get_llm(), 
+        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
+        verbose=True,
+        handle_parsing_errors=True,
+        max_iterations=5,
+        return_intermediate_steps=True,
+        early_stopping_method="generate",
+    )
+    return jira, toolkit, agent
 
 def create_issue(description: str) -> str:
     """Creates a Jira issue"""
+    check_required_env_vars()
     JIRA_USERNAME = os.environ["JIRA_USERNAME"]
     JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
     JIRA_INSTANCE_URL = os.environ["JIRA_INSTANCE_URL"]
     JIRA_PROJECT_KEY = os.environ["JIRA_PROJECT_KEY"]
 
     summary = "Issue {}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
     issue_type = "Task"
-    project_key=JIRA_PROJECT_KEY
+    project_key = JIRA_PROJECT_KEY
     jira = JIRA(basic_auth=(JIRA_USERNAME, JIRA_API_TOKEN), server=JIRA_INSTANCE_URL)
 
     issue_dict = {
@@ -64,30 +86,36 @@ def create_issue(description: str) -> str:
         'summary': summary,
         'description': description,
         'issuetype': {'name': issue_type},
-        
     }
-    new_issue = jira.create_issue(fields=issue_dict)
-    resp = f'New issue created with key: {new_issue.key}'
-    
-    print(resp)
-    return resp
+    try:
+        new_issue = jira.create_issue(fields=issue_dict)
+        resp = f'New issue created with key: {new_issue.key}'
+        print(resp)
+        return resp
+    except Exception as e:
+        raise click.ClickException(str(e))
 
-create_issue_tool = StructuredTool.from_function(create_issue, description="Create a new JIRA issue")
-
-create_agent = initialize_agent(
-    [create_issue_tool],
-    llm,
-    agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-    verbose=True,
-    handle_parsing_errors=True,
-    max_iterations=5,
-    return_intermediate_steps=True,
-    early_stopping_method="generate",
-)
+def get_create_agent():
+    """Get agent for creating issues"""
+    check_required_env_vars()
+    create_issue_tool = StructuredTool.from_function(create_issue, description="Create a new JIRA issue")
+    return initialize_agent(
+        [create_issue_tool],
+        get_llm(),
+        agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
+        verbose=True,
+        handle_parsing_errors=True,
+        max_iterations=5,
+        return_intermediate_steps=True,
+        early_stopping_method="generate",
+    )
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def list(context):
+    """List Jira issues"""
+    check_required_env_vars()
+    agent = get_jira_components()[2]
     agent("""
     INSTRUCTIONS:
     Only read data - do not try to create/write/update any data.
@@ -99,24 +127,25 @@ def list(context):
     Issue-2: Issue Description # 2
     """.format(context))
 
-
 def create_jira_issue(summary, context):
     """Creates a Jira issue"""
-    return create_agent("""Create a new JIRA issue with following description. 
+    check_required_env_vars()
+    return get_create_agent()("""Create a new JIRA issue with following description. 
                  DESCRIPTION:
                  {}""".format(context))
-
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def create(context):
+    """Create a new Jira issue"""
     return create_jira_issue("Jira Issue Summary", context)
-    
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def fix(context):
-
+    """Fix a Jira issue"""
+    check_required_env_vars()
+    llm = get_llm()
     prompt = """
         INSTRUCTIONS:
         You are principal software engineer and given requirements to implement.
@@ -126,9 +155,7 @@ def fix(context):
         {}
         """.format(context)
 
-    fix = llm.invoke(
-        prompt
-    )
+    fix = llm.invoke(prompt)
 
     create_prompt = """Create a new JIRA issue with description below:
                  CONTENT:
@@ -137,10 +164,11 @@ def fix(context):
     cleaned_prompt = create_prompt.strip()
     cleaned_prompt = cleaned_prompt.replace("```", "{code}")    
 
-    create_agent(cleaned_prompt)
+    get_create_agent()(cleaned_prompt)
 
 @click.group()
 def jira():
+    """Jira integration commands"""
     pass
 
 jira.add_command(list)

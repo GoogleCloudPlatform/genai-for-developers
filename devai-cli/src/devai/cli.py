@@ -14,40 +14,22 @@
 
 import click
 
-from devai.commands import cmd,  prompt, review, release, document
+from devai.commands import prompt, review, release, document
 from devai.commands.rag import rag
 from devai.commands.healthcheck import healthcheck
-
 
 # Uncomment after configuring JIRA and GitLab env variables - see README.md for details
 # from devai.commands import jira
 # from devai.commands import gitlab
 
-
 @click.group()
 def devai():
+    """DevAI CLI - AI-powered development tools."""
     pass
 
-@click.command()
-def echo():
-    click.echo('Command echo')
-
-
-# Empty Test Commands
-devai.add_command(echo)
-devai.add_command(cmd.sub)
-
-
-devai.add_command(prompt.prompt)
-devai.add_command(review.review)
-devai.add_command(release.release)
-devai.add_command(document.document)
-devai.add_command(rag.rag)
+# Register commands
 devai.add_command(healthcheck)
-
-# devai.add_command(jira.jira)
-# devai.add_command(gitlab.gitlab)
-
+devai.add_command(review.review)
 
 if __name__ == '__main__':
     devai()

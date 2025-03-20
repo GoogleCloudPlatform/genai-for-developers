@@ -1,21 +1,39 @@
 import os
+import click
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.utilities.github import GitHubAPIWrapper
 from google.cloud.aiplatform import telemetry
 from .constants import MODEL_NAME, USER_AGENT
 
-model = ChatVertexAI(
-    model_name=MODEL_NAME,
-    convert_system_message_to_human=True,
-    project=os.environ["PROJECT_ID"],
-    location=os.environ["LOCATION"],
-)
+def check_required_env_vars():
+    """Check for required environment variables"""
+    required_vars = ['PROJECT_ID', 'LOCATION', 'GITHUB_APP_ID', 'GITHUB_APP_PRIVATE_KEY', 'GITHUB_REPOSITORY']
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        raise click.ClickException(
+            f"Missing required environment variables: {', '.join(missing_vars)}\n"
+            f"Please set them using:\n"
+            f"export {' '.join(f'{var}=your-{var.lower()}' for var in missing_vars)}"
+        )
 
-github = GitHubAPIWrapper(
-    github_app_id=os.getenv("GITHUB_APP_ID"),
-    github_app_private_key=os.getenv("GITHUB_APP_PRIVATE_KEY"),
-    github_repository=os.getenv("GITHUB_REPOSITORY"),
-)
+def get_github_agent():
+    """Get or create GitHub agent"""
+    check_required_env_vars()
+    
+    model = ChatVertexAI(
+        model_name=MODEL_NAME,
+        convert_system_message_to_human=True,
+        project=os.environ["PROJECT_ID"],
+        location=os.environ["LOCATION"],
+    )
+
+    github = GitHubAPIWrapper(
+        github_app_id=os.getenv("GITHUB_APP_ID"),
+        github_app_private_key=os.getenv("GITHUB_APP_PRIVATE_KEY"),
+        github_repository=os.getenv("GITHUB_REPOSITORY"),
+    )
+    
+    return model, github
 
 file_update_request = """{}
 OLD <<<<
@@ -27,6 +45,7 @@ NEW <<<<
 """
 
 def generate_pr_summary(existing_source_code: str, new_source_code: str) -> str:
+    """Generate a summary for a pull request comparing old and new code"""
     pr_summary_template = """
     Summarize the changes between old and new source code and return summary for GitHub pull request. 
     Response format: PR Name\nnPR description
@@ -40,12 +59,16 @@ def generate_pr_summary(existing_source_code: str, new_source_code: str) -> str:
     """
 
     try:
+        model, _ = get_github_agent()
         with telemetry.tool_context_manager(USER_AGENT):
             pr_response = model.invoke(pr_summary_template.format(existing_source_code, new_source_code))
             return pr_response.content
+    except click.ClickException as e:
+        # Re-raise ClickException for environment variable errors
+        raise
     except Exception as e:
         print(f"Error generating pull request summary: {e}")
-        return
+        return None
 
 def create_github_pr(branch: str, files: dict[str, str]):
     """Opens new GitHub Pull Request with updated files
@@ -53,8 +76,8 @@ def create_github_pr(branch: str, files: dict[str, str]):
     branch (str): branch name.
     files (dict[str, str]): file path and content pairs
     """
-
     try:
+        _, github = get_github_agent()
         resp = github.create_branch(branch)
         print(resp)
     except Exception as e:

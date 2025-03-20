@@ -98,16 +98,7 @@ def load_image_from_path(image_path: str) -> Image:
     return Image.load_from_file(image_path)
 
 def validate_and_correct_json(json_text):
-    """Validates and attempts to correct JSON text.
-
-    Args:
-        json_text (str): The JSON text to validate.
-
-    Returns:
-        str: The original or corrected JSON text if valid, None otherwise.
-    """
- 
-
+    """Validate and attempt to correct JSON text."""
     try:
         # Validate the JSON
         json.loads(json_text)
@@ -121,6 +112,23 @@ def validate_and_correct_json(json_text):
                 "Error: Model output is not valid JSON and could not be repaired."
             )
             return None
+
+def create_table(data):
+    """Create a rich table from JSON data."""
+    table = Table(title="Code Review Results")
+    table.add_column("Class/Method", justify="left", style="cyan")
+    table.add_column("Issue Type", justify="left", style="magenta")
+    table.add_column("Description", justify="left", style="green")
+    table.add_column("Severity", justify="left", style="yellow")
+
+    for item in data:
+        class_method = f"{item.get('class_name', '')} {item.get('method_name', '')}".strip() or "-"
+        issue_type = item.get('issue_type', '-')
+        description = item.get('description', '-')
+        severity = item.get('severity', '-')
+        table.add_row(class_method, issue_type, description, severity)
+
+    return table
 
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")

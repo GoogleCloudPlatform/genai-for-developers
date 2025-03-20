@@ -109,12 +109,13 @@ def check_git_environment():
         
         return True, ""
     except subprocess.CalledProcessError as e:
-        if "not a git repository" in str(e):
+        stderr = e.stderr.decode() if isinstance(e.stderr, bytes) else str(e.stderr)
+        if "not a git repository" in stderr:
             return False, "Not a git repository. Please run this command from a git repository."
-        elif "user.name" in str(e) or "user.email" in str(e):
+        elif "user.name" in stderr or "user.email" in stderr:
             return False, "Git user configuration missing. Please configure git user.name and user.email."
         else:
-            return False, f"Git environment check failed: {str(e)}"
+            return False, f"Git environment check failed: {stderr}"
 
 
 @click.command(name="report")

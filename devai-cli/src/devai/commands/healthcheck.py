@@ -18,4 +18,5 @@ def healthcheck():
         click.echo("- Model: gemini-pro")
         
     except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True) 
+        click.echo(f"Error: {str(e)}", err=True)
+        raise click.Abort()  # This will set exit code to 1 
