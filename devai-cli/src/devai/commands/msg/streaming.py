@@ -14,7 +14,7 @@
 
 import click
 from vertexai.generative_models import GenerativeModel
-from devai.util.constants import GEMINI_PRO_MODEL
+from devai.commands.constants import MODEL_NAME
 
 @click.command()
 @click.option('-q', '--qry', required=False, type=str, default="Hello")
@@ -23,7 +23,7 @@ def with_msg_streaming(qry):
     click.echo("Prompt with streaming")
     
     # Initialize Gemini
-    model = GenerativeModel(GEMINI_PRO_MODEL)
+    model = GenerativeModel(MODEL_NAME)
     
     # Send the prompt and stream response
     responses = model.generate_content(qry, stream=True)

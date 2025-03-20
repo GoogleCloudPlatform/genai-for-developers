@@ -1,10 +1,11 @@
 metadata:
   name: "AI/ML Model Review"
-  version: "1.0.0"
+  description: "A comprehensive review of AI/ML models focusing on performance, ethics, and best practices"
+  version: "1.0"
   category: "ai-ml"
   subcategory: "model"
-  author: "DevAI Team"
-  last_updated: "2024-03-20"
+  author: "DevAI"
+  last_updated: "2025-03-20"
   tags: ["ai", "ml", "model", "performance", "ethics"]
 
 configuration:

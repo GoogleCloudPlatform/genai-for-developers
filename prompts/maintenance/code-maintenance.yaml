@@ -1,8 +1,10 @@
 metadata:
   name: "Code Maintenance Review"
-  version: "1.0.0"
+  description: "A comprehensive review of code maintenance, technical debt, and code quality"
+  version: "1.0"
   category: "maintenance"
   subcategory: "code"
+  author: "DevAI"
   author: "DevAI Team"
   last_updated: "2024-03-20"
   tags: ["maintenance", "refactoring", "technical-debt", "code-quality", "legacy"]

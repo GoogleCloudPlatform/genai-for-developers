@@ -1,10 +1,11 @@
 metadata:
   name: "CI/CD Pipeline Review"
-  version: "1.0.0"
+  description: "A comprehensive review of CI/CD pipeline focusing on automation, security, and best practices"
+  version: "1.0"
   category: "devops"
   subcategory: "ci-cd"
-  author: "DevAI Team"
-  last_updated: "2024-03-20"
+  author: "DevAI"
+  last_updated: "2025-03-20"
   tags: ["ci-cd", "pipeline", "automation", "devops", "deployment"]
 
 configuration:
