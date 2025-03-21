@@ -375,7 +375,6 @@ def performance(context):
     qry = get_prompt('review_query')
 
     if qry is None:
-        print("No review query found")
         qry='''
             ### Instruction ###
             You are a seasoned application performance tuning expert with deep knowledge of the nuances of various programming languages. Your task is to meticulously review the provided code snippet (please specify the language), focusing on identifying performance pitfalls and optimization opportunities. Tailor your analysis to the specific programming language used.

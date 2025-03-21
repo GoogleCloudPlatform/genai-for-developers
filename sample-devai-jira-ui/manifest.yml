@@ -24,4 +24,4 @@ permissions:
   external:
     fetch:
       client:
-        - devai-api-133934646591.us-central1.run.app/generate # replace with YOUR CLOUD RUN URL
+        - devai-api-133934646591.us-central1.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL

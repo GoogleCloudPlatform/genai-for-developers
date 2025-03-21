@@ -17,12 +17,20 @@ export JIRA_CLOUD=true
 
 ### Set GitLab env vars
 ```sh
-export GITLAB_BRANCH="main"
 export GITLAB_URL="https://gitlab.com"
 export GITLAB_REPOSITORY="GITLAB_USERID/GITLAB_REPOSITORY"
 export GITLAB_BRANCH="devai"
 export GITLAB_BASE_BRANCH="main"
 export GITLAB_PERSONAL_ACCESS_TOKEN=YOUR_GITLAB_PAT
+```
+
+### Set GitHub env vars
+```sh
+export GITHUB_APP_ID=app-id
+export GITHUB_ACCOUNT=github-userid
+export GITHUB_REPO_NAME=github-repo
+export GITHUB_APP_INSTALLATION_ID=app-installation-id
+export GITHUB_APP_PRIVATE_KEY="/tmp/your-app.private-key.pem"
 ```
 
 ### Set LangSmith env vars
@@ -51,12 +59,17 @@ python run_app.py
 
 ### Test JIRA user story creation
 ```sh
-curl -X POST -H "Content-Type: application/json" -d '{"prompt": "Create a webpage to manage team off-site sessions. Session schema: id, time, topic, speaker. Provide HTML, JavaScript and CSS. Add backend API using FASTAPI framework."}' http://localhost:8080/create-jira-issue
+curl -X POST -H "X-devai-api-key: $DEVAI_API_KEY" -H "Content-Type: application/json" -d '{"prompt": "Create a webpage to manage team off-site sessions. Session schema: id, time, topic, speaker. Provide HTML, JavaScript and CSS. Add backend API using FASTAPI framework."}' http://localhost:8080/create-jira-issue
 ```
 
 ### Test GitLab merge request creation
 ```sh
-curl -X POST -H "Content-Type: application/json" -d '{"prompt": "Create a webpage to manage team off-site sessions. Session schema: id, time, topic, speaker. Provide HTML, JavaScript and CSS. Add backend API using FASTAPI framework."}' http://localhost:8080/generate
+curl -X POST -H "X-devai-api-key: $DEVAI_API_KEY" -H "Content-Type: application/json" -d '{"prompt": "Create a webpage to manage team off-site sessions. Session schema: id, time, topic, speaker. Provide HTML, JavaScript and CSS. Add backend API using FASTAPI framework."}' http://localhost:8080/create-gitlab-mr
+```
+
+### Test GitHub pull request creation
+```sh
+curl -X POST -H "X-devai-api-key: $DEVAI_API_KEY" -H "Content-Type: application/json" -d '{"prompt": "Update readme for this repo"}' http://localhost:8080/create-github-pr
 ```
 
 ### Cloud Run

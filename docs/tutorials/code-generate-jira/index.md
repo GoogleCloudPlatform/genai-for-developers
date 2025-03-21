@@ -660,7 +660,7 @@ permissions:
   external:
     fetch:
       client:
-        - devai-api-gjerpi6qqq-uc.a.run.app/generate # replace with YOUR CLOUD RUN URL
+        - devai-api-gjerpi6qqq-uc.a.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL
 ```
 
 Open resolvers/index file in the editor: `devai-jira-ui-qwiklabs/src/resolvers/index.js`
@@ -711,7 +711,7 @@ const App = () => {
 
     const bodyGenerateData = `{"prompt": ${JSON.stringify(data.fields.description)}}`;
 
-    const generateRes = await api.fetch(devAIApiUrl+'/generate',
+    const generateRes = await api.fetch(devAIApiUrl+'/create-gitlab-mr',
       {
         body: bodyGenerateData,
         method: 'post',
