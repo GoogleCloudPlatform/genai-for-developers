@@ -30,34 +30,36 @@ from typing import List, Dict
 from .constants import USER_AGENT, MODEL_NAME
 from .utils import get_llm, check_required_env_vars
 
-def get_jira_components():
-    """Get Jira components (API wrapper, toolkit, and agent)"""
-    check_required_env_vars()
-    jira = JiraAPIWrapper()
-    toolkit = JiraToolkit.from_jira_api_wrapper(jira)
-    agent = initialize_agent(
-        toolkit.get_tools(), 
-        get_llm(), 
-        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-        verbose=True,
-        handle_parsing_errors=True,
-        max_iterations=5,
-        return_intermediate_steps=True,
-        early_stopping_method="generate",
-    )
-    return jira, toolkit, agent
+with telemetry.tool_context_manager(USER_AGENT):
+    llm = ChatVertexAI(model_name=MODEL_NAME,
+                    convert_system_message_to_human=True,
+                    project=os.environ["PROJECT_ID"],
+                    location=os.environ["LOCATION"])
+
+jira = JiraAPIWrapper()
+toolkit = JiraToolkit.from_jira_api_wrapper(jira)
+agent = initialize_agent(
+    toolkit.get_tools(), 
+    llm, 
+    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
+    verbose=True,
+    handle_parsing_errors=True,
+    max_iterations=5,
+    return_intermediate_steps=True,
+    early_stopping_method="generate",
+)
 
 def create_issue(description: str) -> str:
     """Creates a Jira issue"""
-    check_required_env_vars()
     JIRA_USERNAME = os.environ["JIRA_USERNAME"]
     JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
     JIRA_INSTANCE_URL = os.environ["JIRA_INSTANCE_URL"]
     JIRA_PROJECT_KEY = os.environ["JIRA_PROJECT_KEY"]
 
     summary = "Issue {}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
     issue_type = "Task"
-    project_key = JIRA_PROJECT_KEY
+    project_key=JIRA_PROJECT_KEY
     jira = JIRA(basic_auth=(JIRA_USERNAME, JIRA_API_TOKEN), server=JIRA_INSTANCE_URL)
 
     issue_dict = {
@@ -65,58 +67,51 @@ def create_issue(description: str) -> str:
         'summary': summary,
         'description': description,
         'issuetype': {'name': issue_type},
+        
     }
-    try:
-        new_issue = jira.create_issue(fields=issue_dict)
-        resp = f'New issue created with key: {new_issue.key}'
-        print(resp)
-        return resp
-    except Exception as e:
-        raise click.ClickException(str(e))
+    new_issue = jira.create_issue(fields=issue_dict)
+    resp = f'New issue created with key: {new_issue.key}'
+    
+    print(resp)
+    return resp
 
-def get_create_agent():
-    """Get agent for creating issues"""
-    check_required_env_vars()
-    create_issue_tool = StructuredTool.from_function(create_issue, description="Create a new JIRA issue")
-    return initialize_agent(
-        [create_issue_tool],
-        get_llm(),
-        agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-        verbose=True,
-        handle_parsing_errors=True,
-        max_iterations=1,  # Limit to one iteration
-        return_intermediate_steps=True,
-        early_stopping_method="force",  # Force stop after max_iterations
-    )
+create_issue_tool = StructuredTool.from_function(create_issue, description="Create a new JIRA issue")
+
+create_agent = initialize_agent(
+    [create_issue_tool],
+    llm,
+    agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
+    verbose=True,
+    handle_parsing_errors=True,
+    max_iterations=5,
+    return_intermediate_steps=True,
+    early_stopping_method="generate",
+)
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def list(context):
-    """List Jira issues"""
-    check_required_env_vars()
-    agent = get_jira_components()[2]
+    project_key = os.environ["JIRA_PROJECT_KEY"]
     agent("""
     INSTRUCTIONS:
     Only read data - do not try to create/write/update any data.
     
-    List JIRA tickets in the project {}. 
-    Print/format output as a list with ticket number use template below,  description and summary.
+    List JIRA tickets in the project {}. Use JQL query 'project = {}' to get the tickets.
+    Print/format output as a list with ticket number use template below, description and summary.
     Example:
     Issue-1: Issue Description # 1
     Issue-2: Issue Description # 2
-    """.format(context))
+    """.format(project_key, project_key))
 
 def create_jira_issue(summary, context):
     """Creates a Jira issue"""
-    check_required_env_vars()
-    return get_create_agent()("""Create a new JIRA issue with following description. 
+    return create_agent("""Create a new JIRA issue with following description. 
                  DESCRIPTION:
                  {}""".format(context))
 
 @click.command()
 @click.option('-c', '--context', required=False, type=str, default="")
 def create(context):
-    """Create a new Jira issue"""
     return create_jira_issue("Jira Issue Summary", context)
 
 def get_issue_details(issue_key: str) -> dict:
@@ -240,7 +235,6 @@ def fix(context):
     """
     
     # Get implementation plan from LLM
-    llm = get_llm()
     with telemetry.tool_context_manager(USER_AGENT):
         implementation = llm.invoke(implementation_prompt)
     
