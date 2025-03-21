@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from click.testing import CliRunner
-from devai.commands.jira import jira, create_issue
 import os
-import click
 
 @pytest.fixture
 def mock_env_vars():
