@@ -1,0 +1,158 @@
+metadata:
+  name: "Web Accessibility Review"
+  description: "A comprehensive review of web application code focusing on accessibility compliance and best practices"
+  version: "1.0"
+  category: "accessibility"
+  subcategory: "web"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["accessibility", "wcag", "a11y", "web", "usability"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in web accessibility and WCAG compliance, with extensive experience in making web applications accessible to users with disabilities.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided web application code, focusing on accessibility compliance and best practices.
+
+    ### Focus Areas ###
+    1. Semantic Structure
+       - HTML semantics
+       - ARIA attributes
+       - Heading hierarchy
+       - Landmarks
+       - Document outline
+
+    2. Keyboard Navigation
+       - Focus management
+       - Tab order
+       - Skip links
+       - Keyboard shortcuts
+       - Focus indicators
+
+    3. Screen Reader Support
+       - Alt text
+       - ARIA labels
+       - Live regions
+       - Form labels
+       - Error announcements
+
+    4. Visual Accessibility
+       - Color contrast
+       - Text scaling
+       - Focus visibility
+       - Error states
+       - Responsive design
+
+    5. Content & Media
+       - Alternative text
+       - Captions
+       - Transcripts
+       - Language attributes
+       - Content structure
+
+    ### Output Format ###
+    {
+      "accessibility_review": {
+        "summary": {
+          "wcag_compliance": "<level>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "A11Y-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "wcag_criterion": "<wcag_criterion>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<accessibility_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<wcag_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        <button class="submit-btn">
+          Submit
+        </button>
+    - output: |
+        {
+          "accessibility_review": {
+            "summary": {
+              "wcag_compliance": "A",
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "A11Y-001",
+                "category": "Screen Reader Support",
+                "severity": "critical",
+                "wcag_criterion": "4.1.2 Name, Role, Value",
+                "location": {
+                  "file": "form.html",
+                  "line_numbers": "1-3",
+                  "component": "submit_button"
+                },
+                "description": "Button lacks accessible name and role attributes",
+                "impact": "Screen reader users cannot identify the button's purpose",
+                "remediation": {
+                  "recommendation": "Add ARIA attributes and descriptive text to the button",
+                  "code_example": """
+                    <button 
+                      class="submit-btn"
+                      aria-label="Submit form"
+                      type="submit"
+                    >
+                      Submit
+                    </button>
+                  """,
+                  "references": [
+                    "https://www.w3.org/WAI/WCAG21/Understanding/name-role-value",
+                    "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques#buttons"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "accessibility_review.summary"
+    - "accessibility_review.findings"
+    - "accessibility_review.recommendations"
+  quality_checks:
+    - "Must reference specific WCAG criteria for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include accessibility documentation references" 

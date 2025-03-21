@@ -1,0 +1,194 @@
+metadata:
+  name: "Test Coverage Review"
+  description: "A comprehensive review of test suite focusing on coverage, quality, and best practices"
+  version: "1.0"
+  category: "testing"
+  subcategory: "coverage"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["testing", "coverage", "quality", "unit-tests", "integration-tests"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in software testing and quality assurance, with extensive experience in test design, coverage analysis, and test automation best practices.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided test suite, focusing on coverage, quality, and testing best practices.
+
+    ### Focus Areas ###
+    1. Test Coverage
+       - Line coverage
+       - Branch coverage
+       - Function coverage
+       - Statement coverage
+       - Path coverage
+
+    2. Test Quality
+       - Test isolation
+       - Test independence
+       - Test readability
+       - Test maintainability
+       - Test naming
+
+    3. Test Types
+       - Unit tests
+       - Integration tests
+       - End-to-end tests
+       - Performance tests
+       - Security tests
+
+    4. Test Design
+       - Test patterns
+       - Test data management
+       - Mocking strategies
+       - Assertion quality
+       - Edge cases
+
+    5. Test Infrastructure
+       - Test environment setup
+       - Test dependencies
+       - Test configuration
+       - Test reporting
+       - Test automation
+
+    ### Output Format ###
+    {
+      "test_review": {
+        "summary": {
+          "coverage_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "TEST-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "coverage_type": "<coverage_type>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<testing_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_test_sample>",
+              "references": ["<testing_documentation>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        function calculateTotal(items) {
+          return items.reduce((sum, item) => sum + item.price, 0);
+        }
+
+        // Missing tests for edge cases and error conditions
+        test('calculateTotal adds prices correctly', () => {
+          const items = [
+            { price: 10 },
+            { price: 20 }
+          ];
+          expect(calculateTotal(items)).toBe(30);
+        });
+    - output: |
+        {
+          "test_review": {
+            "summary": {
+              "coverage_score": 40,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "TEST-001",
+                "category": "Test Coverage",
+                "severity": "critical",
+                "coverage_type": "edge_cases",
+                "location": {
+                  "file": "calculator.test.js",
+                  "line_numbers": "1-10",
+                  "component": "calculateTotal"
+                },
+                "description": "Missing tests for edge cases and error conditions",
+                "impact": "Insufficient test coverage, potential bugs in edge cases",
+                "remediation": {
+                  "recommendation": "Add comprehensive test cases covering edge cases and error conditions",
+                  "code_example": """
+                    describe('calculateTotal', () => {
+                      test('adds prices correctly', () => {
+                        const items = [
+                          { price: 10 },
+                          { price: 20 }
+                        ];
+                        expect(calculateTotal(items)).toBe(30);
+                      });
+
+                      test('handles empty array', () => {
+                        expect(calculateTotal([])).toBe(0);
+                      });
+
+                      test('handles items with zero price', () => {
+                        const items = [
+                          { price: 0 },
+                          { price: 10 }
+                        ];
+                        expect(calculateTotal(items)).toBe(10);
+                      });
+
+                      test('handles decimal prices', () => {
+                        const items = [
+                          { price: 10.5 },
+                          { price: 20.75 }
+                        ];
+                        expect(calculateTotal(items)).toBe(31.25);
+                      });
+
+                      test('throws error for invalid input', () => {
+                        expect(() => calculateTotal(null)).toThrow();
+                        expect(() => calculateTotal(undefined)).toThrow();
+                      });
+                    });
+                  """,
+                  "references": [
+                    "https://jestjs.io/docs/getting-started",
+                    "https://martinfowler.com/bliki/TestCoverage.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "test_review.summary"
+    - "test_review.findings"
+    - "test_review.recommendations"
+  quality_checks:
+    - "Must specify coverage type for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include testing documentation references" 

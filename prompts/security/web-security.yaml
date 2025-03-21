@@ -1,0 +1,153 @@
+metadata:
+  name: "Web Application Security Review"
+  description: "A comprehensive review of web application security focusing on vulnerabilities, best practices, and compliance"
+  version: "1.0"
+  category: "security"
+  subcategory: "web-security"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["web", "security", "owasp", "vulnerabilities"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert web application security engineer with extensive experience in OWASP Top 10, web security best practices, and secure coding patterns.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive security review of the provided web application code, focusing on common vulnerabilities and security best practices.
+
+    ### Focus Areas ###
+    1. Authentication & Authorization
+       - Login mechanisms
+       - Session management
+       - Access control
+       - Token handling
+       - Password policies
+
+    2. Input Validation & Sanitization
+       - SQL injection
+       - XSS prevention
+       - CSRF protection
+       - File upload security
+       - API input validation
+
+    3. Data Protection
+       - Encryption in transit
+       - Encryption at rest
+       - Sensitive data handling
+       - Key management
+       - Data retention
+
+    4. Security Headers & Configurations
+       - CSP implementation
+       - HSTS configuration
+       - X-Frame-Options
+       - Content-Type headers
+       - CORS settings
+
+    5. Error Handling & Logging
+       - Error messages
+       - Audit logging
+       - Security events
+       - Debug information
+       - Exception handling
+
+    ### Output Format ###
+    {
+      "security_review": {
+        "summary": {
+          "risk_level": "<high|medium|low>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "SEC-001",
+            "category": "<vulnerability_category>",
+            "severity": "<critical|high|medium|low>",
+            "cwe_id": "<common_weakness_enumeration_id>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<security_impact>",
+            "remediation": {
+              "recommendation": "<fix_description>",
+              "code_example": "<secure_code_sample>",
+              "references": ["<owasp_link>", "<security_documentation>"]
+            }
+          }
+        ],
+        "best_practices": [
+          {
+            "category": "<practice_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>"
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        @app.route('/user/<id>/profile')
+        def get_profile(id):
+            return db.query(f"SELECT * FROM users WHERE id = {id}")
+    - output: |
+        {
+          "security_review": {
+            "summary": {
+              "risk_level": "high",
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "SEC-001",
+                "category": "SQL Injection",
+                "severity": "critical",
+                "cwe_id": "CWE-89",
+                "location": {
+                  "file": "app.py",
+                  "line_numbers": "1-3",
+                  "component": "get_profile"
+                },
+                "description": "Direct use of user input in SQL query without validation",
+                "impact": "Potential unauthorized data access or data manipulation",
+                "remediation": {
+                  "recommendation": "Use parameterized queries to prevent SQL injection",
+                  "code_example": """
+                    @app.route('/user/<id>/profile')
+                    def get_profile(id):
+                        return db.query("SELECT * FROM users WHERE id = ?", [id])
+                  """,
+                  "references": [
+                    "https://owasp.org/www-community/attacks/SQL_Injection",
+                    "https://cwe.mitre.org/data/definitions/89.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "security_review.summary"
+    - "security_review.findings"
+    - "security_review.best_practices"
+  quality_checks:
+    - "Must include CWE IDs where applicable"
+    - "Must provide code examples for all findings"
+    - "Must include OWASP references for critical issues" 

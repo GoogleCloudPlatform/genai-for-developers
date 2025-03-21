@@ -1,0 +1,203 @@
+metadata:
+  name: "API Documentation Review"
+  description: "A comprehensive review of API documentation focusing on clarity, completeness, and best practices"
+  version: "1.0"
+  category: "documentation"
+  subcategory: "api"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["api", "documentation", "openapi", "swagger", "rest"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert technical writer and API documentation specialist, with extensive experience in OpenAPI/Swagger specifications, REST API design, and developer documentation.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided API documentation, focusing on completeness, clarity, and best practices.
+
+    ### Focus Areas ###
+    1. API Specification
+       - OpenAPI/Swagger compliance
+       - Endpoint definitions
+       - Request/response schemas
+       - Authentication methods
+       - Versioning strategy
+
+    2. Documentation Content
+       - Endpoint descriptions
+       - Parameter documentation
+       - Example requests/responses
+       - Error handling
+       - Rate limiting
+
+    3. Code Examples
+       - Language coverage
+       - Example completeness
+       - Error handling examples
+       - Authentication examples
+       - Best practices
+
+    4. Organization & Structure
+       - Documentation hierarchy
+       - Navigation
+       - Search functionality
+       - Cross-referencing
+       - Version management
+
+    5. Developer Experience
+       - Getting started guide
+       - Authentication setup
+       - SDK availability
+       - Troubleshooting guide
+       - FAQ section
+
+    ### Output Format ###
+    {
+      "documentation_review": {
+        "summary": {
+          "completeness_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "DOC-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "section": "<documentation_section>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<documentation_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_documentation_sample>",
+              "references": ["<documentation_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        /**
+         * Create a new user
+         * @param {Object} userData - User data
+         * @returns {Object} Created user
+         */
+        POST /api/users
+        {
+          "name": "string",
+          "email": "string"
+        }
+    - output: |
+        {
+          "documentation_review": {
+            "summary": {
+              "completeness_score": 40,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "DOC-001",
+                "category": "API Documentation",
+                "severity": "critical",
+                "section": "endpoint_documentation",
+                "location": {
+                  "file": "api-docs.yaml",
+                  "line_numbers": "1-8",
+                  "component": "POST /api/users"
+                },
+                "description": "Incomplete API endpoint documentation missing required fields, response schema, and error cases",
+                "impact": "Poor developer experience, potential integration issues",
+                "remediation": {
+                  "recommendation": "Enhance API documentation with complete OpenAPI specification",
+                  "code_example": """
+                    /api/users:
+                      post:
+                        summary: Create a new user
+                        description: Creates a new user in the system with the provided information
+                        operationId: createUser
+                        tags:
+                          - Users
+                        requestBody:
+                          required: true
+                          content:
+                            application/json:
+                              schema:
+                                type: object
+                                required:
+                                  - name
+                                  - email
+                                properties:
+                                  name:
+                                    type: string
+                                    description: Full name of the user
+                                    example: "John Doe"
+                                  email:
+                                    type: string
+                                    format: email
+                                    description: Email address of the user
+                                    example: "john.doe@example.com"
+                        responses:
+                          '201':
+                            description: User created successfully
+                            content:
+                              application/json:
+                                schema:
+                                  $ref: '#/components/schemas/User'
+                          '400':
+                            description: Invalid input
+                            content:
+                              application/json:
+                                schema:
+                                  $ref: '#/components/schemas/Error'
+                          '409':
+                            description: Email already exists
+                            content:
+                              application/json:
+                                schema:
+                                  $ref: '#/components/schemas/Error'
+                  """,
+                  "references": [
+                    "https://swagger.io/docs/specification/about/",
+                    "https://github.com/OAI/OpenAPI-Specification"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "documentation_review.summary"
+    - "documentation_review.findings"
+    - "documentation_review.recommendations"
+  quality_checks:
+    - "Must specify documentation section for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include documentation guidelines references" 

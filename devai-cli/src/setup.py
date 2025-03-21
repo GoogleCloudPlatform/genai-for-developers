@@ -23,6 +23,13 @@ setup(
         'click==8.1.7',
         'google-cloud-aiplatform'
     ],
+    extras_require={
+        'test': [
+            'pytest>=7.0',
+            'pytest-cov>=4.0',
+            'pytest-mock>=3.10',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'devai = devai.cli:devai',

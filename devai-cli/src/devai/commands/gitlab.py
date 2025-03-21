@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import click
-import os, json
+import os
 from langchain.agents import AgentType, initialize_agent
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -22,71 +22,92 @@ from google.cloud.aiplatform import telemetry
   
 from .constants import USER_AGENT, MODEL_NAME
 
-llm = ChatVertexAI(model_name=MODEL_NAME,
-                   convert_system_message_to_human=True,
-                   project=os.environ["PROJECT_ID"],
-                   location=os.environ["LOCATION"])
+def check_required_env_vars():
+    """Check for required environment variables"""
+    required_vars = ['PROJECT_ID']
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        raise click.ClickException(
+            f"Missing required environment variables: {', '.join(missing_vars)}\n"
+            f"Please set them using:\n"
+            f"export {' '.join(f'{var}=your-{var.lower()}' for var in missing_vars)}"
+        )
 
-gitlab = GitLabAPIWrapper()
-toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
-agent = initialize_agent(
-    toolkit.get_tools(), 
-    llm, 
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
-    verbose=True,
-    handle_parsing_errors=True,
-    max_iterations=5,
-    return_intermediate_steps=True,
-    early_stopping_method="generate",
-)
+def get_gitlab_agent():
+    """Get or create GitLab agent"""
+    project_id = os.getenv('PROJECT_ID')
+    region = os.getenv('REGION', 'us-central1')
+    
+    llm = ChatVertexAI(model_name=MODEL_NAME,
+                       convert_system_message_to_human=True,
+                       project=project_id,
+                       location=region)
+    
+    gitlab = GitLabAPIWrapper()
+    toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
+    return initialize_agent(
+        toolkit.get_tools(), 
+        llm, 
+        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
+        verbose=True,
+        handle_parsing_errors=True,
+        max_iterations=5,
+        return_intermediate_steps=True,
+        early_stopping_method="generate",
+    )
 
 def create_pull_request(context):
+    """Create a GitLab merge request with the given context"""
+    agent = get_gitlab_agent()
     with telemetry.tool_context_manager(USER_AGENT):
-        return agent.invoke("""Create GitLab merge request, use provided details below: 
-    {}""".format(context))
+        return agent.invoke(f"""Create GitLab merge request, use provided details below: 
+{context}""")
 
+def create_gitlab_issue_comment(context, issue_name):
+    """Create a comment on a GitLab issue"""
+    agent = get_gitlab_agent()
+    prompt = f"""You need to do two tasks only.
+First task: Get GitLab issue with title '{issue_name}'.
+Second task: add content below as a comment to the issue you found in first task:
 
-def create_gitlab_issue_comment(context, issue_name='CICD AI Insights'):
-
-    prompt = """You need to do two tasks only.
-    First task: Get GitLab issue with title '{}'.
-    Second task: add content below as a comment to the issue you found in first task:
-
-    
-    {}""".format(issue_name, json.dumps(context))
+{context}"""
 
     with telemetry.tool_context_manager(USER_AGENT):
         return agent.invoke(prompt)
 
 def fix_gitlab_issue_comment(context):
-    prompt = """You have the software engineering capabilities of a Google Principle engineer.
-    You are tasked with completing issues on a gitlab repository.
-    Please look at the open issue #{} and complete it by creating pull request that solves the issue."
-    """.format(context)
-    
+    """Fix a GitLab issue by creating a pull request"""
+    agent = get_gitlab_agent()
+    prompt = f"""You have the software engineering capabilities of a Google Principle engineer.
+You are tasked with completing issues on a gitlab repository.
+Please look at the open issue #{context} and complete it by creating pull request that solves the issue."""
+
     with telemetry.tool_context_manager(USER_AGENT):
         return agent.invoke(prompt)
 
-@click.command()
-@click.option('-c', '--context', required=False, type=str, default="")
-def create_pr(context):
-    return create_pull_request(context)
-
-@click.command()
-@click.option('-c', '--context', required=False, type=str, default="")
-@click.option('-i', '--issue', required=False, type=str, default="")
-def create_comment(issue, context):
-    return create_gitlab_issue_comment(issue, context)
-
-@click.command()
-@click.option('-c', '--context', required=False, type=str, default="")
-def fix_issue(context):
-    return fix_gitlab_issue_comment(context)
-
 @click.group()
 def gitlab():
-    pass
+    """GitLab integration commands"""
+    check_required_env_vars()
 
-gitlab.add_command(create_pr)
-gitlab.add_command(create_comment)
-gitlab.add_command(fix_issue)
+@gitlab.command()
+@click.option('--context', required=True, help='Context for the merge request')
+def create_pr(context):
+    """Create a GitLab merge request"""
+    check_required_env_vars()
+    return create_pull_request(context)
+
+@gitlab.command()
+@click.option('--context', required=True, help='Comment content')
+@click.option('--issue', required=True, help='Issue title to comment on')
+def create_comment(context, issue):
+    """Create a comment on a GitLab issue"""
+    check_required_env_vars()
+    return create_gitlab_issue_comment(context, issue)
+
+@gitlab.command()
+@click.option('--context', required=True, help='Issue number to fix')
+def fix_issue(context):
+    """Fix a GitLab issue by creating a pull request"""
+    check_required_env_vars()
+    return fix_gitlab_issue_comment(context)

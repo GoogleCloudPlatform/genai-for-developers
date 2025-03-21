@@ -1,0 +1,165 @@
+metadata:
+  name: "Web Application Performance Review"
+  description: "A comprehensive review of web application code focusing on performance optimization and best practices"
+  version: "1.0"
+  category: "performance"
+  subcategory: "web-performance"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["web", "performance", "optimization", "frontend", "backend"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert performance engineer specializing in web application optimization, with deep knowledge of frontend and backend performance best practices, caching strategies, and resource optimization.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive performance review of the provided web application code, focusing on optimization opportunities and performance best practices.
+
+    ### Focus Areas ###
+    1. Frontend Performance
+       - Resource loading
+       - JavaScript execution
+       - CSS optimization
+       - Image optimization
+       - DOM manipulation
+
+    2. Backend Performance
+       - Database queries
+       - API response times
+       - Caching strategies
+       - Resource utilization
+       - Concurrency handling
+
+    3. Network & Caching
+       - HTTP caching
+       - CDN usage
+       - Compression
+       - Connection optimization
+       - Resource prioritization
+
+    4. Code Optimization
+       - Algorithm efficiency
+       - Memory usage
+       - CPU utilization
+       - Code splitting
+       - Bundle optimization
+
+    5. Monitoring & Metrics
+       - Performance metrics
+       - Error tracking
+       - Resource monitoring
+       - User experience metrics
+       - Bottleneck identification
+
+    ### Output Format ###
+    {
+      "performance_review": {
+        "summary": {
+          "overall_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "PERF-001",
+            "category": "<performance_category>",
+            "severity": "<critical|high|medium|low>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<performance_impact>",
+            "remediation": {
+              "recommendation": "<optimization_description>",
+              "code_example": "<optimized_code_sample>",
+              "references": ["<performance_documentation>"]
+            },
+            "metrics": {
+              "before": "<current_metrics>",
+              "after": "<expected_metrics>"
+            }
+          }
+        ],
+        "optimization_opportunities": [
+          {
+            "category": "<optimization_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "expected_improvement": "<improvement_metrics>"
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        function fetchUserData() {
+          const users = [];
+          for (let i = 0; i < 1000; i++) {
+            users.push(fetch(`/api/users/${i}`));
+          }
+          return Promise.all(users);
+        }
+    - output: |
+        {
+          "performance_review": {
+            "summary": {
+              "overall_score": 60,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "PERF-001",
+                "category": "API Request Optimization",
+                "severity": "critical",
+                "location": {
+                  "file": "userService.js",
+                  "line_numbers": "1-6",
+                  "component": "fetchUserData"
+                },
+                "description": "Making 1000 individual API requests instead of using pagination or batch requests",
+                "impact": "High network overhead, potential server overload, poor user experience",
+                "remediation": {
+                  "recommendation": "Implement pagination and batch requests",
+                  "code_example": """
+                    async function fetchUserData(page = 1, pageSize = 50) {
+                      const response = await fetch(`/api/users?page=${page}&pageSize=${pageSize}`);
+                      return response.json();
+                    }
+                  """,
+                  "references": [
+                    "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
+                    "https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html"
+                  ]
+                },
+                "metrics": {
+                  "before": "1000 requests, ~5s total",
+                  "after": "20 requests, ~200ms total"
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "performance_review.summary"
+    - "performance_review.findings"
+    - "performance_review.optimization_opportunities"
+  quality_checks:
+    - "Must include before/after metrics for all findings"
+    - "Must provide code examples for all optimizations"
+    - "Must include performance documentation references" 

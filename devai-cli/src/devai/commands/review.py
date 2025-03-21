@@ -98,16 +98,7 @@ def load_image_from_path(image_path: str) -> Image:
     return Image.load_from_file(image_path)
 
 def validate_and_correct_json(json_text):
-    """Validates and attempts to correct JSON text.
-
-    Args:
-        json_text (str): The JSON text to validate.
-
-    Returns:
-        str: The original or corrected JSON text if valid, None otherwise.
-    """
- 
-
+    """Validate and attempt to correct JSON text."""
     try:
         # Validate the JSON
         json.loads(json_text)
@@ -122,6 +113,23 @@ def validate_and_correct_json(json_text):
             )
             return None
 
+def create_table(data):
+    """Create a rich table from JSON data."""
+    table = Table(title="Code Review Results")
+    table.add_column("Class/Method", justify="left", style="cyan")
+    table.add_column("Issue Type", justify="left", style="magenta")
+    table.add_column("Description", justify="left", style="green")
+    table.add_column("Severity", justify="left", style="yellow")
+
+    for item in data:
+        class_method = f"{item.get('class_name', '')} {item.get('method_name', '')}".strip() or "-"
+        issue_type = item.get('issue_type', '-')
+        description = item.get('description', '-')
+        severity = item.get('severity', '-')
+        table.add_row(class_method, issue_type, description, severity)
+
+    return table
+
 @click.command(name='code')
 @click.option('-c', '--context', required=False, type=str, default="")
 @click.option('-o', '--output', type=click.Choice(['markdown', 'json', 'table']), default='markdown', help="The desired output format, markdown is the defualt.")
@@ -133,11 +141,31 @@ def code(context, output):
         context (str): The code to be reviewed.
         output (str): The desired output format (markdown, json, or table).
     """
+    # Ensure context is a valid path
+    if not context:
+        click.echo("Error: Please provide a valid path to the code to review")
+        return
+
+    if not os.path.exists(context):
+        click.echo(f"Error: The path '{context}' does not exist")
+        return
+
     source = '''
             ### Context (code) ###
             {}
-
             '''
+
+    # Load files as text into the source variable
+    try:
+        formatted_files = format_files_as_string(context)
+        if not formatted_files:
+            click.echo(f"Error: No readable files found in '{context}'")
+            return
+        source = source.format(formatted_files)
+    except Exception as e:
+        click.echo(f"Error processing files: {str(e)}")
+        return
+
     # Output Format Substitution
     output_format = {
         'markdown': '''Structure: Organize your findings by class and method names. This provides clear context for the issues and aids in refactoring.
@@ -151,9 +179,7 @@ Specificity: Provide detailed explanations for each issue. This helps the origin
 
 Prioritization: If possible, indicate the severity or potential impact of each issue (e.g., critical, high, medium, low). This helps prioritize fixes.
 
-No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."
-
-Prioritize your findings based on their severity or potential impact (e.g., critical, high, medium, low). If no major issues are found, state: "No major issues found. The code appears well-structured and adheres to good practices." Frame your feedback as constructive suggestions or open-ended questions to foster collaboration and avoid a purely critical tone. Example: "Could we explore an alternative algorithm here to potentially improve performance?"''',
+No Issues: If your review uncovers no significant areas for improvement, state "No major issues found. The code appears well-structured and adheres to good practices."''',
 
         'json': '''Provide your feedback in a structured JSON array that follows common standards, with each element containing the following fields:
 
@@ -189,117 +215,24 @@ Provide an overview or overall impression entry for the code as the first entry.
 
             ### Output Format ###
             {output_format}
-            
-            ### Example Dialogue ###
-            <query> First questions are to detect violations of coding style guidelines and conventions. Identify inconsistent formatting, naming conventions, indentation, comment placement, and other style-related issues. Provide suggestions or automatically fix the detected violations to maintain a consistent and readable codebase if this is a problem.
-                    import "fmt"
-                    
-                    func main() {{
-                        name := "Alice"
-                        greeting := fmt.Sprintf("Hello, %s!", name)
-                        fmt.Println(greeting)
-                    }}
-                    
-                    
-                    <response> [
-                        {{
-                            "question": "Indentation",
-                            "answer": "yes",
-                            "description": "Code is consistently indented with spaces (as recommended by Effective Go)"
-                        }},
-                        {{
-                            "question": "Variable Naming",
-                            "answer": "yes",
-                            "description": "Variables ("name", "greeting") use camelCase as recommended"
-                        }},
-                        {{
-                            "question": "Line Length",
-                            "answer": "yes",
-                            "description": "Lines are within reasonable limits" 
-                        }},
-                        {{
-                            "question": "Package Comments", 
-                            "answer": "n/a",
-                            "description": "This code snippet is too small for a package-level comment"
-                        }}
-                    ]
-                    
-                    
-                    <query> Identify common issues such as code smells, anti-patterns, potential bugs, performance bottlenecks, and security vulnerabilities. Offer actionable recommendations to address these issues and improve the overall quality of the code.
-                    
-                    "package main
-                    
-                    import (
-                        "fmt"
-                        "math/rand"
-                        "time"
-                    )
-                    
-                    // Global variable, potentially unnecessary 
-                    var globalCounter int = 0 
-                    
-                    func main() {{
-                        items := []string{{"apple", "banana", "orange"}}
-                    
-                        // Very inefficient loop with nested loop for a simple search
-                        for _, item := range items {{
-                            for _, search := range items {{
-                                if item == search {{
-                                    fmt.Println("Found:", item)
-                                }}
-                            }}
-                        }}
-                    
-                        // Sleep without clear reason, potential performance bottleneck
-                        time.Sleep(5 * time.Second) 
-                    
-                        calculateAndPrint(10)
-                    }}
-                    
-                    // Potential divide-by-zero risk
-                    func calculateAndPrint(input int) {{
-                        result := 100 / input 
-                        fmt.Println(result)
-                    }}"
-                    
-                    <response> [
-                        {{
-                            "question": "Global Variables",
-                            "answer": "no",
-                            "description": "Potential issue: Unnecessary use of the global variable 'globalCounter'. Consider passing values as arguments for better encapsulation." 
-                        }},
-                        {{
-                            "question": "Algorithm Efficiency",
-                            "answer": "no",
-                            "description": "Highly inefficient search algorithm with an O(n^2) complexity. Consider using a map or a linear search for better performance, especially for larger datasets."
-                        }},
-                        {{
-                            "question": "Performance Bottlenecks",
-                            "answer": "no",
-                            "description": "'time.Sleep' without justification introduces a potential performance slowdown. Remove it if the delay is unnecessary or provide context for its use."
-                        }},
-                        {{
-                            "question": "Potential Bugs",
-                            "answer": "no",
-                            "description": "'calculateAndPrint' function has a divide-by-zero risk. Implement a check to prevent division by zero and handle the error appropriately."
-                        }},
-                        {{ 
-                            "question": "Code Readability",
-                            "answer": "no",
-                            "description": "Lack of comments hinders maintainability. Add comments to explain the purpose of functions and blocks of code."
-                        }} 
-                    ]
-
             '''
-    # Load files as text into the source variable
-    source = source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
 
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     # Process Output
     if output in ["json", "table"]:
@@ -314,43 +247,26 @@ Provide an overview or overall impression entry for the code as the first entry.
                     parsed_data = json.loads(valid_json)
                     formatted_json = json.dumps(parsed_data, indent=4)  # Format with indentation
                     click.echo(formatted_json)
-                except json.JSONDecodeError:
-                    click.echo("Error: Error processing JSON data: {e}")
-            elif output == "table":
+                except json.JSONDecodeError as e:
+                    click.echo(f"Error: Error processing JSON data: {e}")
+            else:
                 try:
-                    data = json.loads(valid_json)
-
+                    parsed_data = json.loads(valid_json)
+                    table = create_table(parsed_data)
                     console = Console()
-                    table = Table(show_header=True, header_style="bold green")
-                    table.add_column("Class", style="dim")
-                    table.add_column("Method", style="dim")
-                    table.add_column("Category")
-                    table.add_column("Description", width=120)
-                    table.add_column("Severity")
-
-                    severity_emojis = {
-                        "low": "🟡",  # Yellow circle for low severity
-                        "medium": "⚠️",  # Warning sign for medium severity
-                        "high": "🛑",  # Stop sign for high severity
-                    }
-
-                    for item in data:
-                        class_name = item.get("class_name", "General") 
-                        method_name = item.get("method_name", "N/A")
-                        issue_type = item["issue_type"]
-                        description = item["description"]
-                        severity = item.get("severity", "Unknown")  # Default to 'Unknown' if severity is missing
-
-                        # Add emoji based on severity
-                        severity_with_emoji = f"{severity_emojis.get(severity.lower(), '')} {severity}"  
-                        table.add_row(class_name, method_name, issue_type, description, severity_with_emoji)
-
-
                     console.print(table)
                 except json.JSONDecodeError as e:
-                    click.echo(f"Error processing JSON data: {e}")
+                    click.echo(f"Error: Error processing JSON data: {e}")
+        else:
+            click.echo("Error: Invalid JSON format")
     else:
-        click.echo(response.text) 
+        # For markdown output, ensure proper formatting
+        formatted_text = response.text
+        if formatted_text.startswith("```markdown\n"):
+            formatted_text = formatted_text[11:]  # Remove markdown code block start
+        if formatted_text.endswith("\n```"):
+            formatted_text = formatted_text[:-4]  # Remove markdown code block end
+        click.echo(formatted_text.strip())
 
     #create_jira_issue("Code Review Results", response.text)
     # create_gitlab_issue_comment(response.text)
@@ -433,11 +349,22 @@ def performance(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
 
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -537,11 +464,22 @@ def security(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -626,11 +564,22 @@ def testcoverage(context):
     # Load files as text into source variable
     source=source.format(format_files_as_string(context))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(source)
+        prompt = f"""
+{qry}
+
+Context:
+{source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 
@@ -754,12 +703,25 @@ def impact(current, target):
     current_source=current_source.format(format_files_as_string(current))
     target_source=target_source.format(format_files_as_string(target))
     
-    code_chat_model = GenerativeModel(MODEL_NAME)
+    # Initialize Gemini
+    model = GenerativeModel(MODEL_NAME)
     with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        code_chat.send_message(qry)
-        response = code_chat.send_message(current_source)
-        response = code_chat.send_message(target_source)
+        prompt = f"""
+{qry}
+
+Current Context:
+{current_source}
+
+Target Context:
+{target_source}
+"""
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0.2
+            }
+        )
 
     click.echo(f"{response.text}")
 

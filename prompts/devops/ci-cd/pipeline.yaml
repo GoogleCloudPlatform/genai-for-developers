@@ -1,0 +1,213 @@
+metadata:
+  name: "CI/CD Pipeline Review"
+  description: "A comprehensive review of CI/CD pipeline focusing on automation, security, and best practices"
+  version: "1.0"
+  category: "devops"
+  subcategory: "ci-cd"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["ci-cd", "pipeline", "automation", "devops", "deployment"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert DevOps engineer specializing in CI/CD pipelines, with extensive experience in pipeline automation, deployment strategies, and infrastructure as code.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided CI/CD pipeline configuration, focusing on automation, security, and best practices.
+
+    ### Focus Areas ###
+    1. Pipeline Structure
+       - Stage organization
+       - Job dependencies
+       - Pipeline triggers
+       - Environment management
+       - Artifact handling
+
+    2. Build & Test
+       - Build configuration
+       - Test execution
+       - Code coverage
+       - Dependency management
+       - Cache optimization
+
+    3. Security
+       - Secret management
+       - Access control
+       - Container scanning
+       - Dependency scanning
+       - Compliance checks
+
+    4. Deployment
+       - Deployment strategy
+       - Environment promotion
+       - Rollback procedures
+       - Health checks
+       - Monitoring integration
+
+    5. Performance & Reliability
+       - Pipeline optimization
+       - Resource utilization
+       - Error handling
+       - Retry mechanisms
+       - Pipeline metrics
+
+    ### Output Format ###
+    {
+      "pipeline_review": {
+        "summary": {
+          "maturity_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "PIPE-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "stage": "<pipeline_stage>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<pipeline_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_pipeline_sample>",
+              "references": ["<ci-cd_documentation>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        stages:
+          - build
+          - test
+          - deploy
+
+        build:
+          script:
+            - npm install
+            - npm run build
+
+        test:
+          script:
+            - npm test
+
+        deploy:
+          script:
+            - echo "Deploying to production..."
+            - aws s3 sync dist/ s3://my-bucket/
+    - output: |
+        {
+          "pipeline_review": {
+            "summary": {
+              "maturity_score": 40,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "PIPE-001",
+                "category": "Security",
+                "severity": "critical",
+                "stage": "deploy",
+                "location": {
+                  "file": ".gitlab-ci.yml",
+                  "line_numbers": "1-20",
+                  "component": "deploy_stage"
+                },
+                "description": "Missing security measures in deployment stage: no secret management, no access control, and no scanning",
+                "impact": "Potential security vulnerabilities in deployment process",
+                "remediation": {
+                  "recommendation": "Implement security best practices in deployment stage",
+                  "code_example": """
+                    stages:
+                      - build
+                      - test
+                      - security
+                      - deploy
+
+                    variables:
+                      DOCKER_DRIVER: overlay2
+                      DOCKER_TLS_CERTDIR: ""
+
+                    build:
+                      script:
+                        - npm install
+                        - npm run build
+                      artifacts:
+                        paths:
+                          - dist/
+                          - package-lock.json
+
+                    test:
+                      script:
+                        - npm test
+                      coverage: '/Code coverage: \d+\.\d+/'
+
+                    security:
+                      stage: security
+                      script:
+                        - npm audit
+                        - docker scan my-image:latest
+                        - snyk test
+                      allow_failure: true
+
+                    deploy:
+                      stage: deploy
+                      image: aws-cli
+                      variables:
+                        AWS_DEFAULT_REGION: eu-west-2
+                      before_script:
+                        - aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                        - aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                      script:
+                        - aws s3 sync dist/ s3://my-bucket/ --delete
+                        - aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*"
+                      environment:
+                        name: production
+                      only:
+                        - main
+                  """,
+                  "references": [
+                    "https://docs.gitlab.com/ee/ci/pipelines/",
+                    "https://aws.amazon.com/blogs/security/security-best-practices-for-using-aws-secrets-manager/"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "pipeline_review.summary"
+    - "pipeline_review.findings"
+    - "pipeline_review.recommendations"
+  quality_checks:
+    - "Must specify pipeline stage for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include CI/CD documentation references" 

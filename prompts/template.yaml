@@ -1,0 +1,38 @@
+metadata:
+  name: "Template"
+  description: "A template for creating new review templates"
+  version: "1.0"
+  category: "<category>"
+  subcategory: "<subcategory>"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: []
+
+configuration:
+  temperature: 0.7
+  max_tokens: 1024
+  output_format: "markdown|json|text"
+
+prompt:
+  system_context: |
+    You are an expert in <domain> with extensive experience in <specific_expertise>.
+  
+  instruction: |
+    ### Task Description ###
+    
+    ### Focus Areas ###
+    
+    ### Analysis Requirements ###
+    
+    ### Output Format ###
+    
+  examples:
+    - input: |
+        Example input
+      output: |
+        Example output
+
+validation:
+  required_sections: []
+  output_schema: {}
+  quality_checks: [] 

@@ -1,0 +1,197 @@
+metadata:
+  name: "Mobile App Review"
+  description: "A comprehensive review of mobile application code focusing on performance, security, and best practices"
+  version: "1.0"
+  category: "mobile"
+  subcategory: "app"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["mobile", "ios", "android", "performance", "ux"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert mobile app developer and UX specialist, with extensive experience in iOS and Android development, performance optimization, and user experience design.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided mobile application code, focusing on performance, user experience, and platform-specific best practices.
+
+    ### Focus Areas ###
+    1. Performance
+       - App size
+       - Launch time
+       - Memory usage
+       - Battery consumption
+       - Network efficiency
+
+    2. User Experience
+       - Navigation flow
+       - Touch targets
+       - Gesture support
+       - Feedback mechanisms
+       - Error handling
+
+    3. Platform Compliance
+       - iOS guidelines
+       - Android guidelines
+       - Platform APIs
+       - Device compatibility
+       - Screen sizes
+
+    4. Security
+       - Data storage
+       - Network security
+       - Authentication
+       - Encryption
+       - Privacy
+
+    5. Architecture
+       - Code organization
+       - State management
+       - Dependency injection
+       - Testing strategy
+       - Build process
+
+    ### Output Format ###
+    {
+      "mobile_review": {
+        "summary": {
+          "quality_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "MOB-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "platform": "<ios|android|both>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<mobile_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<platform_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        class MainActivity : AppCompatActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+                setContentView(R.layout.activity_main)
+                
+                // Perform heavy operation on main thread
+                loadData()
+            }
+            
+            private fun loadData() {
+                // Network call on main thread
+                val response = api.getData()
+                updateUI(response)
+            }
+        }
+    - output: |
+        {
+          "mobile_review": {
+            "summary": {
+              "quality_score": 40,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "MOB-001",
+                "category": "Performance",
+                "severity": "critical",
+                "platform": "android",
+                "location": {
+                  "file": "MainActivity.kt",
+                  "line_numbers": "1-15",
+                  "component": "loadData"
+                },
+                "description": "Performing network operation on main thread causing UI freeze",
+                "impact": "Poor user experience, app may appear unresponsive",
+                "remediation": {
+                  "recommendation": "Move network operation to background thread using coroutines",
+                  "code_example": """
+                    class MainActivity : AppCompatActivity() {
+                        private val viewModel: MainViewModel by viewModels()
+                        
+                        override fun onCreate(savedInstanceState: Bundle?) {
+                            super.onCreate(savedInstanceState)
+                            setContentView(R.layout.activity_main)
+                            
+                            // Observe data changes
+                            viewModel.data.observe(this) { response ->
+                                updateUI(response)
+                            }
+                            
+                            // Load data asynchronously
+                            viewModel.loadData()
+                        }
+                    }
+
+                    class MainViewModel : ViewModel() {
+                        private val _data = MutableLiveData<Response>()
+                        val data: LiveData<Response> = _data
+                        
+                        fun loadData() {
+                            viewModelScope.launch {
+                                try {
+                                    val response = withContext(Dispatchers.IO) {
+                                        api.getData()
+                                    }
+                                    _data.value = response
+                                } catch (e: Exception) {
+                                    // Handle error
+                                }
+                            }
+                        }
+                    }
+                  """,
+                  "references": [
+                    "https://developer.android.com/guide/background-processing/threading",
+                    "https://kotlinlang.org/docs/coroutines-overview.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "mobile_review.summary"
+    - "mobile_review.findings"
+    - "mobile_review.recommendations"
+  quality_checks:
+    - "Must specify platform for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include platform documentation references" 

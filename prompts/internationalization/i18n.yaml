@@ -1,0 +1,170 @@
+metadata:
+  name: "Internationalization Review"
+  description: "A comprehensive review of software internationalization and localization best practices"
+  version: "1.0"
+  category: "internationalization"
+  subcategory: "i18n"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["i18n", "l10n", "translation", "localization", "multilingual"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in software internationalization and localization, with extensive experience in implementing multilingual support and cultural adaptation.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided application code, focusing on internationalization and localization best practices.
+
+    ### Focus Areas ###
+    1. Text Externalization
+       - String extraction
+       - Translation keys
+       - Message formatting
+       - Pluralization
+       - Context handling
+
+    2. Cultural Adaptation
+       - Date formats
+       - Number formats
+       - Currency handling
+       - Time zones
+       - Units of measurement
+
+    3. Character Encoding
+       - UTF-8 support
+       - Character sets
+       - Bidirectional text
+       - Font support
+       - Text direction
+
+    4. UI/UX Adaptation
+       - Layout direction
+       - Component sizing
+       - Image localization
+       - Color schemes
+       - Icon adaptation
+
+    5. Technical Implementation
+       - Language detection
+       - Locale switching
+       - Fallback handling
+       - Resource loading
+       - Performance optimization
+
+    ### Output Format ###
+    {
+      "i18n_review": {
+        "summary": {
+          "completeness_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "I18N-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "locale": "<affected_locale>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<i18n_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<i18n_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        const greeting = "Hello, " + name + "!";
+        const date = new Date().toLocaleDateString();
+        const price = "$" + amount.toFixed(2);
+    - output: |
+        {
+          "i18n_review": {
+            "summary": {
+              "completeness_score": 30,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "I18N-001",
+                "category": "Text Externalization",
+                "severity": "critical",
+                "locale": "all",
+                "location": {
+                  "file": "greeting.js",
+                  "line_numbers": "1-3",
+                  "component": "greeting_formatter"
+                },
+                "description": "Hardcoded strings and non-internationalized date/currency formatting",
+                "impact": "Application cannot be properly localized for different languages and regions",
+                "remediation": {
+                  "recommendation": "Implement proper internationalization using i18n library",
+                  "code_example": """
+                    import { format } from 'date-fns';
+                    import { format as formatCurrency } from 'currency-formatter';
+                    import { useTranslation } from 'react-i18next';
+
+                    function Greeting({ name, amount }) {
+                      const { t } = useTranslation();
+                      
+                      const greeting = t('greeting', { name });
+                      const date = format(new Date(), 'PP', { locale: currentLocale });
+                      const price = formatCurrency(amount, { locale: currentLocale });
+                      
+                      return (
+                        <div>
+                          <p>{greeting}</p>
+                          <p>{date}</p>
+                          <p>{price}</p>
+                        </div>
+                      );
+                    }
+                  """,
+                  "references": [
+                    "https://www.i18next.com/",
+                    "https://date-fns.org/docs/format"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "i18n_review.summary"
+    - "i18n_review.findings"
+    - "i18n_review.recommendations"
+  quality_checks:
+    - "Must specify affected locale for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include internationalization documentation references" 

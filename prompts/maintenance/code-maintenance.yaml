@@ -1,0 +1,191 @@
+metadata:
+  name: "Code Maintenance Review"
+  description: "A comprehensive review of code maintenance, technical debt, and code quality"
+  version: "1.0"
+  category: "maintenance"
+  subcategory: "code"
+  author: "DevAI"
+  author: "DevAI Team"
+  last_updated: "2024-03-20"
+  tags: ["maintenance", "refactoring", "technical-debt", "code-quality", "legacy"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in code maintenance and technical debt management, with extensive experience in refactoring, code quality improvement, and legacy system modernization.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided codebase, focusing on maintainability, technical debt, and code quality.
+
+    ### Focus Areas ###
+    1. Code Quality
+       - Code organization
+       - Naming conventions
+       - Code duplication
+       - Complexity metrics
+       - Documentation
+
+    2. Technical Debt
+       - Legacy code
+       - Deprecated APIs
+       - Outdated dependencies
+       - Code smells
+       - Design patterns
+
+    3. Maintainability
+       - Module coupling
+       - Code cohesion
+       - Test coverage
+       - Build process
+       - Deployment
+
+    4. Performance
+       - Resource usage
+       - Response times
+       - Scalability
+       - Bottlenecks
+       - Optimization
+
+    5. Security
+       - Vulnerabilities
+       - Authentication
+       - Authorization
+       - Data protection
+       - Compliance
+
+    ### Output Format ###
+    {
+      "maintenance_review": {
+        "summary": {
+          "maintainability_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "MAINT-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "type": "<technical_debt|quality|security>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<maintenance_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<maintenance_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        class UserService {
+            private Map<String, User> users = new HashMap<>();
+            
+            public User getUser(String id) {
+                return users.get(id);
+            }
+            
+            public void saveUser(User user) {
+                users.put(user.getId(), user);
+            }
+            
+            public List<User> getAllUsers() {
+                return new ArrayList<>(users.values());
+            }
+        }
+    - output: |
+        {
+          "maintenance_review": {
+            "summary": {
+              "maintainability_score": 50,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "MAINT-001",
+                "category": "Technical Debt",
+                "severity": "critical",
+                "type": "data_persistence",
+                "location": {
+                  "file": "UserService.java",
+                  "line_numbers": "1-15",
+                  "component": "UserService"
+                },
+                "description": "Using in-memory storage instead of persistent database",
+                "impact": "Data loss on application restart, not suitable for production",
+                "remediation": {
+                  "recommendation": "Implement proper database persistence with repository pattern",
+                  "code_example": """
+                    @Service
+                    public class UserService {
+                        private final UserRepository userRepository;
+                        
+                        @Autowired
+                        public UserService(UserRepository userRepository) {
+                            this.userRepository = userRepository;
+                        }
+                        
+                        public User getUser(String id) {
+                            return userRepository.findById(id)
+                                .orElseThrow(() -> new UserNotFoundException(id));
+                        }
+                        
+                        public User saveUser(User user) {
+                            return userRepository.save(user);
+                        }
+                        
+                        public List<User> getAllUsers() {
+                            return userRepository.findAll();
+                        }
+                    }
+
+                    @Repository
+                    public interface UserRepository extends JpaRepository<User, String> {
+                        Optional<User> findByEmail(String email);
+                    }
+                  """,
+                  "references": [
+                    "https://spring.io/guides/gs/accessing-data-jpa/",
+                    "https://martinfowler.com/eaaDev/repository.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "maintenance_review.summary"
+    - "maintenance_review.findings"
+    - "maintenance_review.recommendations"
+  quality_checks:
+    - "Must specify issue type for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include maintenance documentation references" 

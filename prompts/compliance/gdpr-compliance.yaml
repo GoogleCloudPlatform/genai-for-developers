@@ -1,0 +1,174 @@
+metadata:
+  name: "GDPR Compliance Review"
+  description: "A comprehensive review of GDPR compliance focusing on data protection, privacy, and best practices"
+  version: "1.0"
+  category: "compliance"
+  subcategory: "gdpr"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["gdpr", "privacy", "data-protection", "compliance", "eu"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in GDPR compliance and data protection regulations, with extensive experience in implementing privacy-by-design principles and ensuring data protection compliance in software applications.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive GDPR compliance review of the provided application code, focusing on data protection requirements, privacy rights, and regulatory compliance.
+
+    ### Focus Areas ###
+    1. Data Collection & Processing
+       - Lawful basis for processing
+       - Data minimization
+       - Purpose limitation
+       - Storage limitation
+       - Processing records
+
+    2. User Rights Implementation
+       - Right to access
+       - Right to rectification
+       - Right to erasure
+       - Right to portability
+       - Right to object
+       - Right to restrict processing
+
+    3. Data Security
+       - Encryption requirements
+       - Access controls
+       - Data breach procedures
+       - Security measures
+       - Data protection impact assessments
+
+    4. Privacy Notices & Consent
+       - Privacy policy implementation
+       - Cookie consent
+       - Data processing notices
+       - User consent mechanisms
+       - Third-party disclosures
+
+    5. International Data Transfers
+       - Cross-border transfers
+       - Data transfer agreements
+       - Adequacy decisions
+       - Standard contractual clauses
+       - Binding corporate rules
+
+    ### Output Format ###
+    {
+      "gdpr_review": {
+        "summary": {
+          "compliance_score": "<0-100>",
+          "critical_violations": "<count>",
+          "high_violations": "<count>",
+          "medium_violations": "<count>",
+          "low_violations": "<count>"
+        },
+        "findings": [
+          {
+            "id": "GDPR-001",
+            "category": "<violation_category>",
+            "severity": "<critical|high|medium|low>",
+            "article_reference": "<gdpr_article>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "component": "<affected_component>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<compliance_impact>",
+            "remediation": {
+              "recommendation": "<compliance_description>",
+              "code_example": "<compliant_code_sample>",
+              "references": ["<gdpr_article_link>", "<guidance_documentation>"]
+            }
+          }
+        ],
+        "compliance_requirements": [
+          {
+            "category": "<requirement_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "documentation": ["<required_documents>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        class UserService {
+          async saveUser(userData) {
+            // Store user data indefinitely
+            await db.users.insert(userData);
+          }
+        }
+    - output: |
+        {
+          "gdpr_review": {
+            "summary": {
+              "compliance_score": 70,
+              "critical_violations": 1,
+              "high_violations": 0,
+              "medium_violations": 0,
+              "low_violations": 0
+            },
+            "findings": [
+              {
+                "id": "GDPR-001",
+                "category": "Storage Limitation",
+                "severity": "critical",
+                "article_reference": "Article 5(1)(e)",
+                "location": {
+                  "file": "userService.js",
+                  "line_numbers": "1-5",
+                  "component": "saveUser"
+                },
+                "description": "User data is stored indefinitely without retention period",
+                "impact": "Violation of GDPR storage limitation principle",
+                "remediation": {
+                  "recommendation": "Implement data retention period and deletion mechanism",
+                  "code_example": """
+                    class UserService {
+                      async saveUser(userData) {
+                        const retentionPeriod = 365; // days
+                        const expiryDate = new Date();
+                        expiryDate.setDate(expiryDate.getDate() + retentionPeriod);
+                        
+                        await db.users.insert({
+                          ...userData,
+                          retentionPeriod,
+                          expiryDate
+                        });
+                      }
+                      
+                      async cleanupExpiredData() {
+                        await db.users.deleteMany({
+                          expiryDate: { $lt: new Date() }
+                        });
+                      }
+                    }
+                  """,
+                  "references": [
+                    "https://gdpr-info.eu/art-5-gdpr/",
+                    "https://ico.org.uk/for-organisations/guide-to-data-protection/guide-to-the-general-data-protection-regulation-gdpr/principles/storage-limitation/"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "gdpr_review.summary"
+    - "gdpr_review.findings"
+    - "gdpr_review.compliance_requirements"
+  quality_checks:
+    - "Must reference specific GDPR articles for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include official GDPR documentation references" 
