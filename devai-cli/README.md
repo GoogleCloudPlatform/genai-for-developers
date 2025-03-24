@@ -78,6 +78,9 @@ devai review code -c ../sample-app/src/main/java/anthos/samples/bankofanthos/bal
 devai review testcoverage -c ../sample-app/src
 
 devai document readme -c ../sample-app/src/main/
+# Sample command to update README.md file and open GitHub PR
+devai document readme -c ../sample-app/src/main/ -f "sample-app/README.md" -b "feature/docs-update"
+
 devai document update-readme -f ../sample-app/README.md -c ../sample-app/src/main/java/
 devai document releasenotes -c ../sample-app/src/main/java
 devai document update-releasenotes -f ../sample-app/releasenotes.md -c ../sample-app/src/main/java/ -t "v1.2.3"
@@ -151,7 +154,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SER
 
 Add following environment variables/secrets to your CICD pipeline.
 
-If you have JIRA, GitLab and LangSmith integrations enabled, add additional env variables for respective systems, see details in sections below.
+If you have JIRA, GitHub, GitLab and LangSmith integrations enabled, add additional env variables for respective systems, see details in sections below. See additional documentation for [more details](../docs/tutorials/).
 
 - GOOGLE_CLOUD_CREDENTIALS
 - PROJECT_ID
@@ -364,95 +367,14 @@ devai echo
 ## Integrations
 
 ### JIRA command configuration
+[Setup](../docs/tutorials/setup-jira.md) information.
 
-Create JIRA API token for your project.
-
-https://id.atlassian.com/manage-profile/security/api-tokens
-
-Set environment variables required for JIRA integration.
-
-```sh
-export JIRA_API_TOKEN=your-jira-api-token
-export JIRA_USERNAME="email that you used to register with JIRA"
-export JIRA_INSTANCE_URL="https://YOUR-PROJECT.atlassian.net"
-export JIRA_PROJECT_KEY="JIRA project key"
-export JIRA_CLOUD=true
-```
-
-#### Enable functionality
-Un-comment imports and function calls to use JIRA commands
-- cli.py
-- review.py
-
-#### Commands to test JIRA integration
-
-```sh
-# Will return list of JIRA issues in specified JIRA project
-devai jira list -c YOUR_JIRA_PROJECT_KEY
-
-# Will create a new JIRA issue with provided details as is
-devai jira create -c "New Feature request to implement Login Page.\nExample code block:\n {code}print(\"devai cli\"){code}"
-
-# Will generate implementation and create a new JIRA issue with details
-devai jira fix -c "write ring buffer implementation in Rust"
-```
+### GitHub command configuration
+[Setup](../docs/tutorials/setup-github.md) information.
 
 ### GitLab command configuration
-
-Create Project Access Token with following details:
-
-- role: Maintainer
-- selected scopes: api
-
-https://gitlab.com/YOUR-USERID/YOUR-PROJECT/-/settings/access_tokens
-
-Set environment variables required for GitLab integration.
-
-```sh
-export GITLAB_PERSONAL_ACCESS_TOKEN=your-gitlab-token
-
-export GITLAB_URL="https://gitlab.com"
-export GITLAB_REPOSITORY="USERID/REPOSITORY"
-export GITLAB_BRANCH="devai"
-export GITLAB_BASE_BRANCH="main"
-```
-
-#### Enable functionality
-Un-comment imports and function calls to use GitLab commands
-- cli.py
-- review.py
-
-#### Commands to test GitLab integration
-
-```sh
-# Will create a new merge request with provided details
-# Requires a branch to be created off main - manual step at this point
-# export GITLAB_BRANCH="fix-branch"
-devai gitlab create-pr -c "Details with file changes, docs, etc"
-
-# Will create a new GitLab issue with provided details as is
-devai gitlab fix-issue -c 4
-
-# Will add a comment to GitLab issue 
-# issue name defaults to 'CICD AI Insights' for demonstration
-devai gitlab create-comment -c "new comment content goes here"
-
-# Will add a comment to GitLab issue with name 'CICD AI Insights'
-devai gitlab create-comment -i "CICD AI Insights" -c "new comment content goes here"
-```
+[Setup](../docs/tutorials/setup-gitlab.md) information.
 
 
 ### LangSmith LLM tracing configuration
-Create an account and generate API key.
-
-https://docs.smith.langchain.com/
-
-Set environment variables required for LangSmith integration.
-
-```sh
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-
-read -s LANGCHAIN_API_KEY
-export LANGCHAIN_API_KEY
-```
+[Setup](../docs/tutorials/setup-langsmith.md) information.

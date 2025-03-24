@@ -14,7 +14,9 @@ resources:
   - key: main
     path: src/frontend/index.jsx
 app:
-  id: ari:cloud:ecosystem::app/07fca444-181a-45d2-9985-9c30b3547558
+  runtime:
+    name: nodejs22.x
+  id: ari:cloud:ecosystem::app/a48501f0-938f-4353-848e-f8589fccf4f8
 permissions:
   scopes:
     - read:jira-work
@@ -22,4 +24,4 @@ permissions:
   external:
     fetch:
       client:
-        - devai-api-7su2ctuqpq-uc.a.run.app/generate
+        - devai-api-133934646591.us-central1.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL

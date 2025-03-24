@@ -42,10 +42,13 @@ Create a service account and grant roles.
 PROJECT_ID=$(gcloud config get-value project)
 SERVICE_ACCOUNT_NAME='vertex-client'
 DISPLAY_NAME='Vertex Client'
-KEY_FILE_NAME='vertex-client-key'
 
 gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --project $PROJECT_ID --display-name "$DISPLAY_NAME"
+```
 
+Grant roles.
+
+```
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.admin"
 
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.user"
@@ -59,9 +62,6 @@ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SER
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
 
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
-
-
-gcloud iam service-accounts keys create $KEY_FILE_NAME.json --iam-account=$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
 
 ```
 
@@ -125,7 +125,7 @@ Review Gemini's explanation for the selected file.
 
 ## LangChain Toolkits
 
-[LangChain Toolkits](https://python.langchain.com/docs/integrations/toolkits/) are sets of tools designed to streamline and enhance the development of applications with LangChain. They offer various functionalities depending on the specific toolkit, but generally, they help with:
+[LangChain Toolkits](https://python.langchain.com/docs/integrations/tools/) are sets of tools designed to streamline and enhance the development of applications with LangChain. They offer various functionalities depending on the specific toolkit, but generally, they help with:
 
 * **Connecting to external data sources**: Access and incorporate information from APIs, databases, and other external sources into your LangChain applications.
 * **Advanced prompting techniques**: Utilize pre-built prompts or create custom ones to optimize interactions with language models.
@@ -159,7 +159,7 @@ GitLab toolkit can perform following tasks:
 
 
 
-Open [GitLab](https://gitlab.com/), create a new public project and set up Project Access Token under "`Settings / Access Tokens`".
+Open [GitLab](https://gitlab.com/), create a new project and set up Project Access Token under "`Settings / Access Tokens`".
 
 Use following details:
 
@@ -171,9 +171,6 @@ Use following details:
 
 
 Copy and paste the Access Token value into a temp file on your laptop, it will be used in the next steps. 
-
-Create a new branch "`devai`" off the "`main`" branch under "`Code / Branches`".
-
 
 
 ## Prepare to deploy application on Cloud Run
@@ -302,6 +299,20 @@ echo -n $LANGCHAIN_API_KEY | \
  --data-file=-
 ```
 
+
+[Create new API key](https://console.cloud.google.com/apis/credentials) to authenticate API calls.
+
+Set `DEVAI_API_KEY` and create a secret:
+
+```sh
+read -s DEVAI_API_KEY
+export DEVAI_API_KEY
+
+echo -n $DEVAI_API_KEY | \
+ gcloud secrets create DEVAI_API_KEY \
+ --data-file=-
+```
+
 Deploy application to Cloud Run.
 
 ```
@@ -324,6 +335,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
   --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
+  --update-secrets="DEVAI_API_KEY=DEVAI_API_KEY:latest" \
   --min-instances=1 \
   --max-instances=3
 ```
@@ -348,22 +360,16 @@ Review Cloud Build logs in the  [Console](https://console.cloud.google.com/cloud
 
 Review created Docker image in  [Artifact Registry](https://console.cloud.google.com/artifacts).
 
-Open `cloud-run-source-deploy/devai-api` and review vulnerabilities that were automatically detected. Check ones that have fixes available and see how it can be fixed based on the description.
-
-
-
 Review Cloud Run instance details in the  [Cloud Console](https://console.cloud.google.com/run).
 
-Test endpoint by running curl command.
+### Test endpoint by running curl command.
 
 ```
-curl -X POST \
-   -H "Content-Type: application/json" \
-   -d '{"prompt": "Create HTML, CSS and JavaScript using React.js framework to implement Login page with username and password fields, validation and documentation. Provide complete implementation, do not omit anything."}' \
-   $(gcloud run services list --filter="(devai-api)" --format="value(URL)")/generate
+curl -H "X-devai-api-key: $DEVAI_API_KEY" \
+   $(gcloud run services list --filter="(devai-api)" --format="value(URL)")/test
 ```
 
-## Forge platform
+## Automate story implementation
 
 [Forge](https://developer.atlassian.com/platform/forge/) is a platform that allows developers to build apps that integrate with Atlassian products, such as Jira, Confluence, Compass and Bitbucket.
 
@@ -431,6 +437,8 @@ The CLI uses your token when running commands.
 4. Click **Create**.
 5. Click **Copy to clipboard** and close the dialog.
 
+### Configure Forge environment settings
+
 Run command below in the Cloud Workstations terminal.
 
 Log in to the Forge CLI to start using Forge commands.
@@ -487,6 +495,12 @@ Change into the application folder.
 
 ```
 cd devai-jira-ui-qwiklabs/
+```
+
+
+Run command to install dependencies.
+```
+npm install
 ```
 
 Run deployment command.
@@ -611,6 +625,16 @@ export DEVAI_API_URL=$(gcloud run services list --filter="(devai-api)" --format=
 forge variables set DEVAI_API_URL $DEVAI_API_URL
 ```
 
+Set DEVAI API Key:
+```
+export DEVAI_API_KEY=api-key-that-you-created
+
+forge variables set --encrypt DEVAI_API_KEY $DEVAI_API_KEY
+```
+
+
+
+
 Confirm by running command below:
 
 ```
@@ -636,7 +660,7 @@ permissions:
   external:
     fetch:
       client:
-        - devai-api-gjerpi6qqq-uc.a.run.app/generate # replace with YOUR CLOUD RUN URL
+        - devai-api-gjerpi6qqq-uc.a.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL
 ```
 
 Open resolvers/index file in the editor: `devai-jira-ui-qwiklabs/src/resolvers/index.js`
@@ -645,7 +669,7 @@ Add lines below after the existing `getText` function.
 
 ```
 resolver.define('getApiKey', (req) => {
-  return process.env.LLM_API_KEY;
+  return process.env.DEVAI_API_KEY;
 });
 
 resolver.define('getDevAIApiUrl', (req) => {
@@ -670,7 +694,7 @@ import { requestJira } from '@forge/bridge';
 import { invoke } from '@forge/bridge';
 import api, { route, assumeTrustedRoute } from '@forge/api';
 
-// const apiKey = await invoke("getApiKey")
+const devAIApiKey = await invoke("getApiKey")
 const devAIApiUrl = await invoke("getDevAIApiUrl")
 
 
@@ -684,42 +708,22 @@ const App = () => {
   
     const res = await requestJira(`/rest/api/2/issue/${issueId}`);
     const data = await res.json();
-    
-    // const genAI = new GoogleGenerativeAI(apiKey);
-    // const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-    // const prompt = `You are principal software engineer at Google and given requirements below to implement.\nPlease provide implementation details and documentation.\n\nREQUIREMENTS:\n\n${data.fields.description}`
-    // const result = await model.generateContent(prompt);
-    // const text = result.response.text();
-    // const jsonText = JSON.stringify(text);
 
     const bodyGenerateData = `{"prompt": ${JSON.stringify(data.fields.description)}}`;
 
-    const generateRes = await api.fetch(devAIApiUrl+'/generate',
+    const generateRes = await api.fetch(devAIApiUrl+'/create-gitlab-mr',
       {
         body: bodyGenerateData,
         method: 'post',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-devai-api-key': devAIApiKey,
+         },
       }
     )
 
-
     const resData = await generateRes.text();
-    const jsonText = JSON.stringify(resData);
 
-    const bodyData = `{
-      "body": ${jsonText}
-    }`;
-
-    console.log("bodyData", bodyData)
-    // Add Gemini response as a comment on the JIRA issue
-    await requestJira(`/rest/api/2/issue/${issueId}/comment`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: bodyData
-    });
     // Add link to the GitLab merge request page as a comment
     await requestJira(`/rest/api/2/issue/${issueId}/comment`, {
       method: 'POST',
@@ -727,7 +731,7 @@ const App = () => {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: `{"body": "[GitLab Merge Request|https://gitlab.com/YOUR-GIT-USERID/YOUR-GIT-REPO/-/merge_requests]"}`
+      body: `{"body": "[GitLab Merge Request|https://gitlab.com/gitrey/qwiklabs-test/-/merge_requests]"}`
     });
 
 
@@ -743,7 +747,7 @@ const App = () => {
   return (
     <>
       <Text>{description}</Text>
-      <Link href='https://gitlab.com/YOUR-GIT-USERID/YOUR-GIT-REPO/-/merge_requests' openNewTab={true}>GitLab Merge Request</Link>
+      <Link href='https://gitlab.com/gitrey/qwiklabs-test/-/merge_requests' openNewTab={true}>GitLab Merge Request</Link>
     </>
   );
 };
@@ -756,6 +760,16 @@ ForgeReconciler.render(
 ```
 
 ### Redeploy Forge application
+
+Add dependencies in `package.json` file:
+```
+"@forge/api": "4.0.0",
+```
+
+Run command to install dependencies:
+```
+npm install
+```
 
 Deploy updated application:
 
@@ -814,112 +828,14 @@ Click "`...`" and select remove from the menu. After that, you can click on the 
 
 ### Check Jira comments 
 
-Once you get back a response from DEVAI API, two comments will be added on the JIRA issue.
+Once you get back a response from DEVAI API, comments will be added on the JIRA issue.
 
 * GitLab merge request
-* Gemini user story implementation details
+
 
 Toggle between "`History`" and "`Comments`" tabs to refresh the view.
 
-
-### Enable GitLab Merge Request creation
-
-Open file `devai-api/app/routes.py` and uncomment lines below in the `generate_handler` method:
-
-```
-print(f"{response.text}\n")
-
-    # resp_text = response.candidates[0].content.parts[0].text
-
-    # pr_prompt = f"""Create GitLab merge request using provided details below.
-    # Create new files, commit them and push them to opened merge request.
-    # When creating new files, remove the lines that start with ``` before saving the files.
-
-    # DETAILS: 
-    # {resp_text}
-    # """
-
-    # print(pr_prompt)
-    # agent.invoke(pr_prompt)
-```
-
-### Redeploy Cloud Run application
-
-Check that you are in the right folder.
-
-```
-cd ~/github/genai-for-developers/devai-api
-```
-
-If you are using the same terminal session you might have all the environment variables still set.
-
-Check it by running "`echo $GITLAB_REPOSITORY`" in the terminal.
-
-Follow these steps to reset them if a new terminal session was opened.
-
-Make sure to reset required environment variables before redeploying the application.
-
-This command requires you to update your GitLab userid and repository name.
-
-```
-export GITLAB_REPOSITORY="USERID/REPOSITORY"
-```
-
-Set rest of the environment variables:
-
-```
-export GITLAB_URL="https://gitlab.com"
-export GITLAB_BRANCH="devai"
-export GITLAB_BASE_BRANCH="main"
-
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-
-export LOCATION=us-central1
-export REPO_NAME=devai-api
-export SERVICE_NAME=devai-api
-export PROJECT_ID=$(gcloud config get-value project)
-
-export JIRA_USERNAME="YOUR-EMAIL"
-export JIRA_INSTANCE_URL="https://YOUR-JIRA-PROJECT.atlassian.net"
-export JIRA_PROJECT_KEY="YOUR-JIRA-PROJECT-KEY"
-```
-
-The GitLab toolkit will be using the "`devai`" branch to push the changes for merge request.
-
-Verify that you created that branch already.
-
-#### Deploy application to Cloud Run.
-
-```
-gcloud run deploy "$SERVICE_NAME" \
-  --source=. \
-  --region="$LOCATION" \
-  --allow-unauthenticated \
-  --service-account vertex-client \
-  --set-env-vars PROJECT_ID="$PROJECT_ID" \
-  --set-env-vars LOCATION="$LOCATION" \
-  --set-env-vars GITLAB_URL="$GITLAB_URL" \
-  --set-env-vars GITLAB_REPOSITORY="$GITLAB_REPOSITORY" \
-  --set-env-vars GITLAB_BRANCH="$GITLAB_BRANCH" \
-  --set-env-vars GITLAB_BASE_BRANCH="$GITLAB_BASE_BRANCH" \
-  --set-env-vars JIRA_USERNAME="$JIRA_USERNAME" \
-  --set-env-vars JIRA_INSTANCE_URL="$JIRA_INSTANCE_URL" \
-  --set-env-vars JIRA_PROJECT_KEY="$JIRA_PROJECT_KEY" \
-  --set-env-vars JIRA_CLOUD="$JIRA_CLOUD" \
-  --set-env-vars LANGCHAIN_TRACING_V2="$LANGCHAIN_TRACING_V2" \
-  --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
-  --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
-  --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
-  --min-instances=1 \
-  --max-instances=3
-```
-
-### Verify end to end integration
-
-Kick off the process from the JIRA task by clicking the button again and verify output in GitLab repository, under Merge request section, and LangSmith.
-
-#### GitLab Merge request details.
+### Verify GitLab Merge request details.
 
 Open GitLab repository and review created merge request.
 
@@ -928,12 +844,6 @@ Open GitLab repository and review created merge request.
 Open  [LangSmith portal](https://smith.langchain.com/) and review LLM trace for JIRA issue creation call.
 
 Sample LangSmith LLM trace.
-
-#### Re-running the integration
-GitLab Toolkit does not create new branches and you would need to manually do the following things if you want to re-run the process.
-
-* Close merge request in GitLab
-* Delete the existing "`devai`" branch in GitLab repository and then create a new one.
 
 ### (OPTIONAL SECTION) Push your changes to GitHub repo
 

@@ -6,9 +6,13 @@ This application defines the routes for the DevAI API.
 
 The API provides two main endpoints:
 
-`/generate`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate code and documentation based on the prompt.
+`/create-gitlab-mr`: This endpoint takes a user prompt as input and uses the Gemini model to generate code and documentation based on the prompt.
 
-`/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini 1.5 Pro model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
+`/generate`: This endpoint takes a user prompt as input and uses the Gemini model to generate code and documentation based on the prompt.
+
+`/create-jira-issue`: This endpoint takes a user prompt as input and uses the Gemini model to generate a detailed technical prompt for a JIRA user story based on the input requirements.
+
+`/create-github-pr`: This endpoint takes a user prompt as input and uses the Gemini model to generate documentation based and opens GitHub pull request with updated README.md file.
 
 The API includes a `/test` endpoint for testing purposes.
 
@@ -41,7 +45,16 @@ For integration with GitLab:
 - GITLAB_BRANCH: The GitLab branch.
 - GITLAB_BASE_BRANCH: The GitLab base branch.
 
-For integration with LAngSmith:
+For integration with GitHub:
+
+- GITHUB_APP_ID: The GitHub App id.
+- GITHUB_ACCOUNT: The GitHub account(org or userid).
+- GITHUB_REPO_NAME: The GitHub repository name.
+- GITHUB_APP_INSTALLATION_ID: The GitHub App installation id.
+
+GitHub App setup [details](../docs/tutorials/setup-github.md).
+
+For integration with LangSmith:
 
 - LANGCHAIN_TRACING_V2: The LangChain tracing flag.
 - LANGCHAIN_ENDPOINT: The LangChain endpoint.
@@ -51,6 +64,7 @@ The code uses the following secrets:
 - LANGCHAIN_API_KEY: The LangChain API key.
 - GITLAB_PERSONAL_ACCESS_TOKEN: The GitLab personal access token.
 - JIRA_API_TOKEN: The JIRA API token.
+- GITHUB_APP_PRIVATE_KEY: GitHub App private key.
 
 ## JIRA User story implementation
 
@@ -76,7 +90,20 @@ gcloud auth login
 gcloud config set project $PROJECT_ID
 ```
 
-Set `JIRA_API_TOKEN` and create a secret:
+Enable APIs
+```sh
+gcloud services enable \
+    aiplatform.googleapis.com \
+    cloudaicompanion.googleapis.com \
+    cloudresourcemanager.googleapis.com \
+    secretmanager.googleapis.com \
+    run.googleapis.com \
+    cloudbuild.googleapis.com \
+    artifactregistry.googleapis.com \
+    logging.googleapis.com
+```
+
+Set `JIRA_API_TOKEN` and create a secret([details](../docs/tutorials/setup-jira.md)):
 
 ```sh
 read -s JIRA_API_TOKEN
@@ -86,7 +113,7 @@ echo -n $JIRA_API_TOKEN | \
  gcloud secrets create JIRA_API_TOKEN \
  --data-file=-
 ```
-Set `GITLAB_PERSONAL_ACCESS_TOKEN` and create a secret:
+Set `GITLAB_PERSONAL_ACCESS_TOKEN` and create a secret([details](../docs/tutorials/setup-gitlab.md)):
 
 ```sh
 read -s GITLAB_PERSONAL_ACCESS_TOKEN
@@ -97,7 +124,14 @@ echo -n $GITLAB_PERSONAL_ACCESS_TOKEN | \
  --data-file=-
 ```
 
-Set `LANGCHAIN_API_KEY` and create a secret:
+Set `GITHUB_APP_PRIVATE_KEY` and create a secret([details](../docs/tutorials/setup-github.md)):
+
+```sh
+gcloud secrets create GITHUB_APP_PRIVATE_KEY \
+  --data-file="/tmp/path-to-your-github-app.private-key.pem"
+```
+
+Set `LANGCHAIN_API_KEY` and create a secret([details](../docs/tutorials/setup-langsmith.md)):
 
 ```sh
 read -s LANGCHAIN_API_KEY
@@ -105,6 +139,17 @@ export LANGCHAIN_API_KEY
 
 echo -n $LANGCHAIN_API_KEY | \
  gcloud secrets create LANGCHAIN_API_KEY \
+ --data-file=-
+```
+
+Set `DEVAI_API_KEY` and create a secret([Create new API key](https://console.cloud.google.com/apis/credentials)):
+
+```sh
+read -s DEVAI_API_KEY
+export DEVAI_API_KEY
+
+echo -n $DEVAI_API_KEY | \
+ gcloud secrets create DEVAI_API_KEY \
  --data-file=-
 ```
 
@@ -122,6 +167,11 @@ export GITLAB_REPOSITORY="GITLAB-USERID/GITLAB-REPO"
 
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+
+export GITHUB_APP_ID=APP_ID
+export GITHUB_ACCOUNT="YOUR-USERID"
+export GITHUB_REPO_NAME="REPO-NAME"
+export GITHUB_APP_INSTALLATION_ID=INSTALLATION_ID
 ```
 
 Deploy service to Cloud Run:
@@ -132,6 +182,36 @@ cd ~/genai-for-developers/devai-api
 ```
 
 Deploy application:
+
+### Configure Service Account for Cloud Run application
+
+Run commands below to create service account.
+
+```sh
+PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+SERVICE_ACCOUNT_NAME='vertex-client'
+DISPLAY_NAME='Vertex Client'
+KEY_FILE_NAME='vertex-client-key'
+
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "$DISPLAY_NAME"
+```
+
+Grant roles for Cloud Run service account:
+```sh
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/aiplatform.admin" --condition None
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor" --condition None
+```
+
+Grant roles for default compute account:
+```sh
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+ --member=serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com \
+ --role=roles/run.builder
+```
+
+### Deploy Cloud Run application:
 
 ```sh
 gcloud run deploy devai-api \
@@ -150,9 +230,15 @@ gcloud run deploy devai-api \
   --set-env-vars JIRA_PROJECT_KEY="$JIRA_PROJECT_KEY" \
   --set-env-vars LANGCHAIN_TRACING_V2="$LANGCHAIN_TRACING_V2" \
   --set-env-vars JIRA_CLOUD="$JIRA_CLOUD" \
+  --set-env-vars GITHUB_APP_ID=$GITHUB_APP_ID \
+  --set-env-vars GITHUB_ACCOUNT="$GITHUB_ACCOUNT" \
+  --set-env-vars GITHUB_REPO_NAME="$GITHUB_REPO_NAME" \
+  --set-env-vars GITHUB_APP_INSTALLATION_ID="$GITHUB_APP_INSTALLATION_ID" \
   --update-secrets="LANGCHAIN_API_KEY=LANGCHAIN_API_KEY:latest" \
   --update-secrets="GITLAB_PERSONAL_ACCESS_TOKEN=GITLAB_PERSONAL_ACCESS_TOKEN:latest" \
   --update-secrets="JIRA_API_TOKEN=JIRA_API_TOKEN:latest" \
+  --update-secrets="GITHUB_APP_PRIVATE_KEY=GITHUB_APP_PRIVATE_KEY:latest" \
+  --update-secrets="DEVAI_API_KEY=DEVAI_API_KEY:latest" \
   --min-instances=1 \
   --max-instances=3
 ```
