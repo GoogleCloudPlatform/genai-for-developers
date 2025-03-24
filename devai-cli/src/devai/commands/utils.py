@@ -3,7 +3,7 @@ import click
 from google.cloud.aiplatform import telemetry
 from langchain_google_vertexai import ChatVertexAI
 
-from ..constants import USER_AGENT, MODEL_NAME
+from .constants import USER_AGENT, MODEL_NAME
 
 def check_required_env_vars():
     """Check for required environment variables"""
