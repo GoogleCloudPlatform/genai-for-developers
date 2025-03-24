@@ -31,6 +31,8 @@ pipelines:
             - export JIRA_PROJECT_KEY=$(echo $JIRA_PROJECT_KEY)
             - export JIRA_CLOUD=true
 
+            - devai review testcoverage -c ./sample-app/src
             - devai review code -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
+            - devai review compliance --context ./sample-app/k8s --config ./devai-cli/gemini/styleguide.md
             - devai review performance -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
             - devai review security -c ./sample-app/src/main/java/anthos/samples/bankofanthos/balancereader
