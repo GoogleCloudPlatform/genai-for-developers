@@ -21,7 +21,7 @@ const App = () => {
 
     const bodyGenerateData = `{"prompt": ${JSON.stringify(data.fields.description)}}`;
 
-    const generateRes = await api.fetch(devAIApiUrl+'/generate',
+    const generateRes = await api.fetch(devAIApiUrl+'/create-gitlab-mr',
       {
         body: bodyGenerateData,
         method: 'post',
