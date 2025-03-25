@@ -13,12 +13,22 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+import os
+
+# Get the path to the prompts directory (inside src)
+PROMPTS_DIR = os.path.join(os.path.dirname(__file__), 'prompts')
 
 setup(
     name='devai-cli',
     version='0.0.0',
     packages=find_packages(),
     py_modules=['devai'],
+    package_data={
+        'devai': ['prompts/**/*.yaml'],  # Include all YAML files from prompts directory
+    },
+    data_files=[
+        ('prompts', [os.path.join(PROMPTS_DIR, f) for f in os.listdir(PROMPTS_DIR) if f.endswith('.yaml')]),
+    ],
     install_requires=[
         'click==8.1.7',
         'google-cloud-aiplatform'

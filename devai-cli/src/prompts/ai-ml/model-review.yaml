@@ -1,0 +1,213 @@
+metadata:
+  name: "AI/ML Model Review"
+  description: "A comprehensive review of AI/ML models focusing on performance, ethics, and best practices"
+  version: "1.0"
+  category: "ai-ml"
+  subcategory: "model"
+  author: "DevAI"
+  last_updated: "2025-03-20"
+  tags: ["ai", "ml", "model", "performance", "ethics"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 2048
+  output_format: "json"
+
+prompt:
+  system_context: |
+    You are an expert in AI/ML model development and evaluation, with extensive experience in model performance, ethics, and best practices.
+
+  instruction: |
+    ### Task Description ###
+    Conduct a comprehensive review of the provided AI/ML model implementation, focusing on performance, ethics, and best practices.
+
+    ### Focus Areas ###
+    1. Model Performance
+       - Accuracy metrics
+       - Training process
+       - Validation strategy
+       - Hyperparameter tuning
+       - Model selection
+
+    2. Data Quality
+       - Data preprocessing
+       - Feature engineering
+       - Data validation
+       - Bias detection
+       - Data privacy
+
+    3. Model Architecture
+       - Layer design
+       - Activation functions
+       - Regularization
+       - Model complexity
+       - Resource usage
+
+    4. Deployment & Operations
+       - Model serving
+       - Monitoring
+       - Versioning
+       - Scaling
+       - Maintenance
+
+    5. Ethics & Fairness
+       - Bias mitigation
+       - Fairness metrics
+       - Transparency
+       - Accountability
+       - Privacy protection
+
+    ### Output Format ###
+    {
+      "model_review": {
+        "summary": {
+          "quality_score": "<0-100>",
+          "critical_issues": "<count>",
+          "high_issues": "<count>",
+          "medium_issues": "<count>",
+          "low_issues": "<count>"
+        },
+        "findings": [
+          {
+            "id": "ML-001",
+            "category": "<issue_category>",
+            "severity": "<critical|high|medium|low>",
+            "component": "<affected_component>",
+            "location": {
+              "file": "<filename>",
+              "line_numbers": "<start-end>",
+              "model": "<affected_model>"
+            },
+            "description": "<detailed_description>",
+            "impact": "<model_impact>",
+            "remediation": {
+              "recommendation": "<improvement_description>",
+              "code_example": "<improved_code_sample>",
+              "references": ["<ml_guidelines>", "<best_practices>"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "category": "<recommendation_category>",
+            "description": "<description>",
+            "implementation": "<implementation_details>",
+            "benefits": ["<benefit1>", "<benefit2>"]
+          }
+        ]
+      }
+    }
+
+  examples:
+    - input: |
+        def train_model(X_train, y_train):
+            model = RandomForestClassifier()
+            model.fit(X_train, y_train)
+            return model
+
+        def predict(model, X):
+            return model.predict(X)
+    - output: |
+        {
+          "model_review": {
+            "summary": {
+              "quality_score": 40,
+              "critical_issues": 1,
+              "high_issues": 0,
+              "medium_issues": 0,
+              "low_issues": 0
+            },
+            "findings": [
+              {
+                "id": "ML-001",
+                "category": "Model Performance",
+                "severity": "critical",
+                "component": "training",
+                "location": {
+                  "file": "model.py",
+                  "line_numbers": "1-6",
+                  "model": "RandomForestClassifier"
+                },
+                "description": "Missing model evaluation, hyperparameter tuning, and cross-validation",
+                "impact": "Poor model performance and potential overfitting",
+                "remediation": {
+                  "recommendation": "Implement comprehensive model evaluation and optimization",
+                  "code_example": """
+                    from sklearn.model_selection import GridSearchCV, cross_val_score
+                    from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score
+
+                    def train_model(X_train, y_train):
+                        # Define parameter grid for hyperparameter tuning
+                        param_grid = {
+                            'n_estimators': [100, 200, 300],
+                            'max_depth': [10, 20, 30, None],
+                            'min_samples_split': [2, 5, 10],
+                            'min_samples_leaf': [1, 2, 4]
+                        }
+
+                        # Create scoring metrics
+                        scoring = {
+                            'accuracy': make_scorer(accuracy_score),
+                            'precision': make_scorer(precision_score, average='weighted'),
+                            'recall': make_scorer(recall_score, average='weighted')
+                        }
+
+                        # Initialize base model
+                        base_model = RandomForestClassifier(random_state=42)
+
+                        # Perform grid search with cross-validation
+                        grid_search = GridSearchCV(
+                            estimator=base_model,
+                            param_grid=param_grid,
+                            scoring=scoring,
+                            cv=5,
+                            n_jobs=-1,
+                            verbose=1
+                        )
+
+                        # Fit the model
+                        grid_search.fit(X_train, y_train)
+
+                        # Get best model
+                        best_model = grid_search.best_estimator_
+
+                        # Perform cross-validation on best model
+                        cv_scores = cross_val_score(
+                            best_model,
+                            X_train,
+                            y_train,
+                            cv=5,
+                            scoring='accuracy'
+                        )
+
+                        return {
+                            'model': best_model,
+                            'best_params': grid_search.best_params_,
+                            'best_score': grid_search.best_score_,
+                            'cv_scores': cv_scores,
+                            'cv_mean': cv_scores.mean(),
+                            'cv_std': cv_scores.std()
+                        }
+
+                    def predict(model, X):
+                        return model['model'].predict(X)
+                  """,
+                  "references": [
+                    "https://scikit-learn.org/stable/modules/cross_validation.html",
+                    "https://scikit-learn.org/stable/modules/grid_search.html"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+
+validation:
+  required_sections:
+    - "model_review.summary"
+    - "model_review.findings"
+    - "model_review.recommendations"
+  quality_checks:
+    - "Must specify affected component for all findings"
+    - "Must provide code examples for all remediations"
+    - "Must include ML documentation references" 
