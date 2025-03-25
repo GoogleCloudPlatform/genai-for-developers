@@ -395,14 +395,16 @@ devai prompts list
 # Show details of a specific prompt
 devai prompts show security/web-security.yaml
 
-# Create a new prompt template
-devai prompts create
+# Configure prompts directory
+devai prompts config --set-path /path/to/prompts
 
 # Initialize a prompts directory with sample templates
 devai prompts init
 
-# Configure prompts directory
-devai prompts config --set-path /path/to/prompts
+# Create a new prompt template
+devai prompts create
+
+
 ```
 
 ### Understanding Prompt Structure
