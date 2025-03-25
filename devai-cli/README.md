@@ -378,3 +378,215 @@ devai echo
 
 ### LangSmith LLM tracing configuration
 [Setup](../docs/tutorials/setup-langsmith.md) information.
+
+
+
+
+## Prompts Command
+
+The `prompts` command provides a powerful template system for managing and executing AI prompts. It allows you to create, manage, and reuse prompt templates for different types of code analysis, documentation, and review tasks. Templates are stored in YAML format and can be organized by categories, making them easy to find and maintain.
+
+### Basic Commands
+
+```bash
+# List all available prompts
+devai prompts list
+
+# Show details of a specific prompt
+devai prompts show security/web-security.yaml
+
+# Create a new prompt template
+devai prompts create
+
+# Initialize a prompts directory with sample templates
+devai prompts init
+
+# Configure prompts directory
+devai prompts config --set-path /path/to/prompts
+```
+
+### Understanding Prompt Structure
+
+Each prompt template is a YAML file with the following structure:
+
+```yaml
+metadata:
+  name: "Web Security Review"
+  description: "Review web application security best practices"
+  version: "1.0"
+  category: "security"
+  subcategory: "web-security"
+  author: "DevAI"
+  last_updated: "2024-03-25"
+  tags: ["security", "web", "review"]
+
+configuration:
+  temperature: 0.7
+  max_tokens: 1024
+  output_format: "markdown"
+
+prompt:
+  system_context: "You are a security expert reviewing web applications."
+  instruction: "Review the following web application code for security vulnerabilities and best practices."
+  examples:
+    - input: "Check this login form for security issues"
+      output: |
+        1. Missing CSRF token
+        2. Password field lacks minimum length requirement
+        3. No rate limiting on login attempts
+
+validation:
+  required_sections: ["vulnerabilities", "recommendations"]
+  output_schema: {}
+  quality_checks: []
+```
+
+### Working with Prompts
+
+1. **Initializing Your Prompts Directory**
+   ```bash
+   # Create a new prompts directory with sample templates
+   devai prompts init
+   
+   # Force initialization even if directory exists
+   devai prompts init --force
+   ```
+
+2. **Listing Available Prompts**
+   ```bash
+   # List all prompts
+   devai prompts list
+   
+   # Filter by category
+   devai prompts list --category security
+   
+   # Filter by subcategory
+   devai prompts list --subcategory web-security
+   
+   # Filter by tags
+   devai prompts list --tag security --tag web
+   ```
+
+3. **Creating Custom Prompts**
+   ```bash
+   # Interactive prompt creation
+   devai prompts create
+   
+   # Follow the prompts to enter:
+   # - Prompt name
+   # - Category
+   # - Subcategory
+   # - Description
+   # - Tags
+   ```
+
+4. **Managing Prompt Directories**
+   ```bash
+   # Show current prompts directory
+   devai prompts config --show
+   
+   # Set custom prompts directory
+   devai prompts config --set-path /path/to/prompts
+   
+   # Reset to use package prompts
+   devai prompts config --reset
+   ```
+
+### Prompt Overrides
+
+The CLI supports a hierarchical prompt system:
+
+1. **Package Prompts**: Default prompts included with the CLI
+2. **User Prompts**: Custom prompts in your prompts directory
+3. **Overrides**: User prompts with the same name as package prompts will override the package version
+
+Example of overriding a package prompt:
+```bash
+# 1. Initialize your prompts directory
+devai prompts init
+
+# 2. Edit the web-security.yaml file to customize it
+vim ~/.devai/prompts/security/web-security.yaml
+
+# 3. Your version will now be used instead of the package version
+devai prompts show security/web-security.yaml
+```
+
+### Best Practices
+
+1. **Organization**
+   - Use categories and subcategories to organize prompts
+   - Add descriptive tags for better filtering
+   - Keep prompt names clear and consistent
+
+2. **Content**
+   - Write clear, specific instructions
+   - Include relevant examples
+   - Use markdown formatting for better readability
+   - Keep system context focused and relevant
+
+3. **Version Control**
+   - Consider versioning your prompts
+   - Document changes in the `last_updated` field
+   - Use semantic versioning for major changes
+
+4. **Validation**
+   - Define required sections for consistent output
+   - Add quality checks where appropriate
+   - Use output schemas for structured responses
+
+### Example Use Cases
+
+1. **Security Review Template**
+   ```yaml
+   metadata:
+     name: "API Security Review"
+     category: "security"
+     subcategory: "api-security"
+     tags: ["security", "api", "review"]
+
+   prompt:
+     system_context: "You are an API security expert."
+     instruction: |
+       Review the API endpoints for:
+       1. Authentication mechanisms
+       2. Authorization controls
+       3. Input validation
+       4. Rate limiting
+       5. Error handling
+   ```
+
+2. **Performance Optimization Template**
+   ```yaml
+   metadata:
+     name: "Database Query Optimization"
+     category: "performance"
+     subcategory: "database"
+     tags: ["performance", "database", "optimization"]
+
+   prompt:
+     system_context: "You are a database optimization expert."
+     instruction: |
+       Analyze the database queries for:
+       1. Index usage
+       2. Query patterns
+       3. Connection management
+       4. N+1 query issues
+   ```
+
+### Troubleshooting
+
+1. **Prompt Not Found**
+   - Check if the prompt exists in the correct directory
+   - Verify the path is correct
+   - Ensure the file has a `.yaml` extension
+
+2. **Override Not Working**
+   - Confirm the file name matches exactly
+   - Check file permissions
+   - Verify the prompts directory is correctly configured
+
+3. **Configuration Issues**
+   - Use `devai prompts config --show` to verify settings
+   - Check directory permissions
+   - Ensure YAML syntax is valid
