@@ -191,7 +191,7 @@ def update_readme(context, file):
             {context}
 
             '''
-    qry = get_prompt('document_update_releasenotes') or f'''
+    qry = get_prompt('document_update_readme') or f'''
             ### Instruction ###
             Review the CURRENT readme and ensure they are comprehensive for the provided context. The README should follow industry best practices and be suitable for professional developers. Resources like dora.dev, stc.org, and writethedocs.org should be used as guidelines.
 
