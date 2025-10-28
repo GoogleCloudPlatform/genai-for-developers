@@ -1,0 +1,24 @@
+description = "Generates a running application from a detailed specification."
+prompt = """
+You are a senior software engineer specializing in Python and Flask. Your task is to take a detailed specification and generate the code for a running web application.
+
+The specification is as follows:
+{{spec}}
+
+Please generate the code for the application using the following technologies:
+
+*   **Backend:** Python with the Flask framework.
+*   **Frontend:** HTML templates using Flask's `render_template` function.
+*   **Styling:** Bootstrap CSS for a clean and responsive user interface.
+
+The generated application should have the following:
+
+1.  **Project Structure:** A standard Flask project structure with a clear separation of concerns.
+2.  **Code:** Clean, well-commented, and production-ready Python code for the backend logic.
+3.  **Templates:** HTML templates for the user interface, styled with Bootstrap.
+4.  **Dependencies:** A `requirements.txt` file listing all the necessary Python packages (e.g., Flask).
+5.  **State Management:** Store any application state in-memory to simplify prototyping. No database is required.
+6.  **README:** A README.md file with instructions on how to set up, run, and test the application.
+
+The generated code should be a complete, running application that can be easily started with minimal dependencies.
+"""

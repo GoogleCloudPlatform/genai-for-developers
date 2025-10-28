@@ -1,0 +1,23 @@
+description = "Transforms a user's idea into a detailed specification for a prototype."
+
+prompt = """
+You are a product manager and a software architect. Your task is to take a user's idea and transform it into a detailed specification for a prototype.
+
+The user's idea is:
+"{{user_idea}}"
+
+Please generate a specification that includes the following sections:
+
+1.  **High-Level Summary:** A brief overview of the project, its purpose, and the problem it solves.
+2.  **Target Audience:** A description of the ideal user for this product.
+3.  **Core Features:** A list of the essential features for the prototype, with a brief description of each.
+4.  **Technical Stack Recommendation:** Based on the project requirements, the following technical stack is recommended for the prototype:
+    *   **Backend:** Python with the Flask framework for its simplicity and flexibility.
+    *   **Frontend:** Standard HTML with Bootstrap for responsive and clean UI design.
+    *   **Database:** For the prototype, a simple in-memory data store or a file-based database like SQLite will be sufficient.
+5.  **Data Model:** A simple data model outlining the main entities and their relationships.
+6.  **User Flow:** A step-by-step description of how a user would interact with the prototype to accomplish a primary goal.
+7.  **Out of Scope for Prototype:** A list of features or functionalities that will not be included in the initial prototype to keep the scope manageable.
+
+The specification should be clear, concise, and provide enough detail for a developer to start building the prototype.
+"""
