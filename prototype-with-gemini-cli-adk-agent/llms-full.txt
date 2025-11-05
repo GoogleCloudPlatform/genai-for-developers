@@ -70,7 +70,7 @@ This version is recommended for most users as it represents the most recent offi
 Bug fixes and new features are merged into the main branch on GitHub first. If you need access to changes that haven't been included in an official PyPI release yet, you can install directly from the main branch:
 
 ```bash
-pip install git+https://github.com/google/adk-python.git@main
+pip install git+https://github.com/google/adk-python.git main
 ```
 
 Note: The development version is built directly from the latest code commits. While it includes the newest fixes and features, it may also contain experimental changes or bugs not present in the stable release. Use it primarily for testing upcoming changes or accessing critical fixes before they are officially released.
@@ -358,7 +358,7 @@ Let's illustrate the power of custom agents with an example pattern: a multi-sta
     This method orchestrates the sub-agents using standard Python async/await and control flow.
     
     ```python
-        @override
+         override
         async def _run_async_impl(
             self, ctx: InvocationContext
         ) -> AsyncGenerator[Event, None]:
@@ -679,7 +679,7 @@ Finally, you instantiate your `StoryFlowAgent` and use the `Runner` as usual.
         # --8<-- [end:init]
 
             # --8<-- [start:executionlogic]
-            @override
+             override
             async def _run_async_impl(
                 self, ctx: InvocationContext
             ) -> AsyncGenerator[Event, None]:
@@ -1894,7 +1894,7 @@ Vertex AI.
 === "Python"
 
     **Integration Method:** Uses the direct model string (e.g.,
-    `"claude-3-sonnet@20240229"`), *but requires manual registration* within ADK.
+    `"claude-3-sonnet 20240229"`), *but requires manual registration* within ADK.
     
     **Why Registration?** ADK's registry automatically recognizes `gemini-*` strings
     and standard Vertex AI endpoint strings (`projects/.../endpoints/...`) and
@@ -1940,7 +1940,7 @@ Vertex AI.
        # --- Example Agent using Claude 3 Sonnet on Vertex AI ---
         
        # Standard model name for Claude 3 Sonnet on Vertex AI
-       claude_model_vertexai = "claude-3-sonnet@20240229"
+       claude_model_vertexai = "claude-3-sonnet 20240229"
         
        agent_claude_vertexai = LlmAgent(
            model=claude_model_vertexai, # Pass the direct string after registration
@@ -6058,7 +6058,7 @@ export GOOGLE_GENAI_USE_VERTEXAI=True
 
         # You can add more FastAPI routes or configurations below if needed
         # Example:
-        # @app.get("/hello")
+        #  app.get("/hello")
         # async def read_root():
         #     return {"Hello": "World"}
 
@@ -6490,7 +6490,7 @@ Create the following files (`main.py`, `requirements.txt`, `Dockerfile`) in the 
 
     # You can add more FastAPI routes or configurations below if needed
     # Example:
-    # @app.get("/hello")
+    #  app.get("/hello")
     # async def read_root():
     #     return {"Hello": "World"}
 
@@ -7362,7 +7362,7 @@ Here is an example of a `pytest` test case that runs a single test file:
 from google.adk.evaluation.agent_evaluator import AgentEvaluator
 import pytest
 
-@pytest.mark.asyncio
+ pytest.mark.asyncio
 async def test_with_single_test_file():
     """Test the agent's basic ability via a session file."""
     await AgentEvaluator.evaluate(
@@ -8605,10 +8605,10 @@ $ mvn compile
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
-[INFO] --- resources:3.3.1:resources (default-resources) @ adk-demo ---
+[INFO] --- resources:3.3.1:resources (default-resources)   adk-demo ---
 [INFO] skip non existing resourceDirectory /home/user/adk-demo/src/main/resources
 [INFO] 
-[INFO] --- compiler:3.13.0:compile (default-compile) @ adk-demo ---
+[INFO] --- compiler:3.13.0:compile (default-compile)   adk-demo ---
 [INFO] Nothing to compile - all classes are up to date.
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -10009,11 +10009,11 @@ The `RunConfig` class holds configuration parameters for an agent's runtime beha
 
 | Parameter                       | Python Type                                  | Java Type                                             | Default (Py / Java)               | Description                                                                                                                  |
 | :------------------------------ | :------------------------------------------- |:------------------------------------------------------|:----------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|
-| `speech_config`                 | `Optional[types.SpeechConfig]`               | `SpeechConfig` (nullable via `@Nullable`)             | `None` / `null`                   | Configures speech synthesis (voice, language) using the `SpeechConfig` type.                                                 |
+| `speech_config`                 | `Optional[types.SpeechConfig]`               | `SpeechConfig` (nullable via ` Nullable`)             | `None` / `null`                   | Configures speech synthesis (voice, language) using the `SpeechConfig` type.                                                 |
 | `response_modalities`           | `Optional[list[str]]`                        | `ImmutableList<Modality>`                             | `None` / Empty `ImmutableList`    | List of desired output modalities (e.g., Python: `["TEXT", "AUDIO"]`; Java: uses structured `Modality` objects).             |
 | `save_input_blobs_as_artifacts` | `bool`                                       | `boolean`                                             | `False` / `false`                 | If `true`, saves input blobs (e.g., uploaded files) as run artifacts for debugging/auditing.                                 |
 | `streaming_mode`                | `StreamingMode`                              | *Currently not supported*                             | `StreamingMode.NONE` / N/A        | Sets the streaming behavior: `NONE` (default), `SSE` (server-sent events), or `BIDI` (bidirectional).                        |
-| `output_audio_transcription`    | `Optional[types.AudioTranscriptionConfig]`   | `AudioTranscriptionConfig` (nullable via `@Nullable`) | `None` / `null`                   | Configures transcription of generated audio output using the `AudioTranscriptionConfig` type.                                |
+| `output_audio_transcription`    | `Optional[types.AudioTranscriptionConfig]`   | `AudioTranscriptionConfig` (nullable via ` Nullable`) | `None` / `null`                   | Configures transcription of generated audio output using the `AudioTranscriptionConfig` type.                                |
 | `max_llm_calls`                 | `int`                                        | `int`                                                 | `500` / `500`                     | Limits total LLM calls per run. `0` or negative means unlimited (warned); `sys.maxsize` raises `ValueError`.                 |
 | `support_cfc`                   | `bool`                                       | *Currently not supported*                             | `False` / N/A                     | **Python:** Enables Compositional Function Calling. Requires `streaming_mode=SSE` and uses the LIVE API. **Experimental.**   |
 
@@ -11610,13 +11610,13 @@ STATIC_DIR = Path("static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
-@app.get("/")
+ app.get("/")
 async def root():
     """Serves the index.html"""
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
-@app.websocket("/ws/{user_id}")
+ app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int, is_audio: str):
     """Client websocket endpoint"""
 
@@ -11650,8 +11650,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, is_audio: str):
 
 *   **`app = FastAPI()`**: Initializes the application.
 *   **Static Files:** Serves files from the `static` directory under `/static`.
-*   **`@app.get("/")` (Root Endpoint):** Serves `index.html`.
-*   **`@app.websocket("/ws/{user_id}")` (WebSocket Endpoint):**
+*   **` app.get("/")` (Root Endpoint):** Serves `index.html`.
+*   **` app.websocket("/ws/{user_id}")` (WebSocket Endpoint):**
     *   **Path Parameters:** `user_id` (int) and `is_audio` (str: "true"/"false").
     *   **Connection Handling:**
         1.  Accepts WebSocket connection.
@@ -12264,7 +12264,7 @@ async def agent_to_client_sse(live_events):
 #### SSE Events Endpoint
 
 ```py
-@app.get("/events/{user_id}")
+ app.get("/events/{user_id}")
 async def sse_endpoint(user_id: int, is_audio: str = "false"):
     """SSE endpoint for agent to client communication"""
 
@@ -12321,7 +12321,7 @@ async def sse_endpoint(user_id: int, is_audio: str = "false"):
 #### Message Sending Endpoint
 
 ```py
-@app.post("/send/{user_id}")
+ app.post("/send/{user_id}")
 async def send_message_endpoint(user_id: int, request: Request):
     """HTTP endpoint for client to agent communication"""
 
@@ -14167,7 +14167,7 @@ except Exception as e:
             Authentication is handled via OpenID Connect with Okta.
          contact:
             name: API Support
-            email: support@example.com # Replace with actual contact if available
+            email: support example.com # Replace with actual contact if available
          servers:
          - url: <substitute with your server name>
             description: Production Environment
@@ -14209,11 +14209,11 @@ except Exception as e:
                            type: string
                            format: email
                            description: User's primary email address.
-                           example: "username@example.com"
+                           example: "username example.com"
                            preferred_username:
                            type: string
                            description: Preferred username of the user (often the email).
-                           example: "username@example.com"
+                           example: "username example.com"
                            given_name:
                            type: string
                            description: Given name (first name) of the user.
@@ -15036,7 +15036,7 @@ Agent client received an event with long running function calls and check the st
 
     * The Schema is passed with the ToolContext parameter in the function signature, like:
       ```
-      @com.google.adk.tools.Annotations.Schema(name = "toolContext") ToolContext toolContext
+       com.google.adk.tools.Annotations.Schema(name = "toolContext") ToolContext toolContext
       ```
     OR
 
@@ -16537,7 +16537,7 @@ root_agent = LlmAgent(
                 command='npx',
                 args=[
                     "-y",  # Argument for npx to auto-confirm install
-                    "@modelcontextprotocol/server-filesystem",
+                    " modelcontextprotocol/server-filesystem",
                     # IMPORTANT: This MUST be an ABSOLUTE path to a folder the
                     # npx process can access.
                     # Replace with a valid absolute path on your system.
@@ -16635,7 +16635,7 @@ root_agent = LlmAgent(
                 command='npx',
                 args=[
                     "-y",
-                    "@modelcontextprotocol/server-google-maps",
+                    " modelcontextprotocol/server-google-maps",
                 ],
                 # Pass the API key as an environment variable to the npx process
                 # This is how the MCP server for Google Maps expects the key.
@@ -16696,8 +16696,8 @@ This pattern allows you to wrap existing ADK tools and make them available to an
 You will create a standard Python MCP server application using the `mcp` library. Within this server, you will:
 
 1.  Instantiate the ADK tool(s) you want to expose (e.g., `FunctionTool(load_web_page)`).
-2.  Implement the MCP server's `@app.list_tools()` handler to advertise the ADK tool(s). This involves converting the ADK tool definition to the MCP schema using the `adk_to_mcp_tool_type` utility from `google.adk.tools.mcp_tool.conversion_utils`.
-3.  Implement the MCP server's `@app.call_tool()` handler. This handler will:
+2.  Implement the MCP server's ` app.list_tools()` handler to advertise the ADK tool(s). This involves converting the ADK tool definition to the MCP schema using the `adk_to_mcp_tool_type` utility from `google.adk.tools.mcp_tool.conversion_utils`.
+3.  Implement the MCP server's ` app.call_tool()` handler. This handler will:
     *   Receive tool call requests from MCP clients.
     *   Identify if the request targets one of your wrapped ADK tools.
     *   Execute the ADK tool's `.run_async()` method.
@@ -16755,7 +16755,7 @@ print("Creating MCP Server instance...")
 app = Server("adk-tool-exposing-mcp-server")
 
 # Implement the MCP server's handler to list available tools
-@app.list_tools()
+ app.list_tools()
 async def list_mcp_tools() -> list[mcp_types.Tool]:
     """MCP handler to list tools this server exposes."""
     print("MCP Server: Received list_tools request.")
@@ -16765,7 +16765,7 @@ async def list_mcp_tools() -> list[mcp_types.Tool]:
     return [mcp_tool_schema]
 
 # Implement the MCP server's handler to execute a tool call
-@app.call_tool()
+ app.call_tool()
 async def call_mcp_tool(
     name: str, arguments: dict
 ) -> list[mcp_types.Content]: # MCP uses mcp_types.Content
@@ -16951,7 +16951,7 @@ async def get_agent_async():
       connection_params=StdioServerParameters(
           command='npx', # Command to run the server
           args=["-y",    # Arguments for the command
-                "@modelcontextprotocol/server-filesystem",
+                " modelcontextprotocol/server-filesystem",
                 TARGET_FOLDER_PATH],
       ),
       tool_filter=['read_file', 'list_directory'] # Optional: filter specific tools
@@ -17745,7 +17745,7 @@ If you prefer a setup that handles the runner and session management automatical
 > **Note:** This tutorial works with adk version 1.0.0 and above
 
 ```python
-# @title Step 0: Setup and Installation
+#  title Step 0: Setup and Installation
 # Install ADK and LiteLLM for multi-model support
 
 !pip install google-adk -q
@@ -17756,7 +17756,7 @@ print("Installation complete.")
 
 
 ```python
-# @title Import necessary libraries
+#  title Import necessary libraries
 import os
 import asyncio
 from google.adk.agents import Agent
@@ -17777,7 +17777,7 @@ print("Libraries imported.")
 
 
 ```python
-# @title Configure API Keys (Replace with your actual keys!)
+#  title Configure API Keys (Replace with your actual keys!)
 
 # --- IMPORTANT: Replace placeholders with your real API keys ---
 
@@ -17802,7 +17802,7 @@ print(f"Anthropic API Key set: {'Yes' if os.environ.get('ANTHROPIC_API_KEY') and
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "False"
 
 
-# @markdown **Security Note:** It's best practice to manage API keys securely (e.g., using Colab Secrets or environment variables) rather than hardcoding them directly in the notebook. Replace the placeholder strings above.
+#  markdown **Security Note:** It's best practice to manage API keys securely (e.g., using Colab Secrets or environment variables) rather than hardcoding them directly in the notebook. Replace the placeholder strings above.
 ```
 
 
@@ -17849,7 +17849,7 @@ Our first tool will provide a *mock* weather report. This allows us to focus on 
 
 
 ```python
-# @title Define the get_weather Tool
+#  title Define the get_weather Tool
 def get_weather(city: str) -> dict:
     """Retrieves the current weather report for a specified city.
 
@@ -17902,7 +17902,7 @@ We configure it with several key parameters:
 
 
 ```python
-# @title Define the Weather Agent
+#  title Define the Weather Agent
 # Use one of the model constants defined earlier
 AGENT_MODEL = MODEL_GEMINI_2_5_FLASH # Starting with Gemini
 
@@ -17932,7 +17932,7 @@ To manage conversations and execute the agent, we need two more components:
 
 
 ```python
-# @title Setup Session Service and Runner
+#  title Setup Session Service and Runner
 
 # --- Session Management ---
 # Key Concept: SessionService stores conversation history & state.
@@ -17980,7 +17980,7 @@ We'll define an `async` helper function (`call_agent_async`) that:
 
 
 ```python
-# @title Define Agent Interaction Function
+#  title Define Agent Interaction Function
 
 from google.genai import types # For creating message Content/Parts
 
@@ -18026,7 +18026,7 @@ Watch the output:
 
 
 ```python
-# @title Run the Initial Conversation
+#  title Run the Initial Conversation
 
 # We need an async function to await our interaction helper
 async def run_conversation():
@@ -18090,7 +18090,7 @@ We imported this during the initial setup (Step 0), but it's the key component f
 
 
 ```python
-# @title 1. Import LiteLlm
+#  title 1. Import LiteLlm
 from google.adk.models.lite_llm import LiteLlm
 ```
 
@@ -18117,7 +18117,7 @@ First, let's create and test the agent using OpenAI's GPT-4o.
 
 
 ```python
-# @title Define and Test GPT Agent
+#  title Define and Test GPT Agent
 
 # Make sure 'get_weather' function from Step 1 is defined in your environment.
 # Make sure 'call_agent_async' is defined from earlier.
@@ -18192,7 +18192,7 @@ Next, we'll do the same for Anthropic's Claude Sonnet.
 
 
 ```python
-# @title Define and Test Claude Agent
+#  title Define and Test Claude Agent
 
 # Make sure 'get_weather' function from Step 1 is defined in your environment.
 # Make sure 'call_agent_async' is defined from earlier.
@@ -18312,7 +18312,7 @@ First, let's create the simple Python functions that will serve as tools for our
 
 
 ```python
-# @title Define Tools for Greeting and Farewell Agents
+#  title Define Tools for Greeting and Farewell Agents
 from typing import Optional # Make sure to import Optional
 
 # Ensure 'get_weather' from Step 1 is available if running this step independently.
@@ -18360,7 +18360,7 @@ Now, create the `Agent` instances for our specialists. Notice their highly focus
 
 
 ```python
-# @title Define Greeting and Farewell Sub-Agents
+#  title Define Greeting and Farewell Sub-Agents
 
 # If you want to use models other than Gemini, Ensure LiteLlm is imported and API keys are set (from Step 0/2)
 # from google.adk.models.lite_llm import LiteLlm
@@ -18421,7 +18421,7 @@ Now, we upgrade our `weather_agent`. The key changes are:
 
 
 ```python
-# @title Define the Root Agent with Sub-Agents
+#  title Define the Root Agent with Sub-Agents
 
 # Ensure sub-agents were created successfully before defining the root agent.
 # Also ensure the original 'get_weather' tool is defined.
@@ -18463,7 +18463,7 @@ else:
 
 **4\. Interact with the Agent Team**
 
-Now that we've defined our root agent (`weather_agent_team` - *Note: Ensure this variable name matches the one defined in the previous code block, likely `# @title Define the Root Agent with Sub-Agents`, which might have named it `root_agent`*) with its specialized sub-agents, let's test the delegation mechanism.
+Now that we've defined our root agent (`weather_agent_team` - *Note: Ensure this variable name matches the one defined in the previous code block, likely `#  title Define the Root Agent with Sub-Agents`, which might have named it `root_agent`*) with its specialized sub-agents, let's test the delegation mechanism.
 
 The following code block will:
 
@@ -18485,7 +18485,7 @@ We expect the following flow:
 
 
 ```python
-# @title Interact with the Agent Team
+#  title Interact with the Agent Team
 import asyncio # Ensure asyncio is imported
 
 # Ensure the root agent (e.g., 'weather_agent_team' or 'root_agent' from the previous cell) is defined.
@@ -18613,7 +18613,7 @@ To clearly demonstrate state management without interference from prior steps, w
 
 
 ```python
-# @title 1. Initialize New Session Service and State
+#  title 1. Initialize New Session Service and State
 
 # Import necessary session components
 from google.adk.sessions import InMemorySessionService
@@ -18728,7 +18728,7 @@ To ensure this step is self-contained and builds correctly, we first redefine th
 
 
 ```python
-# @title 3. Redefine Sub-Agents and Update Root Agent with output_key
+#  title 3. Redefine Sub-Agents and Update Root Agent with output_key
 
 # Ensure necessary imports: Agent, LiteLlm, Runner
 from google.adk.agents import Agent
@@ -18822,7 +18822,7 @@ The conversation flow will be:
 
 
 ```python
-# @title 4. Interact to Test State Flow and output_key
+#  title 4. Interact to Test State Flow and output_key
 import asyncio # Ensure asyncio is imported
 
 # Ensure the stateful runner (runner_root_stateful) is available from the previous cell
@@ -18987,7 +18987,7 @@ This function will inspect the last user message within the `llm_request` conten
 
 
 ```python
-# @title 1. Define the before_model_callback Guardrail
+#  title 1. Define the before_model_callback Guardrail
 
 # Ensure necessary imports are available
 from google.adk.agents.callback_context import CallbackContext
@@ -19054,7 +19054,7 @@ We redefine the root agent, adding the `before_model_callback` parameter and poi
 
 
 ```python
-# @title 2. Update Root Agent with before_model_callback
+#  title 2. Update Root Agent with before_model_callback
 
 
 # --- Redefine Sub-Agents (Ensures they exist in this context) ---
@@ -19143,7 +19143,7 @@ Let's test the guardrail's behavior. We'll use the *same session* (`SESSION_ID_S
 
 
 ```python
-# @title 3. Interact to Test the Model Input Guardrail
+#  title 3. Interact to Test the Model Input Guardrail
 import asyncio # Ensure asyncio is imported
 
 # Ensure the runner for the guardrail agent is available
@@ -19278,7 +19278,7 @@ This function targets the `get_weather_stateful` tool. It checks the `city` argu
 
 
 ```python
-# @title 1. Define the before_tool_callback Guardrail
+#  title 1. Define the before_tool_callback Guardrail
 
 # Ensure necessary imports are available
 from google.adk.tools.base_tool import BaseTool
@@ -19342,7 +19342,7 @@ We redefine the root agent again (`weather_agent_v6_tool_guardrail`), this time 
 
 
 ```python
-# @title 2. Update Root Agent with BOTH Callbacks (Self-Contained)
+#  title 2. Update Root Agent with BOTH Callbacks (Self-Contained)
 
 # --- Ensure Prerequisites are Defined ---
 # (Include or ensure execution of definitions for: Agent, LiteLlm, Runner, ToolContext,
@@ -19434,7 +19434,7 @@ Let's test the interaction flow, again using the same stateful session (`SESSION
 
 
 ```python
-# @title 3. Interact to Test the Tool Argument Guardrail
+#  title 3. Interact to Test the Tool Argument Guardrail
 import asyncio # Ensure asyncio is imported
 
 # Ensure the runner for the tool guardrail agent is available
@@ -19983,7 +19983,7 @@ VertexAiRagRetrieval.run_async()
 Next
 Submodules
 Copyright © 2025, Google
-Made with Sphinx and @pradyunsg's
+Made with Sphinx and  pradyunsg's
 Furo
 
 
@@ -22274,7 +22274,7 @@ model.\n
 }
 ],
 "default": null,
-"description": "Optional. The model name of the rank service. Format: `semantic-ranker-512@latest`",
+"description": "Optional. The model name of the rank service. Format: `semantic-ranker-512 latest`",
 "title": "Modelname"
 }
 },
@@ -26499,7 +26499,7 @@ type_=\"service_account\",\n
 project_id=\"your_project_id\",\n
 private_key_id=\"your_private_key_id\",\n
 private_key=\"-----BEGIN PRIVATE KEY-----...\",\n
-client_email=\"...@....iam.gserviceaccount.com\",\n
+client_email=\"... ....iam.gserviceaccount.com\",\n
 client_id=\"your_client_id\",\n
 auth_uri=\"https://accounts.google.com/o/oauth2/auth\",\n
 token_uri=\"https://oauth2.googleapis.com/token\",\n
@@ -27593,7 +27593,7 @@ type_=\"service_account\",\n
 project_id=\"your_project_id\",\n
 private_key_id=\"your_private_key_id\",\n
 private_key=\"-----BEGIN PRIVATE KEY-----...\",\n
-client_email=\"...@....iam.gserviceaccount.com\",\n
+client_email=\"... ....iam.gserviceaccount.com\",\n
 client_id=\"your_client_id\",\n
 auth_uri=\"https://accounts.google.com/o/oauth2/auth\",\n
 token_uri=\"https://oauth2.googleapis.com/token\",\n
@@ -30639,7 +30639,7 @@ type_=\"service_account\",\n
 project_id=\"your_project_id\",\n
 private_key_id=\"your_private_key_id\",\n
 private_key=\"-----BEGIN PRIVATE KEY-----...\",\n
-client_email=\"...@....iam.gserviceaccount.com\",\n
+client_email=\"... ....iam.gserviceaccount.com\",\n
 client_id=\"your_client_id\",\n
 auth_uri=\"https://accounts.google.com/o/oauth2/auth\",\n
 token_uri=\"https://oauth2.googleapis.com/token\",\n
@@ -31808,7 +31808,7 @@ type_=\"service_account\",\n
 project_id=\"your_project_id\",\n
 private_key_id=\"your_private_key_id\",\n
 private_key=\"-----BEGIN PRIVATE KEY-----...\",\n
-client_email=\"...@....iam.gserviceaccount.com\",\n
+client_email=\"... ....iam.gserviceaccount.com\",\n
 client_id=\"your_client_id\",\n
 auth_uri=\"https://accounts.google.com/o/oauth2/auth\",\n
 token_uri=\"https://oauth2.googleapis.com/token\",\n
@@ -32213,7 +32213,7 @@ Example 1: (using from_server helper):
 async def load_tools():
 return await MCPToolset.from_server(
 connection_params=StdioServerParameters(command=’npx’,
-args=[“-y”, “@modelcontextprotocol/server-filesystem”],
+args=[“-y”, “ modelcontextprotocol/server-filesystem”],
 )
 )
 # Use the tools in an LLM agent
@@ -32260,7 +32260,7 @@ Example 1: (using from_server helper):
 async def load_tools():
 return await MCPToolset.from_server(
 connection_params=StdioServerParameters(command=’npx’,
-args=[“-y”, “@modelcontextprotocol/server-filesystem”],
+args=[“-y”, “ modelcontextprotocol/server-filesystem”],
 )
 )
 # Use the tools in an LLM agent
@@ -32306,7 +32306,7 @@ Usage:
 async def load_tools():
 tools, exit_stack = await MCPToolset.from_server(
 connection_params=StdioServerParameters(command=’npx’,
-args=[“-y”, “@modelcontextprotocol/server-filesystem”],
+args=[“-y”, “ modelcontextprotocol/server-filesystem”],
 )
 )
 ```
@@ -32537,7 +32537,7 @@ The result of running the tool.
 Previous
 Home
 Copyright © 2025, Google
-Made with Sphinx and @pradyunsg's
+Made with Sphinx and  pradyunsg's
 Furo
 
 
@@ -32927,7 +32927,7 @@ VertexAiRagRetrieval (class in google.adk.tools.retrieval)
 VertexAiSearchTool (class in google.adk.tools)
 VertexAiSessionService (class in google.adk.sessions)
 Copyright © 2025, Google
-Made with Sphinx and @pradyunsg's
+Made with Sphinx and  pradyunsg's
 Furo
 
 
@@ -32990,5 +32990,5 @@ google.adk.tools.mcp_tool
 google.adk.tools.openapi_tool
 google.adk.tools.retrieval
 Copyright © 2025, Google
-Made with Sphinx and @pradyunsg's
+Made with Sphinx and  pradyunsg's
 Furo
