@@ -6,7 +6,6 @@ This repository serves as a prototype for building ADK (Agent Development Kit) a
 
 *   **`GEMINI.md`**: Provides instructions on how to use the reference documentation to build ADK agents.
 *   **[`AGENTS.md`](https://github.com/google/adk-python/blob/main/AGENTS.md)**: Contains detailed information and best practices for agent development.
-*   **[`llms-full.txt`](https://github.com/google/adk-python/blob/main/llms-full.txt)**: Offers comprehensive details about Large Language Models (LLMs) for integration into ADK agents.
 
 ## Custom Commands
 
