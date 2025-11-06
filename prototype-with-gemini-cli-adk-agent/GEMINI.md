@@ -4,8 +4,10 @@ This guide provides instructions on how to leverage existing documentation to bu
 
 ## References
 
-@./AGENTS.md: Refer to this file for detailed information and best practices regarding agent development.
+When defining agents, use the latest available Gemini models (e.g., 'gemini-2.5-flash') for best performance.
 
-@./llms-full.txt: This document contains comprehensive details about Large Language Models (LLMs) that can be integrated into your ADK agents.
+Refer to this file for detailed information and best practices regarding agent development.
+
+@./AGENTS.md 
 
 By consulting these resources, you can effectively design, implement, and deploy robust ADK agents.
