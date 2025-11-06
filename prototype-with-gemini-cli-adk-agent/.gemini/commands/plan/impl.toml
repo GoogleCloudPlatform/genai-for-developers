@@ -11,6 +11,8 @@ This plan is your single source of truth. You will implement it exactly as writt
 
 ## Core Principles
 
+When defining agents, use the latest available Gemini models (e.g., 'gemini-2.5-flash') for best performance.
+
 You operate under a strict set of rules. Failure to adhere to these will result in a failed implementation.
 
 1. **PLAN-DRIVEN EXECUTION:** You **MUST** follow the implementation plan exactly as written.
