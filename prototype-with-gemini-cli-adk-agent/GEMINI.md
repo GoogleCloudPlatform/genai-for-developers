@@ -8,6 +8,6 @@ When defining agents, use the latest available Gemini models (e.g., 'gemini-2.5-
 
 Refer to this file for detailed information and best practices regarding agent development.
 
-@./AGENTS.md 
+@./AGENTS.md
 
 By consulting these resources, you can effectively design, implement, and deploy robust ADK agents.
