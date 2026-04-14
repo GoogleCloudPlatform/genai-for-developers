@@ -18,4 +18,4 @@ rich==13.7.1
 json-repair==0.23.1
 PyGithub==2.5.0
 
-pytest==8.3.5
+pytest==9.0.3
