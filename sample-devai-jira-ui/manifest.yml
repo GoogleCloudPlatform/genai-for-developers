@@ -23,5 +23,5 @@ permissions:
     - write:jira-work
   external:
     fetch:
-      client:
-        - devai-api-133934646591.us-central1.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL
+      backend:
+        - devai-api-133934646591.us-central1.run.app # replace with YOUR CLOUD RUN URL
