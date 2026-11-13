@@ -659,21 +659,48 @@ permissions:
     - write:jira-work
   external:
     fetch:
-      client:
-        - devai-api-gjerpi6qqq-uc.a.run.app/create-gitlab-mr # replace with YOUR CLOUD RUN URL
+      backend:
+        - '*.run.app' # replace with YOUR CLOUD RUN URL
 ```
 
 Open resolvers/index file in the editor: `devai-jira-ui-qwiklabs/src/resolvers/index.js`
 
-Add lines below after the existing `getText` function.
+Add `import { fetch } from '@forge/api';` at the top of the file and define the `createGitLabMR` function:
 
 ```
-resolver.define('getApiKey', (req) => {
-  return process.env.DEVAI_API_KEY;
-});
+resolver.define('createGitLabMR', async (req) => {
+  const { prompt } = req.payload || {};
 
-resolver.define('getDevAIApiUrl', (req) => {
-  return process.env.DEVAI_API_URL;
+  if (!prompt || typeof prompt !== 'string') {
+    throw new Error('Prompt is required and must be a string');
+  }
+
+  const devAIApiUrl = process.env.DEVAI_API_URL;
+  const devAIApiKey = process.env.DEVAI_API_KEY;
+
+  if (!devAIApiUrl) {
+    throw new Error('DEVAI_API_URL environment variable is not configured');
+  }
+  if (!devAIApiKey) {
+    throw new Error('DEVAI_API_KEY environment variable is not configured');
+  }
+
+  const baseUrl = devAIApiUrl.endsWith('/') ? devAIApiUrl.slice(0, -1) : devAIApiUrl;
+  const response = await fetch(`${baseUrl}/create-gitlab-mr`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-devai-api-key': devAIApiKey,
+    },
+    body: JSON.stringify({ prompt }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to create GitLab MR (${response.status}): ${errorText}`);
+  }
+
+  return await response.text();
 });
 ```
 
@@ -690,13 +717,7 @@ Search for this line in the file and make the changes:
 ```
 import React from 'react';
 import ForgeReconciler, { Text, Link, useProductContext } from '@forge/react';
-import { requestJira } from '@forge/bridge';
-import { invoke } from '@forge/bridge';
-import api, { route, assumeTrustedRoute } from '@forge/api';
-
-const devAIApiKey = await invoke("getApiKey")
-const devAIApiUrl = await invoke("getDevAIApiUrl")
-
+import { requestJira, invoke } from '@forge/bridge';
 
 const App = () => {
   const context = useProductContext();
@@ -705,24 +726,15 @@ const App = () => {
 
   const fetchDescriptionForIssue = async () => {
     const issueId = context?.extension.issue.id;
-  
+
     const res = await requestJira(`/rest/api/2/issue/${issueId}`);
     const data = await res.json();
 
-    const bodyGenerateData = `{"prompt": ${JSON.stringify(data.fields.description)}}`;
+    if (!data.fields?.description) {
+      return "Error: The issue description is empty.";
+    }
 
-    const generateRes = await api.fetch(devAIApiUrl+'/create-gitlab-mr',
-      {
-        body: bodyGenerateData,
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-devai-api-key': devAIApiKey,
-         },
-      }
-    )
-
-    const resData = await generateRes.text();
+    await invoke('createGitLabMR', { prompt: data.fields.description });
 
     // Add link to the GitLab merge request page as a comment
     await requestJira(`/rest/api/2/issue/${issueId}/comment`, {
@@ -734,13 +746,16 @@ const App = () => {
       body: `{"body": "[GitLab Merge Request|https://gitlab.com/gitrey/qwiklabs-test/-/merge_requests]"}`
     });
 
-
     return "Response will be added as a comment. Please refresh in a few moments.";
   };
 
   React.useEffect(() => {
     if (context) {
-      fetchDescriptionForIssue().then(setDescription);
+      fetchDescriptionForIssue()
+        .then(setDescription)
+        .catch((err) => {
+          setDescription(`Error creating merge request: ${err.message}`);
+        });
     }
   }, [context]);
 
