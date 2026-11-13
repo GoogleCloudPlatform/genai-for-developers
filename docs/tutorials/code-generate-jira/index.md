@@ -660,7 +660,7 @@ permissions:
   external:
     fetch:
       backend:
-        - devai-api-gjerpi6qqq-uc.a.run.app # replace with YOUR CLOUD RUN URL
+        - '*.run.app' # replace with YOUR CLOUD RUN URL
 ```
 
 Open resolvers/index file in the editor: `devai-jira-ui-qwiklabs/src/resolvers/index.js`

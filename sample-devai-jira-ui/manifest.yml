@@ -24,4 +24,4 @@ permissions:
   external:
     fetch:
       backend:
-        - devai-api-133934646591.us-central1.run.app # replace with YOUR CLOUD RUN URL
+        - '*.run.app' # replace with YOUR CLOUD RUN URL
