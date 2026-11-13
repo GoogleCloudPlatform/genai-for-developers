@@ -97,6 +97,9 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 @routes.post("/create-jira-issue", response_class=JSONResponse)
 async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for JIRA Issue Creation Content Requests"""
+    # Validate API key
+    if not validate_api_key(request.headers.get('x-devai-api-key')):
+        raise HTTPException(status_code=401, detail="Error: Unauthorized")
     # Retrieve user prompt
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")

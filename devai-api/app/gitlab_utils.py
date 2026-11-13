@@ -33,6 +33,7 @@ from .file_processor import format_files_as_string
 LLM_INSTRUCTION_TEMPLATE = """You are principal software engineer and given requirements below for implementation.
         You must follow rules when generating implementation:
         - you must use existing codebase from the context below
+        - only generate application source code and tests; never modify CI/CD pipeline files, credentials, or sensitive configuration files
         - in your response, generate complete source code files and not diffs
         - in your response, include full filepath with name before file content, excluding repository name
         - must return response using sample format
@@ -54,11 +55,106 @@ LLM_INSTRUCTION_TEMPLATE = """You are principal software engineer and given requ
         """
 
 PR_PROMPT_TEMPLATE = """Create GitLab merge request using provided details below.
-        Update existing files or Create new files, commit them and push them to opened merge request.
+        Update existing source code files or Create new source code files, commit them and push them to opened merge request.
+        Do not delete files or modify CI/CD pipelines, workflows, or sensitive files.
         
         DETAILS: 
         {response_text}
         """
+
+ALLOWED_TOOL_NAMES = {
+    "Create File",
+    "Update File",
+    "Read File",
+    "Create Pull Request",
+    "create_file",
+    "update_file",
+    "read_file",
+    "create_pull_request",
+}
+
+DISALLOWED_FILE_NAMES = {
+    ".gitlab-ci.yml",
+    ".gitlab-ci.yaml",
+    ".gitignore",
+    ".gitmodules",
+    "dockerfile",
+    "docker-compose.yml",
+    "docker-compose.yaml",
+}
+
+DISALLOWED_PATH_PREFIXES = (
+    ".git/",
+    ".gitlab/",
+    ".github/",
+    ".ci/",
+)
+
+SENSITIVE_FILE_EXTENSIONS = (
+    ".pem",
+    ".key",
+    ".pfx",
+    ".p12",
+    ".pkcs12",
+    ".kdbx",
+    ".keystore",
+)
+
+
+def _is_safe_repo_path(file_path: str) -> bool:
+    """Validates that a file path in a repository is safe to create or modify."""
+    clean_path = file_path.strip().replace("\\", "/")
+
+    # Reject empty, absolute paths, or directory traversal
+    if not clean_path or clean_path.startswith("/") or ".." in clean_path.split("/"):
+        return False
+
+    parts = [p for p in clean_path.split("/") if p]
+    if not parts:
+        return False
+
+    filename = parts[-1].lower()
+
+    # Reject traversal into protected config directories
+    if any(clean_path.lower().startswith(prefix) for prefix in DISALLOWED_PATH_PREFIXES):
+        return False
+
+    # Reject protected pipeline / VCS files
+    if filename in DISALLOWED_FILE_NAMES:
+        return False
+
+    # Reject secrets and credentials
+    if filename.startswith(".env") or filename.endswith(SENSITIVE_FILE_EXTENSIONS):
+        return False
+
+    return True
+
+
+def _wrap_file_tool(tool):
+    """Wraps file creation/modification tools with security path validation."""
+    orig_func = getattr(tool, "func", None)
+    orig_run = getattr(tool, "_run", None)
+
+    def guarded_run(query: str, *args, **kwargs):
+        lines = query.strip().split("\n", 1)
+        file_path = lines[0].strip() if lines else ""
+        if not _is_safe_repo_path(file_path):
+            return (
+                f"Error: Modification or creation of path '{file_path}' "
+                "is restricted for security reasons."
+            )
+        if orig_func:
+            return orig_func(query, *args, **kwargs)
+        if orig_run:
+            return orig_run(query, *args, **kwargs)
+        raise RuntimeError("No execution function found on tool")
+
+    if orig_func:
+        tool.func = guarded_run
+    if hasattr(tool, "_run"):
+        tool._run = guarded_run
+    return tool
+
 
 class MergeRequestError(Exception):
     """Custom exception for merge request creation."""
@@ -115,6 +211,14 @@ def _init_agent(new_gitlab_branch: str):
     gitlab = GitLabAPIWrapper(gitlab_branch=new_gitlab_branch)
     toolkit = GitLabToolkit.from_gitlab_api_wrapper(gitlab)
 
+    raw_tools = toolkit.get_tools() if hasattr(toolkit, "get_tools") else getattr(toolkit, "tools", [])
+    allowed_tools = []
+    for tool in raw_tools:
+        if tool.name in ALLOWED_TOOL_NAMES:
+            if tool.name in ("Create File", "Update File", "create_file", "update_file"):
+                tool = _wrap_file_tool(tool)
+            allowed_tools.append(tool)
+
     with telemetry.tool_context_manager(USER_AGENT):
         llm = ChatVertexAI(model_name=MODEL_NAME,
             convert_system_message_to_human=True,
@@ -122,7 +226,7 @@ def _init_agent(new_gitlab_branch: str):
             max_output_tokens=8192)
 
     agent = initialize_agent(
-        toolkit.get_tools(), 
+        allowed_tools, 
         llm, 
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
         verbose=True,
