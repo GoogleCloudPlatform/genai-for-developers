@@ -20,7 +20,8 @@ resolver.define('createGitLabMR', async (req) => {
     throw new Error('DEVAI_API_KEY environment variable is not configured');
   }
 
-  const response = await fetch(`${devAIApiUrl}/create-gitlab-mr`, {
+  const baseUrl = devAIApiUrl.endsWith('/') ? devAIApiUrl.slice(0, -1) : devAIApiUrl;
+  const response = await fetch(`${baseUrl}/create-gitlab-mr`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

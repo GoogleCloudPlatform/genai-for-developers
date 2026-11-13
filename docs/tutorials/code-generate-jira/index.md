@@ -685,7 +685,8 @@ resolver.define('createGitLabMR', async (req) => {
     throw new Error('DEVAI_API_KEY environment variable is not configured');
   }
 
-  const response = await fetch(`${devAIApiUrl}/create-gitlab-mr`, {
+  const baseUrl = devAIApiUrl.endsWith('/') ? devAIApiUrl.slice(0, -1) : devAIApiUrl;
+  const response = await fetch(`${baseUrl}/create-gitlab-mr`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -728,6 +729,10 @@ const App = () => {
 
     const res = await requestJira(`/rest/api/2/issue/${issueId}`);
     const data = await res.json();
+
+    if (!data.fields?.description) {
+      return "Error: The issue description is empty.";
+    }
 
     await invoke('createGitLabMR', { prompt: data.fields.description });
 

@@ -13,6 +13,10 @@ const App = () => {
     const res = await requestJira(`/rest/api/2/issue/${issueId}`);
     const data = await res.json();
 
+    if (!data.fields?.description) {
+      return "Error: The issue description is empty.";
+    }
+
     await invoke('createGitLabMR', { prompt: data.fields.description });
 
     // Add link to the GitLab merge request page as a comment

@@ -135,10 +135,17 @@ def _wrap_file_tool(tool):
     orig_func = getattr(tool, "func", None)
     orig_run = getattr(tool, "_run", None)
 
-    def guarded_run(query: str, *args, **kwargs):
-        lines = query.strip().split("\n", 1)
-        file_path = lines[0].strip() if lines else ""
-        if not _is_safe_repo_path(file_path):
+    def guarded_run(query: str = None, *args, **kwargs):
+        file_path = ""
+        if kwargs and "file_path" in kwargs:
+            file_path = str(kwargs["file_path"])
+        elif kwargs and "path" in kwargs:
+            file_path = str(kwargs["path"])
+        elif isinstance(query, str):
+            lines = query.strip().split("\n", 1)
+            file_path = lines[0].strip() if lines else ""
+
+        if not file_path or not _is_safe_repo_path(file_path):
             return (
                 f"Error: Modification or creation of path '{file_path}' "
                 "is restricted for security reasons."

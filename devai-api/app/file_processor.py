@@ -120,14 +120,14 @@ def get_text_files_contents(path, ignore=None):
                     continue
                 try:
                     real_file = os.path.realpath(full_path)
-                    if not real_file.startswith(base_real_path):
+                    if os.path.commonpath([base_real_path, real_file]) != base_real_path:
                         continue
                     if os.path.getsize(full_path) > MAX_FILE_SIZE:
                         continue
                     if is_ascii_text(full_path):
                         with open(full_path, 'r', encoding='utf-8') as f:
                             result[full_path] = f.read(MAX_FILE_SIZE)
-                except OSError:
+                except (OSError, UnicodeDecodeError):
                     continue
     return result
 
@@ -144,9 +144,9 @@ def format_files_as_string(input):
             try:
                 real_file = os.path.realpath(file_path)
                 real_base = os.path.realpath(base_path)
-                if not real_file.startswith(real_base):
+                if os.path.commonpath([real_base, real_file]) != real_base:
                     return f"file: {file_path}\nsource: [Skipped - Path Outside Base Directory]\n"
-            except OSError:
+            except (OSError, ValueError):
                 return f"file: {file_path}\nsource: [Skipped - Invalid File Path]\n"
 
         try:
