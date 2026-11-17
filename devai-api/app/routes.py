@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import PlainTextResponse, JSONResponse
+import logging
+
 from fastapi import APIRouter, Body, HTTPException, Request
+from fastapi.responses import PlainTextResponse, JSONResponse
 
 
 from google.cloud.aiplatform import telemetry
@@ -75,7 +76,8 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     try:
         return create_merge_request(prompt)
     except MergeRequestError as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create merge request: {e}") from e
+        logging.exception("Failed to create merge request")
+        raise HTTPException(status_code=500, detail="Failed to create merge request") from e
     
 
 @routes.post("/generate", response_class=PlainTextResponse)
@@ -91,7 +93,8 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     try:
         return create_merge_request(prompt)
     except MergeRequestError as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create merge request: {e}") from e
+        logging.exception("Failed to create merge request")
+        raise HTTPException(status_code=500, detail="Failed to create merge request") from e
     
 
 @routes.post("/create-jira-issue", response_class=JSONResponse)
