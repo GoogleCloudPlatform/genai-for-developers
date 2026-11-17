@@ -199,16 +199,19 @@ def clone_repo(github_account: str, repo_name: str):
         return repo
 
     except Exception as e:
-        sanitized = _sanitize_credentials(str(e))
+        token = locals().get("installation_token")
+        sanitized = _sanitize_credentials(str(e), token)
         logging.error(f"Error cloning repository: {sanitized}")
         return None
 
 
-def _sanitize_credentials(text: str) -> str:
+def _sanitize_credentials(text: str, token: str = None) -> str:
     """Redacts credentials and access tokens from text or exception strings."""
     if not text:
         return ""
     sanitized = re.sub(r"://([^:@\s]+):([^@\s]+)@", r"://\1:[REDACTED]@", str(text))
+    if token and token in sanitized:
+        sanitized = sanitized.replace(token, "[REDACTED]")
     return sanitized
 
 
@@ -232,7 +235,7 @@ def delete_folder(repo_name: str):
         return
 
     try:
-        shutil.rmtree(target_dir, ignore_errors=True)
+        shutil.rmtree(target_dir)
     except Exception as e:
         logging.error(f"Error deleting folder {clean_name}: {e}")
 

@@ -83,7 +83,7 @@ async def create_gitlab_mr_handler(request: Request, prompt: str = Body(embed=Tr
 
     try:
         return create_merge_request(prompt)
-    except MergeRequestError as e:
+    except Exception as e:
         logging.exception("Failed to create merge request")
         raise HTTPException(status_code=500, detail="Failed to create merge request") from e
     
@@ -100,7 +100,7 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
 
     try:
         return create_merge_request(prompt)
-    except MergeRequestError as e:
+    except Exception as e:
         logging.exception("Failed to create merge request")
         raise HTTPException(status_code=500, detail="Failed to create merge request") from e
     
