@@ -71,20 +71,20 @@ def get_prompt( secret_id: str) -> str:
             logging.info(f"Successfully retrieved secret ID: {secret_id} in project {project_id}")
             return payload
         
-        except PermissionDenied as e:
-            logging.warning(f"Insufficient permissions to access secret {secret_id} in project {project_id}: {e}")
+        except PermissionDenied:
+            logging.warning(f"Insufficient permissions to access secret '{secret_id}'")
             return None
         
         except NotFound:
-            logging.info(f"Secret ID not found: {secret_id} in project {project_id}")
+            logging.info(f"Secret ID not found: '{secret_id}'")
             return None
         
-        except Exception as e:  # Catching a broader range of potential errors
-            logging.error(f"An unexpected error occurred while retrieving secret '{secret_id}': {e}")
+        except Exception:  # Catching a broader range of potential errors
+            logging.error(f"An unexpected error occurred while retrieving secret '{secret_id}'")
             return None
     
-    except EnvironmentError as e:
-        logging.error(e)
+    except EnvironmentError:
+        logging.error("Failed to initialize Secret Manager client due to environment configuration error")
 
 def load_image_from_path(image_path: str) -> Image:
     """Loads an image from a local path.

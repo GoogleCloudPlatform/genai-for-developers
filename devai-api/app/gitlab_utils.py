@@ -15,6 +15,7 @@
 import datetime
 import gitlab
 import os
+import re
 from git import Repo
 
 from langchain.agents import AgentType, initialize_agent
@@ -187,6 +188,17 @@ def _create_branch() -> str:
 
     return new_branch_name
 
+def _sanitize_credentials(text: str) -> str:
+    """Redacts credentials and access tokens from text or exception strings."""
+    if not text:
+        return ""
+    sanitized = re.sub(r"://([^:@\s]+):([^@\s]+)@", r"://\1:[REDACTED]@", str(text))
+    token = os.environ.get("GITLAB_PERSONAL_ACCESS_TOKEN")
+    if token and token in sanitized:
+        sanitized = sanitized.replace(token, "[REDACTED]")
+    return sanitized
+
+
 def _clone_repo(repo_name: str) -> Repo:
     """Clones a GitLab repository to the local file system.
 
@@ -199,12 +211,15 @@ def _clone_repo(repo_name: str) -> Repo:
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
     gitlab_access_token = os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]
 
-    repo = Repo.clone_from(
-        f"https://oauth2:{gitlab_access_token}@gitlab.com/{gitlab_repo_name}.git",
-        repo_name,
-    )
-
-    return repo
+    try:
+        repo = Repo.clone_from(
+            f"https://oauth2:{gitlab_access_token}@gitlab.com/{gitlab_repo_name}.git",
+            repo_name,
+        )
+        return repo
+    except Exception as e:
+        sanitized = _sanitize_credentials(str(e))
+        raise RuntimeError(f"Error cloning GitLab repository: {sanitized}") from None
 
 def _init_agent(new_gitlab_branch: str):
     """Initializes an agent with the GitLab toolkit.
@@ -314,7 +329,8 @@ def create_merge_request(prompt: str) -> str:
         
         return implementation_details
     except Exception as e:
-         raise MergeRequestError(f"Failed to create merge request: {e}") from e
+        sanitized = _sanitize_credentials(str(e))
+        raise MergeRequestError(f"Failed to create merge request: {sanitized}") from None
     finally:
         delete_folder(repo_name)
 

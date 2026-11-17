@@ -32,7 +32,8 @@ resolver.define('createGitLabMR', async (req) => {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to create GitLab MR (${response.status}): ${errorText}`);
+    console.error(`Backend request failed with status ${response.status}: ${errorText}`);
+    throw new Error(`Failed to create GitLab MR (${response.status})`);
   }
 
   return await response.text();

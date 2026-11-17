@@ -14,6 +14,7 @@
 
 
 import logging
+import os
 
 from fastapi import APIRouter, Body, HTTPException, Request
 from fastapi.responses import PlainTextResponse, JSONResponse
@@ -50,7 +51,7 @@ async def test(request: Request):
 
 
 @routes.post("/create-github-pr", response_class=PlainTextResponse)
-async def generate_handler(request: Request, prompt: str = Body(embed=True)):
+async def create_github_pr_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for GitHub Pull Requests Generation"""
     # Validate API key
     if not validate_api_key(request.headers.get('x-devai-api-key')):
@@ -59,12 +60,19 @@ async def generate_handler(request: Request, prompt: str = Body(embed=True)):
     if not prompt:
         raise HTTPException(status_code=400, detail="Error: Prompt is required")
 
-    pr_details = create_pull_request(prompt)
-
-    return pr_details
+    try:
+        pr_details = create_pull_request(prompt)
+        if not pr_details:
+            raise HTTPException(status_code=500, detail="Failed to create pull request")
+        return pr_details
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception("Failed to create pull request")
+        raise HTTPException(status_code=500, detail="Failed to create pull request") from e
 
 @routes.post("/create-gitlab-mr", response_class=PlainTextResponse)
-async def generate_handler(request: Request, prompt: str = Body(embed=True)):
+async def create_gitlab_mr_handler(request: Request, prompt: str = Body(embed=True)):
     """Handler for GitLab Merge Requests Generation"""
     # Validate API key
     if not validate_api_key(request.headers.get('x-devai-api-key')):
@@ -141,10 +149,15 @@ async def create_jira_issue_handler(request: Request, prompt: str = Body(embed=T
     REQUIREMENTS:
     {prompt}
     """
-    with telemetry.tool_context_manager(USER_AGENT):
-        code_chat = code_chat_model.start_chat(response_validation=False)
-        response = code_chat.send_message(instructions)
+    try:
+        with telemetry.tool_context_manager(USER_AGENT):
+            code_chat = code_chat_model.start_chat(response_validation=False)
+            response = code_chat.send_message(instructions)
 
-        create_jira_issue("New JIRA Issue", response.text)
+            create_jira_issue("New JIRA Issue", response.text)
 
-    return {"message": "JIRA issue was created: https://cymbal-eats.atlassian.net/jira/software/projects/CYMEATS/boards/1"}
+        jira_instance_url = os.environ.get("JIRA_INSTANCE_URL", "https://cymbal-eats.atlassian.net")
+        return {"message": f"JIRA issue was created: {jira_instance_url}"}
+    except Exception as e:
+        logging.exception("Failed to create JIRA issue")
+        raise HTTPException(status_code=500, detail="Failed to create JIRA issue") from e

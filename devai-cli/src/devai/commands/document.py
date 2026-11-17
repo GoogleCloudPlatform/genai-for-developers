@@ -62,19 +62,19 @@ def get_prompt( secret_id: str) -> str:
             return payload
         
         except PermissionDenied:
-            logging.warning(f"Insufficient permissions to access secret {secret_id} in project {project_id}")
+            logging.warning(f"Insufficient permissions to access secret '{secret_id}'")
             return None
         
         except NotFound:
-            logging.info(f"Secret ID not found: {secret_id} in project {project_id}")
+            logging.info(f"Secret ID not found: '{secret_id}'")
             return None
         
-        except Exception as e:  # Catching a broader range of potential errors
-            logging.error(f"An unexpected error occurred while retrieving secret '{secret_id}': {e}")
+        except Exception:  # Catching a broader range of potential errors
+            logging.error(f"An unexpected error occurred while retrieving secret '{secret_id}'")
             return None
     
-    except EnvironmentError as e:
-        logging.error(e)
+    except EnvironmentError:
+        logging.error("Failed to initialize Secret Manager client due to environment configuration error")
 
 @click.command(name='readme')
 @click.option('-c', '--context', required=False, type=str, default="", help="The code, or context, that you would like to pass.")
