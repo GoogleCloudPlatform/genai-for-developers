@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+import re
+import shutil
 import subprocess
 import requests
 
@@ -196,20 +199,45 @@ def clone_repo(github_account: str, repo_name: str):
         return repo
 
     except Exception as e:
-        print(f"Error cloning repository: {e}")
+        token = locals().get("installation_token")
+        sanitized = _sanitize_credentials(str(e), token)
+        logging.error(f"Error cloning repository: {sanitized}")
         return None
 
 
+def _sanitize_credentials(text: str, token: str = None) -> str:
+    """Redacts credentials and access tokens from text or exception strings."""
+    if not text:
+        return ""
+    sanitized = re.sub(r"://([^:@\s]+):([^@\s]+)@", r"://\1:[REDACTED]@", str(text))
+    if token and token in sanitized:
+        sanitized = sanitized.replace(token, "[REDACTED]")
+    return sanitized
+
+
 def delete_folder(repo_name: str):
-    """Deletes the specified folder and its contents.
+    """Safely deletes the specified folder and its contents within current working directory.
 
     Args:
         repo_name (str): The name of the folder to delete.
     """
+    if not repo_name or not isinstance(repo_name, str):
+        return
+
+    clean_name = os.path.basename(repo_name.strip())
+    if not clean_name or clean_name in (".", ".."):
+        return
+
+    target_dir = os.path.abspath(clean_name)
+    cwd = os.path.abspath(os.getcwd())
+
+    if os.path.dirname(target_dir) != cwd or not os.path.exists(target_dir):
+        return
+
     try:
-        subprocess.run(["rm", "-rf", repo_name], check=True)
+        shutil.rmtree(target_dir)
     except Exception as e:
-        print(f"Error deleting folder: {e}")
+        logging.error(f"Error deleting folder {clean_name}: {e}")
 
 
 def validate_github_setup():
@@ -237,14 +265,11 @@ def create_pull_request(prompt: str):
     try:
         validate_github_setup()
     except Exception as e:
-        resp = "Error validating GitHub setup"
-        print(f"{resp}: {e}")
-        return resp
+        logging.error(f"Error validating GitHub setup: {e}")
+        return None
 
-    response = ""
+    repo_name = os.environ.get("GITHUB_REPO_NAME", "")
     try:
-        repo_name = os.environ["GITHUB_REPO_NAME"]
-
         delete_folder(repo_name)
 
         source_code = get_source_code(repo_name)
@@ -262,11 +287,11 @@ def create_pull_request(prompt: str):
         )
         return response
     except Exception as e:
-        print(f"Failed to create pull request: {e}")
+        sanitized = _sanitize_credentials(str(e))
+        logging.error(f"Failed to create pull request: {sanitized}")
+        return None
     finally:
         delete_folder(repo_name)
-
-    return response
 
 def get_summary(instructions, source_code):
     """Uses a language model to generate a README summary based on provided instructions and source code.

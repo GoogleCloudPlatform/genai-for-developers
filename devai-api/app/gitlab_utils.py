@@ -15,6 +15,7 @@
 import datetime
 import gitlab
 import os
+import re
 from git import Repo
 
 from langchain.agents import AgentType, initialize_agent
@@ -187,6 +188,17 @@ def _create_branch() -> str:
 
     return new_branch_name
 
+def _sanitize_credentials(text: str) -> str:
+    """Redacts credentials and access tokens from text or exception strings."""
+    if not text:
+        return ""
+    sanitized = re.sub(r"://([^:@\s]+):([^@\s]+)@", r"://\1:[REDACTED]@", str(text))
+    token = os.environ.get("GITLAB_PERSONAL_ACCESS_TOKEN")
+    if token and token in sanitized:
+        sanitized = sanitized.replace(token, "[REDACTED]")
+    return sanitized
+
+
 def _clone_repo(repo_name: str) -> Repo:
     """Clones a GitLab repository to the local file system.
 
@@ -199,12 +211,15 @@ def _clone_repo(repo_name: str) -> Repo:
     gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
     gitlab_access_token = os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]
 
-    repo = Repo.clone_from(
-        f"https://oauth2:{gitlab_access_token}@gitlab.com/{gitlab_repo_name}.git",
-        repo_name,
-    )
-
-    return repo
+    try:
+        repo = Repo.clone_from(
+            f"https://oauth2:{gitlab_access_token}@gitlab.com/{gitlab_repo_name}.git",
+            repo_name,
+        )
+        return repo
+    except Exception as e:
+        sanitized = _sanitize_credentials(str(e))
+        raise RuntimeError(f"Error cloning GitLab repository: {sanitized}") from None
 
 def _init_agent(new_gitlab_branch: str):
     """Initializes an agent with the GitLab toolkit.
@@ -298,8 +313,9 @@ def create_merge_request(prompt: str) -> str:
     Raises:
         MergeRequestError: If an error occurs during the merge request creation.
     """
-    _, repo_name = get_repo_details()
+    repo_name = None
     try:
+        _, repo_name = get_repo_details()
         delete_folder(repo_name)    
         _clone_repo(repo_name)
         codebase = load_codebase(repo_name, prompt)
@@ -314,9 +330,11 @@ def create_merge_request(prompt: str) -> str:
         
         return implementation_details
     except Exception as e:
-         raise MergeRequestError(f"Failed to create merge request: {e}") from e
+        sanitized = _sanitize_credentials(str(e))
+        raise MergeRequestError(f"Failed to create merge request: {sanitized}") from None
     finally:
-        delete_folder(repo_name)
+        if repo_name:
+            delete_folder(repo_name)
 
 def get_repo_details() -> tuple[str, str]:
     """Extracts the repository owner and name from the GITLAB_REPOSITORY environment variable.
@@ -324,8 +342,10 @@ def get_repo_details() -> tuple[str, str]:
     Returns:
         tuple[str, str]: A tuple containing the repository owner and name.
     """
-    gitlab_repo_name = os.environ["GITLAB_REPOSITORY"]
-    repo = gitlab_repo_name.split("/")
+    gitlab_repo_name = os.environ.get("GITLAB_REPOSITORY", "")
+    repo = [part for part in gitlab_repo_name.split("/") if part]
+    if len(repo) < 2:
+        raise ValueError("GITLAB_REPOSITORY environment variable is not set or invalid (format: owner/repo)")
     return (repo[0], repo[1])
 
 def load_codebase(repo_name: str, prompt: str) -> str:
